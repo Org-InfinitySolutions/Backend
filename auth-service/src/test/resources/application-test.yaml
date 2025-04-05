@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: auth-service-test
+  cloud:
+    discovery:
+      enabled: false
+    service-registry:
+      auto-registration:
+        enabled: false
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: password
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+  security:
+    user:
+      name: test
+      password: test
+eureka:
+  client:
+    enabled: false
