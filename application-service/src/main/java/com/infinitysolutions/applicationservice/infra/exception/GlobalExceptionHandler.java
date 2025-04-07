@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.exc.InvalidTypeIdException;
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -16,8 +17,22 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.List;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(ApplicationServiceException.class)
+    public ResponseEntity<ErrorResponse> handleApplicationServiceException(ApplicationServiceException ex, HttpServletRequest request) {
+        log.error("Exceção de serviço: {}", ex.getMessage());
+
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .status(getStatusForException(ex).value())
+                .error(ex.getMessage())
+                .path(request.getRequestURI())
+                .build();
+
+        return ResponseEntity.status(getStatusForException(ex)).body(errorResponse);
+    }
 
     // Trata erros de validação de campos (anotações @Valid)
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -111,5 +126,16 @@ public class GlobalExceptionHandler {
         // errorResponse.setMessage(ex.getMessage());
         
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+    }
+
+    private HttpStatus getStatusForException(ApplicationServiceException ex) {
+        if (ex instanceof RecursoExistenteException) {
+            return HttpStatus.CONFLICT;
+        } else if (ex instanceof RecursoNaoEncontradoException) {
+            return HttpStatus.NOT_FOUND;
+        } else if (ex instanceof RecursoIncompativelException) {
+            return HttpStatus.UNPROCESSABLE_ENTITY;
+        }
+        return HttpStatus.INTERNAL_SERVER_ERROR;
     }
 }

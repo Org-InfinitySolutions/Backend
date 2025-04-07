@@ -1,5 +1,7 @@
 package com.infinitysolutions.applicationservice.service.strategy;
 
+import com.infinitysolutions.applicationservice.infra.exception.RecursoExistenteException;
+import com.infinitysolutions.applicationservice.infra.exception.RecursoNaoEncontradoException;
 import com.infinitysolutions.applicationservice.mapper.PessoaJuridicaMapper;
 import com.infinitysolutions.applicationservice.mapper.UsuarioMapper;
 import com.infinitysolutions.applicationservice.model.Endereco;
@@ -12,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
@@ -27,7 +30,8 @@ public class PessoaJuridicaStrategy implements UsuarioStrategy<PessoaJuridicaCad
         boolean existePorCnpj = pessoaJuridicaRepository.existsByCnpj(usuarioCadastroDTO.getCnpj());
 
         if (existePorCnpj) {
-
+            log.warn("Tentativa de criar uma pessoa jurídica com um CNPJ já existente: {}", usuarioCadastroDTO.getCnpj());
+            throw RecursoExistenteException.cnpjJaEmUso(usuarioCadastroDTO.getCnpj());
         }
 
         log.info("Cadastrando pessoa jurídica com CNPJ: {}", usuarioCadastroDTO.getCnpj());
@@ -41,7 +45,6 @@ public class PessoaJuridicaStrategy implements UsuarioStrategy<PessoaJuridicaCad
     public PessoaJuridicaRespostaCadastroDTO atualizar(PessoaJuridicaAtualizacaoDTO usuarioCadastroDTO, UUID pessoaJuridicaId) {
         PessoaJuridica pessoaJuridica = findById(pessoaJuridicaId);
         log.info("Atualizando pessoa jurídica com CNPJ: {}", pessoaJuridica.getCnpj());
-
         pessoaJuridicaMapper.atualizarPessoaJuridica(usuarioCadastroDTO, pessoaJuridica);
         PessoaJuridica pessoaJuridicaAtualizada = pessoaJuridicaRepository.save(pessoaJuridica);
 
@@ -58,7 +61,12 @@ public class PessoaJuridicaStrategy implements UsuarioStrategy<PessoaJuridicaCad
 
     private PessoaJuridica findById(UUID id) {
         log.info("Buscando pessoa jurídica com ID: {}", id);
-        return pessoaJuridicaRepository.findById(id).orElseThrow(() -> new RuntimeException("Pessoa Jurídica não encontrada"));
+        Optional<PessoaJuridica> optPessoaJuridica = pessoaJuridicaRepository.findByIdAndUsuario_IsAtivoTrue(id);
+        if (optPessoaJuridica.isEmpty()){
+            log.warn("Tentativa de buscar pessoa jurídica com ID não existente: {}", id);
+            throw RecursoNaoEncontradoException.usuarioNaoEncontrado(id);
+        }
+        return optPessoaJuridica.get();
     }
 
     @Override
@@ -73,7 +81,7 @@ public class PessoaJuridicaStrategy implements UsuarioStrategy<PessoaJuridicaCad
 
     @Override
     public List<PessoaJuridicaDTO> listarTodos() {
-        return pessoaJuridicaRepository.findAll().stream()
+        return pessoaJuridicaRepository.findAllByUsuario_IsAtivoTrue().stream()
                 .map(pessoaJuridica -> {
                     boolean possuiContratoSocial = pessoaJuridica.getContratoSocial() != null;
                     boolean possuiCartaoCnpj = pessoaJuridica.getCartaoCnpj() != null;
@@ -88,4 +96,7 @@ public class PessoaJuridicaStrategy implements UsuarioStrategy<PessoaJuridicaCad
     public Class<PessoaJuridicaCadastroDTO> getTipoDTO() {
         return PessoaJuridicaCadastroDTO.class;
     }
+
+    @Override
+    public Class<PessoaJuridicaAtualizacaoDTO> getTipoAtualizacaoDTO() {return PessoaJuridicaAtualizacaoDTO.class;}
 }

@@ -51,7 +51,7 @@ public class PessoaJuridicaDTO extends UsuarioRespostaDTO {
             boolean possuiCartaoCnpj,
             boolean cadastroCompleto) {
 
-        super(id, nome, telefoneCelular, endereco);
+        super(id, nome, telefoneCelular, "PJ", endereco);
         this.cnpj = cnpj;
         this.razaoSocial = razaoSocial;
         this.telefoneResidencial = telefoneResidencial;

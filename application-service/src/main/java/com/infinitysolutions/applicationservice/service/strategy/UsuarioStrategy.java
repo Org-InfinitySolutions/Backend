@@ -22,4 +22,5 @@ public interface UsuarioStrategy <
     D buscarPorId(UUID id);
     List<D> listarTodos();
     Class<T> getTipoDTO();
+    Class<U> getTipoAtualizacaoDTO();
 }

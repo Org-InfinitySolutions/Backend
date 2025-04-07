@@ -6,12 +6,12 @@ import lombok.Getter;
 public abstract class AuthServiceException extends RuntimeException {
     private final String codigo;
 
-    public AuthServiceException(String codigo, String mensagem) {
+    protected AuthServiceException(String codigo, String mensagem) {
         super(mensagem);
         this.codigo = codigo;
     }
 
-    public AuthServiceException(String codigo, String mensagem, Throwable cause) {
+    protected AuthServiceException(String codigo, String mensagem, Throwable cause) {
         super(mensagem, cause);
         this.codigo = codigo;
     }

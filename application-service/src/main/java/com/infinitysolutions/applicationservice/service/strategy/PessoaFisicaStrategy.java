@@ -1,5 +1,7 @@
 package com.infinitysolutions.applicationservice.service.strategy;
 
+import com.infinitysolutions.applicationservice.infra.exception.RecursoExistenteException;
+import com.infinitysolutions.applicationservice.infra.exception.RecursoNaoEncontradoException;
 import com.infinitysolutions.applicationservice.mapper.PessoaFisicaMapper;
 import com.infinitysolutions.applicationservice.mapper.UsuarioMapper;
 import com.infinitysolutions.applicationservice.model.Endereco;
@@ -15,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
@@ -27,11 +30,17 @@ public class PessoaFisicaStrategy implements UsuarioStrategy<PessoaFisicaCadastr
 
     @Override
     public PessoaFisicaRespostaCadastroDTO cadastrar(PessoaFisicaCadastroDTO usuarioCadastroDTO, Endereco usuarioEndereco) {
-        boolean existePorCpf = pessoaFisicaRepository.existsByCpf(usuarioCadastroDTO.getCpf());
+        boolean existePorCpf = pessoaFisicaRepository.existsByCpf(usuarioCadastroDTO.getCpf().replaceAll("[.\\-\\s]", ""));
         boolean existePorRg = pessoaFisicaRepository.existsByRgContaining(usuarioCadastroDTO.getRg());
 
-        if (existePorCpf || existePorRg) {
+        if (existePorCpf) {
+            log.warn("Tentativa de criar uma pessoa física com um CPF já existente: {}", usuarioCadastroDTO.getCpf());
+            throw RecursoExistenteException.cpfJaEmUso(usuarioCadastroDTO.getCpf());
+        }
 
+        if (existePorRg) {
+            log.warn("Tentativa de criar uma pessoa física com um RG já existente: {}", usuarioCadastroDTO.getRg());
+            throw RecursoExistenteException.rgJaEmUso(usuarioCadastroDTO.getRg());
         }
 
         log.info("Cadastrando pessoa física com CPF: {}", usuarioCadastroDTO.getCpf());
@@ -64,8 +73,12 @@ public class PessoaFisicaStrategy implements UsuarioStrategy<PessoaFisicaCadastr
 
     private PessoaFisica findById(UUID id) {
         log.info("Buscando pessoa fisica com ID: {}", id);
-        return pessoaFisicaRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Pessoa física não encontrada com ID: " + id));
+        Optional<PessoaFisica> optPessoaFisica = pessoaFisicaRepository.findByIdAndUsuario_IsAtivoTrue(id);
+        if (optPessoaFisica.isEmpty()){
+            log.warn("Pessoa fisica com ID: {} não encontrado", id);
+            throw RecursoNaoEncontradoException.usuarioNaoEncontrado(id);
+        }
+        return optPessoaFisica.get();
     }
 
     @Override
@@ -77,7 +90,7 @@ public class PessoaFisicaStrategy implements UsuarioStrategy<PessoaFisicaCadastr
 
     @Override
     public List<PessoaFisicaDTO> listarTodos() {
-        return pessoaFisicaRepository.findAll()
+        return pessoaFisicaRepository.findAllByUsuario_IsAtivoTrue()
                 .stream()
                 .map(pessoaFisica -> {
                     boolean possuiCopiaRG = pessoaFisica.getCopiaRg() != null;
@@ -89,5 +102,10 @@ public class PessoaFisicaStrategy implements UsuarioStrategy<PessoaFisicaCadastr
     @Override
     public Class<PessoaFisicaCadastroDTO> getTipoDTO() {
         return PessoaFisicaCadastroDTO.class;
+    }
+
+    @Override
+    public Class<PessoaFisicaAtualizacaoDTO> getTipoAtualizacaoDTO() {
+        return PessoaFisicaAtualizacaoDTO.class;
     }
 }

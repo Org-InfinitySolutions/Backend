@@ -39,7 +39,7 @@ public class PessoaFisicaDTO extends UsuarioRespostaDTO {
             String rg,
             boolean possuiCopiaRg,
             boolean cadastroCompleto) {
-        super(id, nome, telefone, endereco);
+        super(id, nome, telefone, "PF", endereco);
         this.cpf = cpf;
         this.rg = rg;
         this.possuiCopiaRg = possuiCopiaRg;
