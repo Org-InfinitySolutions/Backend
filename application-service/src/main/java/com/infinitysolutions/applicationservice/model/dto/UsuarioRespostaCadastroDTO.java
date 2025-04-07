@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
@@ -18,6 +19,7 @@ import java.util.UUID;
 })
 @Schema(description = "Informações de resposta após criação de usuário")
 @Data
+@NoArgsConstructor
 public abstract class UsuarioRespostaCadastroDTO {
     private UUID id;
 

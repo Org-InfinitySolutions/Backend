@@ -8,9 +8,12 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 
-@Table(indexes = {@Index(name = "idx_endereco_busca",
-                         columnList = "logradouro, numero, bairro, cidade, estado, cep")})
-
+@Table(name = "endereco",
+        indexes = {
+                @Index(name = "uq_idx_endereco_completo",
+                        columnList = "cep, logradouro(100), numero, bairro(100), cidade(100), estado, complemento(100)",
+                        unique = true)
+        })
 public class Endereco {
 
     @Id
@@ -18,25 +21,25 @@ public class Endereco {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "cep", nullable = false, length = 10)
+    @Column(name = "cep", nullable = false, length = 8)
     private String cep;
 
-    @Column(name = "logradouro", nullable = false)
+    @Column(name = "logradouro", nullable = false, length = 255)
     private String logradouro;
 
-    @Column(name = "bairro", nullable = false)
+    @Column(name = "bairro", nullable = false, length = 255)
     private String bairro;
 
-    @Column(name = "cidade", nullable = false)
+    @Column(name = "cidade", nullable = false, length = 255)
     private String cidade;
 
     @Column(name = "estado", nullable = false, length = 2)
     private String estado;
 
-    @Column(name = "numero", nullable = false)
+    @Column(name = "numero", nullable = false, length = 20)
     private String numero;
 
-    @Column(name = "complemento")
+    @Column(name = "complemento", length = 255, nullable = true)
     private String complemento;
 
     public Endereco(String cep, String logradouro, String bairro, String cidade, String estado, String numero, String complemento) {

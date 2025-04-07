@@ -34,13 +34,12 @@ public class PessoaFisicaDTO extends UsuarioRespostaDTO {
             UUID id, 
             String nome, 
             String telefone, 
-            String email,
             EnderecoDTO endereco,
             String cpf,
             String rg,
             boolean possuiCopiaRg,
             boolean cadastroCompleto) {
-        super(id, nome, telefone, email, endereco);
+        super(id, nome, telefone, endereco);
         this.cpf = cpf;
         this.rg = rg;
         this.possuiCopiaRg = possuiCopiaRg;

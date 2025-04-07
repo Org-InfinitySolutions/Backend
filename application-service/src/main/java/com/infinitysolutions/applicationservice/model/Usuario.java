@@ -12,21 +12,28 @@ import java.util.UUID;
 
 @Data
 @Entity
+@Table(
+        name = "usuario",
+        indexes = {
+                @Index(name = "idx_usuario_celular", columnList = "telefone_celular"),
+        }
+)
 @NoArgsConstructor
 public class Usuario {
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id_usuario", unique = true, nullable = false, updatable = false)
     private UUID id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "fk_endereco", nullable = false)
     private Endereco endereco;
 
     @Column(name = "nome", nullable = false)
     private String nome;
 
-    @Column(name = "telefone", nullable = false, length = 20)
-    private String telefone;
+    @Column(name = "telefone_celular", nullable = false, length = 20)
+    private String telefoneCelular;
 
     @Column(name = "data_criacao", nullable = false, updatable = false)
     @CreationTimestamp
@@ -52,9 +59,9 @@ public class Usuario {
     @Column(name = "comprovante_data_upload")
     private LocalDateTime comprovanteDataUpload;
 
-    public Usuario(String nome, String telefone) {
+    public Usuario(String nome, String telefoneCelular) {
         this.nome = nome;
-        this.telefone = telefone;
+        this.telefoneCelular = telefoneCelular;
         this.isAtivo = true;
     }
 }

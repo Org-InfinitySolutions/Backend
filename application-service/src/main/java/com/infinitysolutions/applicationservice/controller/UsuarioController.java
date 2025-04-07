@@ -1,6 +1,7 @@
 package com.infinitysolutions.applicationservice.controller;
 
 import com.infinitysolutions.applicationservice.model.dto.UsuarioCadastroDTO;
+import com.infinitysolutions.applicationservice.model.dto.UsuarioRespostaCadastroDTO;
 import com.infinitysolutions.applicationservice.service.UsuarioService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -24,7 +25,7 @@ public class UsuarioController {
         description = "Cadastra um novo usuário no sistema, podendo ser pessoa física (PF) ou pessoa jurídica (PJ)"
     )
 
-    public void cadastrar(@Valid @RequestBody UsuarioCadastroDTO usuarioCadastroDTO) {
-        service.cadastrar(usuarioCadastroDTO);
+    public UsuarioRespostaCadastroDTO cadastrar(@Valid @RequestBody UsuarioCadastroDTO usuarioCadastroDTO) {
+        return service.cadastrar(usuarioCadastroDTO);
     }
 }

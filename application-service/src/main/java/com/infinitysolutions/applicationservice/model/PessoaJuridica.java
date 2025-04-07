@@ -9,6 +9,12 @@ import java.util.UUID;
 @Entity
 @Data
 @NoArgsConstructor
+@Table(
+        name = "pessoa_juridica",
+        indexes = {
+                @Index(name = "idx_pj_telefone_residencial", columnList = "telefone_residencial"),
+        }
+)
 public class PessoaJuridica {
 
     @Id
@@ -19,6 +25,9 @@ public class PessoaJuridica {
     @MapsId
     @JoinColumn(name = "fk_usuario")
     private Usuario usuario;
+
+    @Column(name = "telefone_residencial", nullable = false, length = 20)
+    private String telefoneResidencial;
 
     @Column(length = 14, nullable = false, unique = true)
     private String cnpj;
@@ -33,4 +42,11 @@ public class PessoaJuridica {
     @Lob
     @Column(name = "cartao_cnpj")
     private byte[] cartaoCnpj;
+
+    public PessoaJuridica(Usuario usuario, String telefoneResidencial, String cnpj, String razaoSocial) {
+        this.usuario = usuario;
+        this.telefoneResidencial = telefoneResidencial;
+        this.cnpj = cnpj;
+        this.razaoSocial = razaoSocial;
+    }
 }

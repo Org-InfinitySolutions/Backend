@@ -21,7 +21,11 @@ public class PessoaJuridicaDTO extends UsuarioRespostaDTO {
             example = "Empresa Exemplo LTDA")
     @JsonProperty("razao_social")
     private String razaoSocial;
-    
+
+    @Schema(description = "Telefone residencial de contato com DDD", example = "(11) 98765-4321")
+    @JsonProperty("telefone_residencial")
+    private String telefoneResidencial;
+
     @Schema(description = "Indica se a empresa possui contrato social cadastrado")
     @JsonProperty("possui_contrato_social")
     private boolean possuiContratoSocial;
@@ -38,17 +42,19 @@ public class PessoaJuridicaDTO extends UsuarioRespostaDTO {
     public PessoaJuridicaDTO(
             UUID id,
             String nome,
-            String telefone,
-            String email,
+            String telefoneCelular,
+            String telefoneResidencial,
             EnderecoDTO endereco,
             String cnpj,
             String razaoSocial,
             boolean possuiContratoSocial,
             boolean possuiCartaoCnpj,
             boolean cadastroCompleto) {
-        super(id, nome, telefone, email, endereco);
+
+        super(id, nome, telefoneCelular, endereco);
         this.cnpj = cnpj;
         this.razaoSocial = razaoSocial;
+        this.telefoneResidencial = telefoneResidencial;
         this.possuiContratoSocial = possuiContratoSocial;
         this.possuiCartaoCnpj = possuiCartaoCnpj;
         this.cadastroCompleto = cadastroCompleto;

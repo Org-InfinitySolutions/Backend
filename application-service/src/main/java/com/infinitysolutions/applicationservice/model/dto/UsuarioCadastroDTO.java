@@ -1,5 +1,6 @@
 package com.infinitysolutions.applicationservice.model.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.infinitysolutions.applicationservice.infra.validation.EmailValido;
@@ -35,18 +36,19 @@ public abstract class UsuarioCadastroDTO {
         )
         private String nome;
 
-        @NotBlank(message = "O telefone é obrigatório")
+        @NotBlank(message = "O telefone celular é obrigatório")
         @Pattern(
                 regexp = "^\\(?[1-9]{2}\\)? ?(?:[2-8]|9[1-9])[0-9]{3}\\-?[0-9]{4}$",
                 message = "Telefone inválido. Formatos aceitos: (99) 99999-9999 ou 99999999999"
         )
         @Schema(
-                description = "Telefone de contato com DDD",
+                description = "Telefone celular de contato com DDD",
                 example = "(11) 98765-4321",
                 pattern = "(99) 99999-9999 ou 99999999999",
                 requiredMode = Schema.RequiredMode.REQUIRED
         )
-        private String telefone;
+        @JsonProperty("telefone_celular")
+        private String telefoneCelular;
 
         @Schema(
                 description = "Tipo de usuário (PF para Pessoa Física ou PJ para Pessoa Jurídica)",

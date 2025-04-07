@@ -5,7 +5,9 @@ import lombok.Getter;
 @Getter
 public enum NomeCargo {
     FUNCIONARIO(1),
-    ADMIN(2);
+    ADMIN(2),
+    USUARIO_PF(3),
+    USUARIO_PJ(4);
 
     private final int id;
 

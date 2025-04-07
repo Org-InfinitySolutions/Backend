@@ -5,6 +5,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.util.UUID;
+
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class PessoaJuridicaRespostaCadastroDTO extends UsuarioRespostaCadastroDTO{
@@ -13,4 +15,15 @@ public class PessoaJuridicaRespostaCadastroDTO extends UsuarioRespostaCadastroDT
 
     @JsonProperty("razao_social")
     private String razaoSocial;
+
+    @JsonProperty("telefone_residencial")
+    private String telefoneResidencial;
+
+    public PessoaJuridicaRespostaCadastroDTO(UUID id, String nome, String telefoneCelular, EnderecoResumidoDTO enderecoResumidoDTO, String cnpj, String razaoSocial, String telefoneResidencial) {
+        super(id, nome, telefoneCelular, enderecoResumidoDTO);
+        this.cnpj = cnpj;
+        this.razaoSocial = razaoSocial;
+        this.telefoneResidencial = telefoneResidencial;
+
+    }
 }

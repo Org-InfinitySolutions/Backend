@@ -15,7 +15,7 @@ public class PessoaFisica {
     @Column(name = "fk_usuario")
     private UUID id;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     @MapsId
     @JoinColumn(name = "fk_usuario")
     private Usuario usuario;

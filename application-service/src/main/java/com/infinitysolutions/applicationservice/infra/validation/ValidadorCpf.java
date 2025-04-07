@@ -5,28 +5,44 @@ import jakarta.validation.ConstraintValidatorContext;
 
 import java.util.regex.Pattern;
 
+/**
+ * Validador para a anotação @CpfValido.
+ * Verifica se a String representa um CPF estruturalmente válido (11 dígitos),
+ * ignorando a máscara (pontos e traço).
+ *
+ * NÃO realiza a validação matemática (cálculo dos dígitos verificadores).
+ * Considera nulo como válido (permitindo composição com @NotNull/@NotBlank).
+ * Rejeita CPFs com todos os dígitos repetidos (ex: 111.111.111-11).
+ */
 public class ValidadorCpf implements ConstraintValidator<CpfValido, String> {
 
-    // Padrão para validar o formato do CPF (com separadores)
-    private static final Pattern PATTERN_FORMATADO = Pattern.compile("^\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}$");
-    
-    // Padrão para validar o formato do CPF (apenas dígitos)
-    private static final Pattern PATTERN_NUMERICO = Pattern.compile("^\\d{11}$");
-    
-    @Override
-    public void initialize(CpfValido constraintAnnotation) {
-        ConstraintValidator.super.initialize(constraintAnnotation);
-    }
+    private static final Pattern PATTERN_APENAS_DIGITOS_11 = Pattern.compile("^\\d{11}$");
+    private static final Pattern PATTERN_DIGITOS_REPETIDOS = Pattern.compile("(\\d)\\1{10}");
 
     @Override
     public boolean isValid(String cpf, ConstraintValidatorContext context) {
-        // Verifica se o CPF é nulo ou vazio
-        if (cpf == null || cpf.isEmpty()) {
+
+        if (cpf == null) {
+            return true;
+        }
+        String cpfLimpo = cpf.replaceAll("[.\\-\\s]", "");
+        if (!PATTERN_APENAS_DIGITOS_11.matcher(cpfLimpo).matches()) {
             return false;
         }
-        
-        // Verifica se o CPF está no formato correto (com ou sem pontuação)
-        return PATTERN_FORMATADO.matcher(cpf).matches() || 
-               PATTERN_NUMERICO.matcher(cpf).matches();
+
+        if (PATTERN_DIGITOS_REPETIDOS.matcher(cpfLimpo).matches()) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * (Opcional) Helper para adicionar mensagens de erro customizadas ao contexto.
+     * Isso permite ter mensagens diferentes para falhas diferentes.
+     */
+    private void addConstraintViolation(ConstraintValidatorContext context, String message) {
+        context.disableDefaultConstraintViolation(); // Desabilita a mensagem padrão
+        context.buildConstraintViolationWithTemplate(message) // Define a nova mensagem
+                .addConstraintViolation(); // Adiciona a violação
     }
 }

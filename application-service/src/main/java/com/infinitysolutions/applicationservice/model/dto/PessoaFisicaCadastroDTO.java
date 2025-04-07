@@ -13,6 +13,7 @@ import lombok.*;
 public class PessoaFisicaCadastroDTO extends UsuarioCadastroDTO {
     @NotBlank(message = "O CPF é obrigatório")
     @CpfValido
+    @Pattern(regexp = "^(\\d{11}|\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2})$", message = "Formato do CPF inválido")
     @Schema(description = "CPF do usuário (apenas números ou com pontuação)", example = "123.456.789-00")
     private String cpf;
     
