@@ -17,7 +17,8 @@ public class RecursoNaoEncontradoException extends AuthServiceException {
         return new RecursoNaoEncontradoException("Credencial não encontrada para usuário com ID: " + idUsuario);
     }
 
-    public static RecursoNaoEncontradoException usuarioPorEmail(String email) {
-        return new RecursoNaoEncontradoException("Não foi encontrado usuário com o email: " + email);
+    public static RecursoNaoEncontradoException credencialNaoEncontrada(String email) {
+        return new RecursoNaoEncontradoException("Credencial não encontrada para usuário com email: " + email);
     }
+
 }

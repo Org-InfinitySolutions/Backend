@@ -2,6 +2,7 @@ package com.infinitysolutions.authservice.infra.exception;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -65,6 +66,27 @@ public class GlobalExceptionHandler {
                 .build();
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ErrorResponse> handleDataIntegrityViolationException(DataIntegrityViolationException ex, HttpServletRequest request) {
+        log.error("Violação de integridade de dados: {}", ex.getMessage());
+
+        String errorMessage = "Erro de integridade de dados";
+        String rootCause = ex.getMostSpecificCause().getMessage();
+
+        if (rootCause != null && rootCause.contains("Duplicate entry") && rootCause.contains("email")) {
+            errorMessage = "Email já está em uso";
+        }
+
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .status(HttpStatus.CONFLICT.value())
+                .error("conflito_dados")
+                .message(errorMessage)
+                .path(request.getRequestURI())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
     }
 
     private HttpStatus getStatusForException(AuthServiceException ex) {

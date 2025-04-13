@@ -1,9 +1,12 @@
 package com.infinitysolutions.applicationservice.infra.configuration;
 
 import io.swagger.v3.core.jackson.ModelResolver;
+import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -19,13 +22,17 @@ public class SwaggerConfig {
                                 "\nInclui informações dos endpoints e exemplos.")
                         .version("0.0.1")
                         .contact(new Contact()
-                                        .name("FilipeGuerreiro")
-                                        .email("filipe.guerreiro@sptech.school")
-//                                .url("https://www.empresa.com")
-                        ));
-//                        .license(new License()
-//                                .name("Licença MIT")
-//                                .url("https://opensource.org/licenses/MIT")));
+                                .name("FilipeGuerreiro")
+                                .email("filipe.guerreiro@sptech.school")
+                        ))
+                .components(new Components()
+                        .addSecuritySchemes("bearer-jwt", new SecurityScheme()
+                                .type(SecurityScheme.Type.HTTP)
+                                .scheme("bearer")
+                                .bearerFormat("JWT")
+                                .description("Insira um token JWT válido para autenticar")
+                        ))
+                .addSecurityItem(new SecurityRequirement().addList("bearer-jwt"));
     }
 
     @Bean

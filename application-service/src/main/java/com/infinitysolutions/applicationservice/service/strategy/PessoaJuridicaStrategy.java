@@ -30,8 +30,7 @@ public class PessoaJuridicaStrategy implements UsuarioStrategy<PessoaJuridicaCad
 
     @Override
     public PessoaJuridicaRespostaCadastroDTO cadastrar(PessoaJuridicaCadastroDTO usuarioCadastroDTO, Endereco usuarioEndereco) {
-        boolean existePorCnpj = pessoaJuridicaRepository.existsByCnpj(usuarioCadastroDTO.getCnpj());
-
+        boolean existePorCnpj = pessoaJuridicaRepository.existsByCnpj(usuarioCadastroDTO.getCnpj().replaceAll("[.\\-/\\\\s]", ""));
         if (existePorCnpj) {
             log.warn("Tentativa de criar uma pessoa jurídica com um CNPJ já existente: {}", usuarioCadastroDTO.getCnpj());
             throw RecursoExistenteException.cnpjJaEmUso(usuarioCadastroDTO.getCnpj());

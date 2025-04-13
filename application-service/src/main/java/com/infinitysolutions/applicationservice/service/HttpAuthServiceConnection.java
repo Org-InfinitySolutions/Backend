@@ -32,12 +32,12 @@ public class HttpAuthServiceConnection implements AuthServiceConnection {
         try {
 
             authServiceClient.registrarCredenciais(credenciaisDTO, authApiKey);
-            log.info("Credenciais para o usuário ID: {} enviadas com sucesso.", credenciaisDTO.idUsuario());        } catch (FeignException e) {
+            log.info("Credenciais para o usuário ID: {} enviadas com sucesso.", credenciaisDTO.idUsuario());
+        } catch (FeignException e) {
             log.error("Erro ao enviar credenciais para AuthService para o usuário ID: {}. Status: {}, Response: {}", 
                     credenciaisDTO.idUsuario(), e.status(), e.getMessage());
 
-            if (e.status() == 409 && e.getMessage() != null && e.getMessage().contains("Email já está em uso")) {
-
+            if (e.status() == 409 || (e.contentUTF8() != null && e.contentUTF8().contains("Email já está em uso"))) {
                 String email = credenciaisDTO.email();
                 log.warn("Tentativa de cadastro com email já existente: {}", email);
                 throw com.infinitysolutions.applicationservice.infra.exception.RecursoExistenteException.emailJaEmUso(email);

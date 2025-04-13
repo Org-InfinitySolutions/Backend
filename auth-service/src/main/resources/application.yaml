@@ -28,6 +28,7 @@ eureka:
 jwt:
   private-key: classpath:privateKey.pem
   public-key: classpath:publicKey.pem
+  expiracao-segundos: ${AUTH_JWT_TEMPO_EXPIRACAO:3600}
 
 springdoc:
   api-docs:
