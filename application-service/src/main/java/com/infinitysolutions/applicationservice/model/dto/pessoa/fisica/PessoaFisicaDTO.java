@@ -1,6 +1,8 @@
-package com.infinitysolutions.applicationservice.model.dto;
+package com.infinitysolutions.applicationservice.model.dto.pessoa.fisica;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.infinitysolutions.applicationservice.model.dto.usuario.UsuarioRespostaDTO;
+import com.infinitysolutions.applicationservice.model.dto.endereco.EnderecoDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Data;

@@ -36,6 +36,15 @@ public record RequisicaoCadastro(
                 requiredMode = Schema.RequiredMode.REQUIRED
         )
         @JsonProperty("id_usuario")
-        UUID idUsuario
+        UUID idUsuario,
+
+        @JsonProperty("tipo_usuario")
+        @NotNull(message = "O tipo do usuário é obrigatório")
+        @Schema(
+                description = "tipo do usuário (PF para Pessoa Física ou PJ para Pessoa Jurídica)",
+                example = "PF",
+                requiredMode = Schema.RequiredMode.REQUIRED
+        )
+        String tipoUsuario
 ) {
 }

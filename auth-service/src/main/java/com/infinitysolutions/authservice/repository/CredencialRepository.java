@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.UUID;
 
 public interface CredencialRepository extends JpaRepository<Credencial, UUID> {
-    boolean existsByEmail(String email);
-    Credencial findByEmail(String email);
+    boolean existsByFkUsuarioAndAtivoTrue(UUID id);
+    boolean existsByEmailAndAtivoTrue(String email);
+    Credencial findByFkUsuarioAndAtivoTrue(UUID id);
 }

@@ -1,9 +1,9 @@
 package com.infinitysolutions.applicationservice.controller;
 
-import com.infinitysolutions.applicationservice.model.dto.UsuarioAtualizacaoDTO;
-import com.infinitysolutions.applicationservice.model.dto.UsuarioCadastroDTO;
-import com.infinitysolutions.applicationservice.model.dto.UsuarioRespostaCadastroDTO;
-import com.infinitysolutions.applicationservice.model.dto.UsuarioRespostaDTO;
+import com.infinitysolutions.applicationservice.model.dto.usuario.UsuarioAtualizacaoDTO;
+import com.infinitysolutions.applicationservice.model.dto.usuario.UsuarioCadastroDTO;
+import com.infinitysolutions.applicationservice.model.dto.usuario.UsuarioRespostaCadastroDTO;
+import com.infinitysolutions.applicationservice.model.dto.usuario.UsuarioRespostaDTO;
 import com.infinitysolutions.applicationservice.service.UsuarioService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

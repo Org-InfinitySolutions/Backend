@@ -1,6 +1,7 @@
 package com.infinitysolutions.authservice.model;
 
 import jakarta.persistence.*;
+import jakarta.ws.rs.DefaultValue;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -24,21 +25,26 @@ public class Credencial {
     @Column(name = "hash_senha", nullable = false)
     private String hashSenha;
 
-    @Column(name = "ultimo_login", nullable = true)
+    @Column(name = "ultimo_login")
     private LocalDateTime ultimoLogin;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinTable(
             name = "credencial_cargo",
             joinColumns = @JoinColumn(name = "fk_usuario"),
             inverseJoinColumns = @JoinColumn(name = "cargo_id")
     )
-    private Set<Cargo> cargos = new HashSet<>();
+    private Set<Cargo> cargos;
+
+    @DefaultValue("true")
+    @Column(nullable = false)
+    private boolean ativo = true;
 
     public Credencial(UUID fkUsuario, String email, String hashSenha){
         this.fkUsuario = fkUsuario;
         this.email = email;
         this.hashSenha = hashSenha;
+        this.cargos = new HashSet<>();
     }
 
     public void atualizarUltimoLogin() {

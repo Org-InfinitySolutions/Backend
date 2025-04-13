@@ -1,4 +1,4 @@
-package com.infinitysolutions.applicationservice.model.dto;
+package com.infinitysolutions.applicationservice.model.dto.endereco;
 
 public record EnderecoResumidoDTO(
         String cep,

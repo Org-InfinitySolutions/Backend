@@ -7,7 +7,7 @@ import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import com.infinitysolutions.applicationservice.model.dto.EstoqueDtoCriacao;
+import com.infinitysolutions.applicationservice.model.dto.estoque.EstoqueCadastroDTO;
 
 
 @Entity
@@ -28,7 +28,7 @@ public class Estoque {
     @NotBlank(message = "")
     private String categoria;
 
-    public Estoque(EstoqueDtoCriacao dto){
+    public Estoque(EstoqueCadastroDTO dto){
         this.nome = dto.nome();
         this.numSerie = dto.numSerie();
         this.categoria = dto.categoria();

@@ -128,6 +128,22 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
     }
 
+    @ExceptionHandler(AuthServiceCommunicationException.class)
+    public ResponseEntity<ErrorResponse> handleAuthServiceCommunicationException(
+            AuthServiceCommunicationException ex,
+            HttpServletRequest request) {
+
+        log.error("Exceção de serviço: {}", ex.getMessage());
+
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                    .status(HttpStatus.SERVICE_UNAVAILABLE.value())
+                    .error("Erro de Comunicação com o Serviço de Autenticação")
+                    .message(ex.getMessage() + " Se o problema persistir, entre em contato com o suporte.")
+                    .path(request.getRequestURI())
+                    .build();
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(errorResponse);
+    }
+
     private HttpStatus getStatusForException(ApplicationServiceException ex) {
         if (ex instanceof RecursoExistenteException) {
             return HttpStatus.CONFLICT;
@@ -135,6 +151,8 @@ public class GlobalExceptionHandler {
             return HttpStatus.NOT_FOUND;
         } else if (ex instanceof RecursoIncompativelException) {
             return HttpStatus.UNPROCESSABLE_ENTITY;
+        } else if (ex instanceof AuthServiceCommunicationException) {
+            return HttpStatus.SERVICE_UNAVAILABLE;
         }
         return HttpStatus.INTERNAL_SERVER_ERROR;
     }

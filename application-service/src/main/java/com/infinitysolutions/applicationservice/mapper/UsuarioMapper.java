@@ -3,7 +3,12 @@ package com.infinitysolutions.applicationservice.mapper;
 import com.infinitysolutions.applicationservice.model.PessoaFisica;
 import com.infinitysolutions.applicationservice.model.PessoaJuridica;
 import com.infinitysolutions.applicationservice.model.Usuario;
-import com.infinitysolutions.applicationservice.model.dto.*;
+import com.infinitysolutions.applicationservice.model.dto.endereco.EnderecoDTO;
+import com.infinitysolutions.applicationservice.model.dto.endereco.EnderecoResumidoDTO;
+import com.infinitysolutions.applicationservice.model.dto.pessoa.fisica.PessoaFisicaDTO;
+import com.infinitysolutions.applicationservice.model.dto.pessoa.fisica.PessoaFisicaRespostaCadastroDTO;
+import com.infinitysolutions.applicationservice.model.dto.pessoa.juridica.PessoaJuridicaDTO;
+import com.infinitysolutions.applicationservice.model.dto.pessoa.juridica.PessoaJuridicaRespostaCadastroDTO;
 
 public class UsuarioMapper {
 

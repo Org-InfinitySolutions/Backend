@@ -45,6 +45,8 @@ class CredencialServiceTest {
     private String senha;
     private String senhaEncoded;
     private Credencial credencialMock;
+    private String tipoUsuario;
+
 
     @BeforeEach
     void setUp() {
@@ -52,6 +54,7 @@ class CredencialServiceTest {
         email = "email@email.com";
         senha = "senha123";
         senhaEncoded = "senhaEncoded";
+        tipoUsuario = "PJ";
         credencialMock = new Credencial(idUsuario, email, senhaEncoded);
     }
 
@@ -68,7 +71,7 @@ class CredencialServiceTest {
                     .thenReturn(credencialMock);
 
             // Act
-            service.criarCredencialUsuario(idUsuario, email, senha);
+            service.criarCredencialUsuario(idUsuario, email, senha, tipoUsuario);
 
             // Assert
             verify(repository).save(credencialMock);
@@ -86,7 +89,7 @@ class CredencialServiceTest {
         // Act & Assert
         RecursoExistenteException exception = assertThrows(
                 RecursoExistenteException.class,
-                () -> service.criarCredencialUsuario(idUsuario, email, senha)
+                () -> service.criarCredencialUsuario(idUsuario, email, senha, tipoUsuario)
         );
 
         assertTrue(exception.getMessage().contains(idUsuario.toString()));
@@ -104,7 +107,7 @@ class CredencialServiceTest {
         // Act & Assert
         RecursoExistenteException exception = assertThrows(
           RecursoExistenteException.class,
-                () -> service.criarCredencialUsuario(idUsuario, email, senha)
+                () -> service.criarCredencialUsuario(idUsuario, email, senha, tipoUsuario)
         );
 
         assertTrue(exception.getMessage().contains(email));

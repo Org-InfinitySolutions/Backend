@@ -17,4 +17,8 @@ public class AutenticacaoException extends AuthServiceException {
     public static AutenticacaoException tokenInvalido() {
         return new AutenticacaoException("Token inválido ou expirado");
     }
+
+    public static AutenticacaoException acessoNegado() {
+        return new AutenticacaoException("Acesso não autorizado ao recurso");
+    }
 }

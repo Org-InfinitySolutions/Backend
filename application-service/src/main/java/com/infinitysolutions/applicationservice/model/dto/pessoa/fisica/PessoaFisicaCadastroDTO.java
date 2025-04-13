@@ -1,6 +1,7 @@
-package com.infinitysolutions.applicationservice.model.dto;
+package com.infinitysolutions.applicationservice.model.dto.pessoa.fisica;
 
 import com.infinitysolutions.applicationservice.infra.validation.CpfValido;
+import com.infinitysolutions.applicationservice.model.dto.usuario.UsuarioCadastroDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;

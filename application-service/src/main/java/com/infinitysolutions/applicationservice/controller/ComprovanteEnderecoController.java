@@ -70,7 +70,7 @@ public class ComprovanteEnderecoController {
     @DeleteMapping
     public ResponseEntity<String> deleteComprovanteEndereco(@PathVariable UUID usuarioId) {
         // Este mét odo seria implementado no serviço para permitir a exclusão do comprovante
-        // comprovanteEnderecoService.deleteComprovanteEndereco(usuarioId);
+        // comprovanteEnderecoService.deleteComprovanteEndereco(idUsuario);
         return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED)
                 .body("Funcionalidade de exclusão ainda não implementada");
     }

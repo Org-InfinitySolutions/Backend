@@ -1,10 +1,13 @@
-package com.infinitysolutions.applicationservice.model.dto;
+package com.infinitysolutions.applicationservice.model.dto.usuario;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.infinitysolutions.applicationservice.infra.validation.EmailValido;
 import com.infinitysolutions.applicationservice.infra.validation.SenhaValida;
+import com.infinitysolutions.applicationservice.model.dto.endereco.EnderecoDTO;
+import com.infinitysolutions.applicationservice.model.dto.pessoa.fisica.PessoaFisicaCadastroDTO;
+import com.infinitysolutions.applicationservice.model.dto.pessoa.juridica.PessoaJuridicaCadastroDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;

@@ -1,7 +1,7 @@
 package com.infinitysolutions.applicationservice.mapper;
 
 import com.infinitysolutions.applicationservice.model.PessoaJuridica;
-import com.infinitysolutions.applicationservice.model.dto.PessoaJuridicaAtualizacaoDTO;
+import com.infinitysolutions.applicationservice.model.dto.pessoa.juridica.PessoaJuridicaAtualizacaoDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;

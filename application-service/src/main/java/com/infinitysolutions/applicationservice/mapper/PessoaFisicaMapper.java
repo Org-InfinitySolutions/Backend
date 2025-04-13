@@ -1,9 +1,7 @@
 package com.infinitysolutions.applicationservice.mapper;
 
 import com.infinitysolutions.applicationservice.model.PessoaFisica;
-import com.infinitysolutions.applicationservice.model.Usuario;
-import com.infinitysolutions.applicationservice.model.dto.PessoaFisicaAtualizacaoDTO;
-import com.infinitysolutions.applicationservice.model.dto.PessoaFisicaCadastroDTO;
+import com.infinitysolutions.applicationservice.model.dto.pessoa.fisica.PessoaFisicaAtualizacaoDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;

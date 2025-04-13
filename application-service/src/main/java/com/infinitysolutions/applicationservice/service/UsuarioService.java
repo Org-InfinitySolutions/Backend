@@ -4,10 +4,13 @@ import com.infinitysolutions.applicationservice.infra.exception.ErroInesperadoEx
 import com.infinitysolutions.applicationservice.infra.exception.RecursoIncompativelException;
 import com.infinitysolutions.applicationservice.infra.exception.RecursoNaoEncontradoException;
 import com.infinitysolutions.applicationservice.model.Endereco;
-import com.infinitysolutions.applicationservice.model.dto.UsuarioAtualizacaoDTO;
-import com.infinitysolutions.applicationservice.model.dto.UsuarioCadastroDTO;
-import com.infinitysolutions.applicationservice.model.dto.UsuarioRespostaCadastroDTO;
-import com.infinitysolutions.applicationservice.model.dto.UsuarioRespostaDTO;
+import com.infinitysolutions.applicationservice.model.dto.auth.AuthServiceCadastroRequestDTO;
+import com.infinitysolutions.applicationservice.model.dto.usuario.UsuarioAtualizacaoDTO;
+import com.infinitysolutions.applicationservice.model.dto.usuario.UsuarioCadastroDTO;
+import com.infinitysolutions.applicationservice.model.dto.usuario.UsuarioRespostaCadastroDTO;
+import com.infinitysolutions.applicationservice.model.dto.usuario.UsuarioRespostaDTO;
+import com.infinitysolutions.applicationservice.repository.UsuarioRepository;
+import com.infinitysolutions.applicationservice.service.adapter.AuthServiceCredencialAdapter;
 import com.infinitysolutions.applicationservice.service.strategy.UsuarioStrategy;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +30,8 @@ public class UsuarioService {
 
     private final List<UsuarioStrategy> strategies;
     private final EnderecoService enderecoService;
-
+    private final HttpAuthServiceConnection httpAuthServiceConnection;
+    private final AuthServiceCredencialAdapter credencialAdapter;
 
     @Transactional
     public UsuarioRespostaCadastroDTO cadastrar(UsuarioCadastroDTO usuarioCadastroDTO) {
@@ -43,7 +47,11 @@ public class UsuarioService {
       log.info("Configurando endereço do Usuario");
       Endereco enderecoEncontrado = enderecoService.buscarEndereco(usuarioCadastroDTO.getEndereco());
 
-      return estrategia.get().cadastrar(usuarioCadastroDTO, enderecoEncontrado);
+      var usuarioCadastrado = estrategia.get().cadastrar(usuarioCadastroDTO, enderecoEncontrado);
+
+      AuthServiceCadastroRequestDTO authServiceCadastroRequestDTO = credencialAdapter.adaptarParaCadastro(usuarioCadastrado.getId(), usuarioCadastroDTO);
+      httpAuthServiceConnection.enviarCredenciais(authServiceCadastroRequestDTO);
+      return usuarioCadastrado;
     }
 
     public List<UsuarioRespostaDTO> listarTodos() {
@@ -81,6 +89,7 @@ public class UsuarioService {
                 strategy.buscarPorId(usuarioId);
                 log.info("Usuário encontrado pela estratégia: {}. Iniciando exclusão.", strategy.getClass().getSimpleName());
                 strategy.excluir(usuarioId);
+                httpAuthServiceConnection.desativarCredenciais(usuarioId);
                 encontrado = true;
                 break;
             } catch (RecursoNaoEncontradoException e) {

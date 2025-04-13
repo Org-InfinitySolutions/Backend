@@ -2,7 +2,7 @@ package com.infinitysolutions.applicationservice.service;
 
 import com.infinitysolutions.applicationservice.mapper.EnderecoMapper;
 import com.infinitysolutions.applicationservice.model.Endereco;
-import com.infinitysolutions.applicationservice.model.dto.EnderecoDTO;
+import com.infinitysolutions.applicationservice.model.dto.endereco.EnderecoDTO;
 import com.infinitysolutions.applicationservice.repository.EnderecoRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

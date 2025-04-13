@@ -2,6 +2,8 @@ server:
   port: 8081
 
 spring:
+  security:
+    apiKey: ${AUTH_SERVICE_API_KEY:seu-api-key-aqui}
   application:
     name: auth-service
   datasource:

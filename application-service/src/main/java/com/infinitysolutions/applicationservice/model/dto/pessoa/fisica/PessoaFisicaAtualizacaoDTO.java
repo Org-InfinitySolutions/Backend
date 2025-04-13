@@ -1,5 +1,6 @@
-package com.infinitysolutions.applicationservice.model.dto;
+package com.infinitysolutions.applicationservice.model.dto.pessoa.fisica;
 
+import com.infinitysolutions.applicationservice.model.dto.usuario.UsuarioAtualizacaoDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

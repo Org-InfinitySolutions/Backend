@@ -12,11 +12,16 @@ public class RecursoExistenteException extends ApplicationServiceException {
     public static RecursoExistenteException cpfJaEmUso(String cpf) {
         return new RecursoExistenteException("CPF já está em uso: " + cpf);
     }
+    
     public static RecursoExistenteException rgJaEmUso(String rg) {
         return new RecursoExistenteException("RG já está em uso: " + rg);
     }
 
     public static RecursoExistenteException cnpjJaEmUso(String cnpj) {
         return new RecursoExistenteException("CNPJ já está em uso: " + cnpj);
+    }
+    
+    public static RecursoExistenteException emailJaEmUso(String email) {
+        return new RecursoExistenteException("Email já está em uso: " + email);
     }
 }

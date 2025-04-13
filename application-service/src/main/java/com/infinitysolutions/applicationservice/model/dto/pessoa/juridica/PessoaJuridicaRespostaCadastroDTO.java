@@ -1,6 +1,8 @@
-package com.infinitysolutions.applicationservice.model.dto;
+package com.infinitysolutions.applicationservice.model.dto.pessoa.juridica;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.infinitysolutions.applicationservice.model.dto.usuario.UsuarioRespostaCadastroDTO;
+import com.infinitysolutions.applicationservice.model.dto.endereco.EnderecoResumidoDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -9,7 +11,7 @@ import java.util.UUID;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class PessoaJuridicaRespostaCadastroDTO extends UsuarioRespostaCadastroDTO{
+public class PessoaJuridicaRespostaCadastroDTO extends UsuarioRespostaCadastroDTO {
     @Schema(example = "12.345.678/0001-90")
     private String cnpj;
 

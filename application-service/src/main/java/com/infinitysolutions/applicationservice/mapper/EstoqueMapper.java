@@ -2,13 +2,13 @@ package com.infinitysolutions.applicationservice.mapper;
 
 
 import com.infinitysolutions.applicationservice.model.Estoque;
-import com.infinitysolutions.applicationservice.model.dto.EstoqueDtoCriacao;
+import com.infinitysolutions.applicationservice.model.dto.estoque.EstoqueCadastroDTO;
 
 public class EstoqueMapper {
 
-    public static Estoque toEstoque(EstoqueDtoCriacao dto) {return new Estoque(dto);}
+    public static Estoque toEstoque(EstoqueCadastroDTO dto) {return new Estoque(dto);}
 
-    public static EstoqueDtoCriacao toDto(Estoque estoque){
-        return new EstoqueDtoCriacao(estoque.getNome(), estoque.getCategoria(), estoque.getNumSerie());
+    public static EstoqueCadastroDTO toDto(Estoque estoque){
+        return new EstoqueCadastroDTO(estoque.getNome(), estoque.getCategoria(), estoque.getNumSerie());
     }
 }

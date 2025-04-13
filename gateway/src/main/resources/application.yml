@@ -28,12 +28,12 @@ spring:
         locator:
           enabled: true
           lower-case-service-id: true
-#      routes:   -- configurar depois com os projetos criados.
-#        - id: login-service
-#          uri: lb://login-service
-#          predicates:
-#            - Path=/api/**
-#            - Method=*
+      routes:
+        - id: application-service
+          uri: lb://application-service
+          predicates:
+            - Path=/api/**
+            - Method=*
 
 
 eureka:
