@@ -1,29 +1,9 @@
-server:
-  port: 8081
-
+# Configurações comuns para todos os perfis
 spring:
-  security:
-    apiKey: ${AUTH_SERVICE_API_KEY:seu-api-key-aqui}
   application:
     name: auth-service
-  datasource:
-    url: jdbc:mysql://localhost:3306/novalocacoes
-    username: root
-    password: 281004
-  jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: true
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.MySQLDialect
-
-eureka:
-  client:
-    service-url:
-      defaultZone: http://localhost:8761/eureka
-    register-with-eureka: true
-    fetch-registry: true
+  security:
+    apiKey: ${AUTH_SERVICE_API_KEY:seu-api-key-aqui}
 
 jwt:
   private-key: classpath:privateKey.pem
@@ -40,3 +20,69 @@ springdoc:
     doc-expansion: none
     disable-swagger-default-url: true
   show-actuator: true
+
+---
+# Perfil de Desenvolvimento
+spring:
+  config:
+    activate:
+      on-profile: dev
+  datasource:
+    url: jdbc:mysql://localhost:3306/novalocacoes
+    username: root
+    password: 281004
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+
+server:
+  port: 8081
+
+admin:
+  email: admin@infinitysolutions.com
+  senha: admin123
+  usuario-id: 00000000-0000-0000-0000-000000000001
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+    register-with-eureka: true
+    fetch-registry: true
+
+---
+# Perfil de Produção
+spring:
+  config:
+    activate:
+      on-profile: prod
+  datasource:
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:novalocacoes}
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:281004}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+
+server:
+  port: ${SERVER_PORT:8081}
+
+admin:
+  email: ${ADMIN_EMAIL:admin@infinitysolutions.com}
+  senha: ${ADMIN_SENHA:admin123}
+  usuario-id: 00000000-0000-0000-0000-000000000001
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://${EUREKA_IP:localhost}:8761/eureka
+    register-with-eureka: true
+    fetch-registry: true

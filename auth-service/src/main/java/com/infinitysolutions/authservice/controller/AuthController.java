@@ -21,7 +21,6 @@ import java.util.UUID;
 @Validated
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/auth")
 @Slf4j
 @Tag(name = "Autenticação", description = "Endpoints para autenticação e gerenciamento de credenciais")
 public class AuthController {

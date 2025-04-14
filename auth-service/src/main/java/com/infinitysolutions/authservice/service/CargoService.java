@@ -26,7 +26,7 @@ public class CargoService {
 
         if (existePorNome) {
             log.info("Cargo já existe no banco de dados: {}", nomeCargo);
-            return cargoRepository.findByNome(nomeCargo);
+            return cargoRepository.findByNome(nomeCargo).get();
         }
 
         log.info("Cargo não existe no banco de dados, criando novo cargo: {}", nomeCargo);

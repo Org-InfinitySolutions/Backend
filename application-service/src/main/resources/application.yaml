@@ -13,9 +13,9 @@ spring:
   application:
     name: application-service
   datasource:
-    url: jdbc:mysql://localhost:3306/novalocacoes
-    username: root
-    password: 281004
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:novalocacoes}
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:281004}
   jpa:
     hibernate:
       ddl-auto: update
@@ -26,13 +26,13 @@ spring:
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:8761/eureka
+      defaultZone: http://${EUREKA_IP:localhost}:8761/eureka
     register-with-eureka: true
     fetch-registry: true
 
 services:
   auth:
-    url: ${AUTH_SERVICE_URL:http://localhost:8081}
+    url: http://${AUTH_SERVICE_URL:localhost}:8081
     apikey: ${AUTH_SERVICE_API_KEY:seu-api-key-aqui}
 jwt:
   public-key: classpath:publicKey.pem

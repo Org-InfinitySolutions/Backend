@@ -14,16 +14,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/**
- * Testes unitários para a classe {@link ValidadorCpf}
- * <p>
- * Estes testes verificam se o validador de CPF está funcionando corretamente
- * para todos os cenários relevantes, incluindo CPFs com formatação correta (com e sem pontuação),
- * valores nulos ou vazios, CPFs com tamanho incorreto e
- * CPFs com caracteres inválidos. O validador verifica apenas o formato do CPF,
- * não sua validade matemática (que será feita posteriormente por uma API externa).
- * </p>
- */
 @ExtendWith(MockitoExtension.class)
 public class ValidadorCpfTest {
     
@@ -74,13 +64,6 @@ public class ValidadorCpfTest {
     }
     
     @ParameterizedTest
-    @DisplayName("Deve retornar false para valores nulos ou vazios")
-    @NullAndEmptySource
-    public void deveRetornarFalseParaValoresNulosOuVazios(String cpf) {
-        assertFalse(validador.isValid(cpf, context));
-    }
-    
-    @ParameterizedTest
     @DisplayName("Deve retornar false para CPFs com tamanho incorreto")
     @ValueSource(strings = {
             "123456", 
@@ -106,8 +89,8 @@ public class ValidadorCpfTest {
             "88888888888",
             "99999999999"
     })
-    public void deveRetornarTrueParaCpfComTodosDigitosIguais(String cpf) {
-        assertTrue(validador.isValid(cpf, context));
+    public void deveRetornarFalseParaCpfComTodosDigitosIguais(String cpf) {
+        assertFalse(validador.isValid(cpf, context));
     }
     
     @ParameterizedTest

@@ -1,0 +1,115 @@
+services:
+  auth:
+    build:
+      context: ./auth-service
+      dockerfile: Dockerfile
+    container_name: auth
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DB_HOST: db_service
+      DB_PORT: 3306
+      DB_NAME: novalocacoes
+      DB_USERNAME: root
+      DB_PASSWORD: 281004
+      EUREKA_IP: eureka
+      AUTH_SERVICE_API_KEY: new-api-key-here
+      AUTH_JWT_TEMPO_EXPIRACAO: 3600
+    depends_on:
+      - db_service
+      - eureka
+    networks:
+      - novalocacoes-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  application_service:
+    build:
+      context: ./application-service
+      dockerfile: Dockerfile
+    container_name: application-service
+    ports:
+      - "8082:8082"
+    environment:
+      DB_HOST: db_service
+      DB_PORT: 3306
+      DB_NAME: novalocacoes
+      DB_USERNAME: root
+      DB_PASSWORD: 281004
+      EUREKA_IP: eureka
+      AUTH_SERVICE_URL: auth
+      AUTH_SERVICE_API_KEY: new-api-key-here
+    depends_on:
+      - db_service
+      - eureka
+    networks:
+      - novalocacoes-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8082/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  gateway_service:
+    build:
+      context: ./gateway
+      dockerfile: Dockerfile
+    container_name: gateway-service
+    ports:
+      - "8080:8080"
+    depends_on:
+      - eureka
+    environment:
+      EUREKA_IP: eureka
+    networks:
+      - novalocacoes-network
+    restart: unless-stopped
+
+  eureka:
+    build:
+      context: ./servidor
+      dockerfile: Dockerfile
+    container_name: eureka
+    ports:
+      - "8761:8761"
+    environment:
+      HOSTNAME: eureka
+    networks:
+      - novalocacoes-network
+    restart: unless-stopped
+
+
+  db_service:
+    image: mysql:8.0
+    container_name: novalocacoes-db
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: 281004
+      MYSQL_DATABASE: novalocacoes
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./bd_script.sql:/docker-entrypoint-initdb.d/1-schema.sql
+    networks:
+      - novalocacoes-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$$MYSQL_ROOT_PASSWORD"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+networks:
+  novalocacoes-network:
+    driver: bridge
+
+volumes:
+  mysql-data:
