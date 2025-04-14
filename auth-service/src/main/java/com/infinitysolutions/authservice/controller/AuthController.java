@@ -22,7 +22,8 @@ import java.util.UUID;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
-@Tag(name = "Autenticação", description = "Endpoints para autenticação e gerenciamento de credenciais")
+@Tag(name = "Auth", description = "Endpoints para autenticação e gerenciamento de credenciais")
+@RequestMapping("/auth")
 public class AuthController {
 
     private final CredencialService credencialService;

@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
-@FeignClient(name = "auth-service", url = "${services.auth.url}", path = "/api/auth")
+@FeignClient(name = "auth-service", url = "${services.auth.url}", path = "/auth")
 public interface AuthServiceClient {
     @PostMapping("/cadastrar")
     @ResponseStatus(HttpStatus.CREATED)
