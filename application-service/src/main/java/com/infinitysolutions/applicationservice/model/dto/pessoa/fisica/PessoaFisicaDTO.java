@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Data
@@ -37,11 +38,13 @@ public class PessoaFisicaDTO extends UsuarioRespostaDTO {
             String nome, 
             String telefone, 
             EnderecoDTO endereco,
+            LocalDateTime dataCriacao,
+            LocalDateTime dataAtualizacao,
             String cpf,
             String rg,
             boolean possuiCopiaRg,
             boolean cadastroCompleto) {
-        super(id, nome, telefone, "PF", endereco);
+        super(id, nome, telefone, "PF", endereco, dataCriacao, dataAtualizacao);
         this.cpf = cpf;
         this.rg = rg;
         this.possuiCopiaRg = possuiCopiaRg;

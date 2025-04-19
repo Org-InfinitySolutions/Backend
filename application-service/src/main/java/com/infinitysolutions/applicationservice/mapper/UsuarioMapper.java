@@ -75,6 +75,8 @@ public class UsuarioMapper {
                 pessoaFisica.getUsuario().getEndereco().getNumero(),
                 pessoaFisica.getUsuario().getEndereco().getComplemento()
                 ),
+                pessoaFisica.getUsuario().getDataCriacao(),
+                pessoaFisica.getUsuario().getDataAtualizacao(),
                 pessoaFisica.getCpf(),
                 pessoaFisica.getRg(),
                 possuiCopiaRG,
@@ -97,6 +99,8 @@ public class UsuarioMapper {
                         pessoaJuridica.getUsuario().getEndereco().getNumero(),
                         pessoaJuridica.getUsuario().getEndereco().getComplemento()
                 ),
+                pessoaJuridica.getUsuario().getDataCriacao(),
+                pessoaJuridica.getUsuario().getDataAtualizacao(),
                 pessoaJuridica.getCnpj(),
                 pessoaJuridica.getRazaoSocial(),
                 possuiContratoSocial,

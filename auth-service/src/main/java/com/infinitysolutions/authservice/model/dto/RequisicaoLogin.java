@@ -8,7 +8,7 @@ public record RequisicaoLogin(
         @EmailValido
         @Schema(
                 description = "Email do usuário para autenticação",
-                example = "usuario@example.com",
+                example = "usuario@exemplo.com",
                 requiredMode = Schema.RequiredMode.REQUIRED
         )
         String email,

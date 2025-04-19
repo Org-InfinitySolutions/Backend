@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Data
@@ -47,13 +48,15 @@ public class PessoaJuridicaDTO extends UsuarioRespostaDTO {
             String telefoneCelular,
             String telefoneResidencial,
             EnderecoDTO endereco,
+            LocalDateTime dataCriacao,
+            LocalDateTime dataAtualizacao,
             String cnpj,
             String razaoSocial,
             boolean possuiContratoSocial,
             boolean possuiCartaoCnpj,
             boolean cadastroCompleto) {
 
-        super(id, nome, telefoneCelular, "PJ", endereco);
+        super(id, nome, telefoneCelular, "PJ", endereco, dataCriacao, dataAtualizacao);
         this.cnpj = cnpj;
         this.razaoSocial = razaoSocial;
         this.telefoneResidencial = telefoneResidencial;

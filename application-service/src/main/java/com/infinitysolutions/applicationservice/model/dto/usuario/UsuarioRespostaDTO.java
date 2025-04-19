@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @JsonTypeInfo(
@@ -55,16 +56,35 @@ public abstract class UsuarioRespostaDTO {
     )
     private String tipo;
 
+    @Schema(
+            description = "Data de criação do usuário",
+            example = "2023-10-01T12:00:00"
+    )
+    @JsonProperty("data_criacao")
+    private LocalDateTime dataCriacao;
+
+    @Schema(
+            description = "Data da última atualização do usuário",
+            example = "2023-10-01T12:00:00"
+    )
+    @JsonProperty("data_atualizacao")
+    private LocalDateTime dataAtualizacao;
+
     protected UsuarioRespostaDTO(
             UUID id, 
             String nome, 
             String telefone,
             String tipo,
-            EnderecoDTO endereco) {
+            EnderecoDTO endereco,
+            LocalDateTime dataCriacao,
+            LocalDateTime dataAtualizacao
+            ) {
         this.id = id;
         this.nome = nome;
         this.telefoneCelular = telefone;
         this.endereco = endereco;
         this.tipo = tipo;
+        this.dataCriacao = dataCriacao;
+        this.dataAtualizacao = dataAtualizacao;
     }
 }
