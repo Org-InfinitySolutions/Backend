@@ -23,7 +23,7 @@ import java.util.UUID;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class PessoaFisicaStrategy implements UsuarioStrategy<PessoaFisicaCadastroDTO, PessoaFisicaAtualizacaoDTO ,PessoaFisicaRespostaCadastroDTO, PessoaFisicaDTO> {
+public class PessoaFisicaImpl implements UsuarioStrategy<PessoaFisicaCadastroDTO, PessoaFisicaAtualizacaoDTO ,PessoaFisicaRespostaCadastroDTO, PessoaFisicaDTO> {
 
     private final PessoaFisicaRepository pessoaFisicaRepository;
     private final PessoaFisicaMapper pessoaFisicaMapper;

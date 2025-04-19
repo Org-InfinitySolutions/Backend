@@ -4,6 +4,7 @@ import com.infinitysolutions.authservice.infra.exception.AutenticacaoException;
 import com.infinitysolutions.authservice.infra.exception.RecursoExistenteException;
 import com.infinitysolutions.authservice.infra.exception.RecursoNaoEncontradoException;
 import com.infinitysolutions.authservice.model.Cargo;
+import com.infinitysolutions.authservice.model.dto.RespostaEmail;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -79,5 +80,10 @@ public class CredencialService {
             throw AutenticacaoException.credenciaisInvalidas();
         }
         return credencial;
+    }
+
+    public RespostaEmail buscarEmail(UUID usuarioId) {
+        Credencial credencial = procurarCredencial(usuarioId);
+        return new RespostaEmail(credencial.getEmail());
     }
 }

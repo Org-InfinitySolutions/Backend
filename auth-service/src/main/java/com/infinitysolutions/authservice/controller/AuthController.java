@@ -1,13 +1,10 @@
 package com.infinitysolutions.authservice.controller;
 
 
-import com.infinitysolutions.authservice.model.dto.RespostaLogin;
-import com.infinitysolutions.authservice.model.dto.RequisicaoEstado;
-import com.infinitysolutions.authservice.model.dto.RequisicaoLogin;
+import com.infinitysolutions.authservice.model.dto.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import com.infinitysolutions.authservice.model.dto.RequisicaoCadastro;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -46,6 +43,16 @@ public class AuthController {
     )
     public void atualizarEstado(@Valid @RequestBody RequisicaoEstado requisicaoEstado, @PathVariable UUID usuarioId) {
         credencialService.atualizarEstado(usuarioId, requisicaoEstado.ativo());
+    }
+
+    @GetMapping("/credenciais/{usuarioId}/email")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(
+            summary = "Buscar email da credencial",
+            description = "Busca o email de uma credencial de usuário com base no ID do usuário"
+    )
+    public RespostaEmail buscarEmail(@PathVariable UUID usuarioId) {
+        return credencialService.buscarEmail(usuarioId);
     }
 
     @PostMapping("/cadastrar")
