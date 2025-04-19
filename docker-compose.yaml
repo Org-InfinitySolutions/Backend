@@ -45,6 +45,7 @@ services:
       EUREKA_IP: eureka
       AUTH_SERVICE_URL: auth
       AUTH_SERVICE_API_KEY: new-api-key-here
+      GMAIL_PASSWORD: gmail-password
     depends_on:
       - db_service
       - eureka
