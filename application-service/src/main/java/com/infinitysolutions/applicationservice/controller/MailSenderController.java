@@ -38,24 +38,39 @@ public class MailSenderController {
     public EmailResponseDTO enviarCodigoVerificacao(@RequestBody @Valid UsuarioAutenticacaoCadastroDTO dto) {
             return emailAutenticacaoService.enviarCodigoAutenticacao(dto);
     }
-
-
     @PostMapping("/validar-codigo")
     @Operation(
         summary = "Validar código de verificação",
         description = "Valida o código enviado para o email do usuário durante o processo de cadastro"
     )
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Solicitação processada com sucesso"),
-        @ApiResponse(responseCode = "400", description = "Requisição inválida")
+        @ApiResponse(responseCode = "200", description = "Código validado com sucesso"),
+        @ApiResponse(responseCode = "400", description = "Requisição inválida"),
+        @ApiResponse(responseCode = "404", description = "Código não encontrado para o email"),
+        @ApiResponse(responseCode = "410", description = "Código expirado"),
+        @ApiResponse(responseCode = "429", description = "Número máximo de tentativas excedido")
     })
-    @ResponseStatus(HttpStatus.OK)
-    public EmailResponseDTO validarCodigo(@RequestBody @Valid UsuarioAutenticacaoValidarCodigoDTO dto) {
+    public ResponseEntity<EmailResponseDTO> validarCodigo(@RequestBody @Valid UsuarioAutenticacaoValidarCodigoDTO dto) {
             var response = emailAutenticacaoService.validarCodigoAutenticacao(dto.email(), dto.codigo());
             if (response.getKey()) {
-                return new EmailResponseDTO(true, "Código validado com sucesso", response.getValue());
+                return ResponseEntity.ok(
+                    new EmailResponseDTO(true, "Código validado com sucesso", response.getValue())
+                );
             } else {
-                return new EmailResponseDTO(false, "Falha na validação do código.", response.getValue());
+                String mensagem = response.getValue();
+                if (mensagem.contains("sem código ativo")) {
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(new EmailResponseDTO(false, "Código não encontrado para o email informado", mensagem));
+                } else if (mensagem.contains("Código expirado")) {
+                    return ResponseEntity.status(HttpStatus.GONE)
+                        .body(new EmailResponseDTO(false, "Código expirado", mensagem));
+                } else if (mensagem.contains("Máximo de tentativas excedido")) {
+                    return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+                        .body(new EmailResponseDTO(false, "Número máximo de tentativas excedido", mensagem));
+                } else {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(new EmailResponseDTO(false, "Código inválido", mensagem));
+                }
             }
     }
 }

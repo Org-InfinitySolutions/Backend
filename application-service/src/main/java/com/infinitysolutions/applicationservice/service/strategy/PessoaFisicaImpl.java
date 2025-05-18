@@ -23,7 +23,7 @@ import java.util.UUID;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class PessoaFisicaImpl implements UsuarioStrategy<PessoaFisicaCadastroDTO, PessoaFisicaAtualizacaoDTO ,PessoaFisicaRespostaCadastroDTO, PessoaFisicaDTO> {
+public class PessoaFisicaImpl implements UsuarioStrategy<PessoaFisicaCadastroDTO, PessoaFisicaAtualizacaoDTO, PessoaFisicaRespostaCadastroDTO, PessoaFisicaDTO> {
 
     private final PessoaFisicaRepository pessoaFisicaRepository;
     private final PessoaFisicaMapper pessoaFisicaMapper;
@@ -107,5 +107,9 @@ public class PessoaFisicaImpl implements UsuarioStrategy<PessoaFisicaCadastroDTO
     @Override
     public Class<PessoaFisicaAtualizacaoDTO> getTipoAtualizacaoDTO() {
         return PessoaFisicaAtualizacaoDTO.class;
+    }
+
+    public boolean verificarCpf(String cpf) {
+        return pessoaFisicaRepository.existsByCpf(cpf.replaceAll("[.\\-\\s]", ""));
     }
 }

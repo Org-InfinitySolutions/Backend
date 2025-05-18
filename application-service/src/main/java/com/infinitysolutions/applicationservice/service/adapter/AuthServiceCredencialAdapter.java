@@ -9,16 +9,17 @@ import java.util.UUID;
 @Component
 public class AuthServiceCredencialAdapter {
 
-    public AuthServiceCadastroRequestDTO adaptarParaCadastro(UUID usuarioId, UsuarioCadastroDTO usuarioCadastroDTO) {
-        if (usuarioCadastroDTO == null) {
+    public AuthServiceCadastroRequestDTO adaptarParaCadastroRequest(UUID usuarioId, UsuarioCadastroDTO dto) {
+
+        if (dto == null) {
             throw new IllegalArgumentException("UsuarioCadastroDTO não pode ser nulo");
         }
 
         return new AuthServiceCadastroRequestDTO(
-                usuarioCadastroDTO.getEmail(),
-                usuarioCadastroDTO.getSenha(),
+                dto.getEmail(),
+                dto.getSenha(),
                 usuarioId,
-                usuarioCadastroDTO.getTipo()
+                dto.getTipo()
         );
     }
 }

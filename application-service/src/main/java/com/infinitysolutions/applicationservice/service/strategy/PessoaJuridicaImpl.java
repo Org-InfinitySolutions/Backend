@@ -101,4 +101,8 @@ public class PessoaJuridicaImpl implements UsuarioStrategy<PessoaJuridicaCadastr
 
     @Override
     public Class<PessoaJuridicaAtualizacaoDTO> getTipoAtualizacaoDTO() {return PessoaJuridicaAtualizacaoDTO.class;}
+
+    public boolean verificarCnpj(String cnpj) {
+        return pessoaJuridicaRepository.existsByCnpj(cnpj.replaceAll("[.\\-/\\\\s]", ""));
+    }
 }

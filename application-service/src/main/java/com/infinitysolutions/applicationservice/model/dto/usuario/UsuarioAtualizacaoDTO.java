@@ -3,13 +3,13 @@ package com.infinitysolutions.applicationservice.model.dto.usuario;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.infinitysolutions.applicationservice.infra.validation.TelefoneValido;
 import com.infinitysolutions.applicationservice.model.dto.endereco.EnderecoDTO;
 import com.infinitysolutions.applicationservice.model.dto.pessoa.fisica.PessoaFisicaAtualizacaoDTO;
 import com.infinitysolutions.applicationservice.model.dto.pessoa.juridica.PessoaJuridicaAtualizacaoDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
@@ -39,19 +39,15 @@ public abstract class UsuarioAtualizacaoDTO {
     @NotBlank(message = "O nome é obrigatório")
     private String nome;
 
-    @Pattern(
-            regexp = "^\\(?[1-9]{2}\\)? ?(?:[2-8]|9[1-9])[0-9]{3}\\-?[0-9]{4}$",
-            message = "Telefone inválido. Formatos aceitos: (99) 99999-9999 ou 99999999999"
-    )
+    @NotBlank(message = "O telefone celular é obrigatório")
+    @TelefoneValido(fixo = false, message = "Telefone celular inválido. Formato esperado: (99) 99999-9999")
     @Schema(
             description = "Telefone celular de contato com DDD",
-            example = "(11) 98765-4321",
-            pattern = "(99) 99999-9999 ou 99999999999",
+            example = "(11) 99999-9999",
+            pattern = "(99) 99999-9999 ou 9999999999",
             requiredMode = Schema.RequiredMode.REQUIRED
     )
     @JsonProperty("telefone_celular")
-    @NotBlank(message = "O telefone celular é obrigatório")
-
     private String telefoneCelular;
 
     @Schema(

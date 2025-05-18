@@ -9,8 +9,10 @@ import com.infinitysolutions.applicationservice.model.dto.usuario.UsuarioAtualiz
 import com.infinitysolutions.applicationservice.model.dto.usuario.UsuarioCadastroDTO;
 import com.infinitysolutions.applicationservice.model.dto.usuario.UsuarioRespostaCadastroDTO;
 import com.infinitysolutions.applicationservice.model.dto.usuario.UsuarioRespostaDTO;
-import com.infinitysolutions.applicationservice.repository.UsuarioRepository;
+import com.infinitysolutions.applicationservice.model.dto.validacao.RespostaVerificacao;
 import com.infinitysolutions.applicationservice.service.adapter.AuthServiceCredencialAdapter;
+import com.infinitysolutions.applicationservice.service.strategy.PessoaFisicaImpl;
+import com.infinitysolutions.applicationservice.service.strategy.PessoaJuridicaImpl;
 import com.infinitysolutions.applicationservice.service.strategy.UsuarioStrategy;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +24,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@SuppressWarnings("unchecked")
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -32,25 +35,36 @@ public class UsuarioService {
     private final EnderecoService enderecoService;
     private final HttpAuthServiceConnection httpAuthServiceConnection;
     private final AuthServiceCredencialAdapter credencialAdapter;
+    private final PessoaFisicaImpl pessoaFisica;
+    private final PessoaJuridicaImpl pessoaJuridica;
+
 
     @Transactional
     public UsuarioRespostaCadastroDTO cadastrar(UsuarioCadastroDTO usuarioCadastroDTO) {
+
       log.info("Iniciando processo de cadastro do Usuario");
       Optional<UsuarioStrategy> estrategia = strategies.stream()
+
               .filter(strategy -> strategy.getTipoDTO().equals(usuarioCadastroDTO.getClass()))
               .findFirst();
+
       if (estrategia.isEmpty()) {
           log.warn("Estratégia não encontrada para o tipo de usuário: {}", usuarioCadastroDTO.getClass());
           throw RecursoNaoEncontradoException.estrategiaNaoEncontrada(usuarioCadastroDTO.getClass().toString());
       }
+
       log.info("Estratégia encontrada: {}", estrategia.getClass().getSimpleName());
+
       log.info("Configurando endereço do Usuario");
       Endereco enderecoEncontrado = enderecoService.buscarEndereco(usuarioCadastroDTO.getEndereco());
 
+
       var usuarioCadastrado = estrategia.get().cadastrar(usuarioCadastroDTO, enderecoEncontrado);
 
-      AuthServiceCadastroRequestDTO authServiceCadastroRequestDTO = credencialAdapter.adaptarParaCadastro(usuarioCadastrado.getId(), usuarioCadastroDTO);
+      AuthServiceCadastroRequestDTO authServiceCadastroRequestDTO = credencialAdapter.adaptarParaCadastroRequest(usuarioCadastrado.getId(), usuarioCadastroDTO);
+
       httpAuthServiceConnection.enviarCredenciais(authServiceCadastroRequestDTO);
+
       return usuarioCadastrado;
     }
 
@@ -137,5 +151,17 @@ public class UsuarioService {
         }
         log.warn("Nenhuma estratégia encontrou o usuário com ID {} para atualização.", usuarioId);
         throw RecursoNaoEncontradoException.usuarioNaoEncontrado(usuarioId);
+    }
+
+    public RespostaVerificacao verificarCpf(String cpf){
+        boolean cpfDisponivel = !pessoaFisica.verificarCpf(cpf);
+        return new RespostaVerificacao(cpf, cpfDisponivel);
+
+    }
+
+    public RespostaVerificacao verificarCnpj(String cnpj){
+        boolean cnpjDisponivel = !pessoaJuridica.verificarCnpj(cnpj);
+        return new RespostaVerificacao(cnpj, cnpjDisponivel);
+
     }
 }

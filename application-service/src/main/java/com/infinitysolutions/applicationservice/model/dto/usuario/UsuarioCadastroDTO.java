@@ -5,13 +5,13 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.infinitysolutions.applicationservice.infra.validation.EmailValido;
 import com.infinitysolutions.applicationservice.infra.validation.SenhaValida;
+import com.infinitysolutions.applicationservice.infra.validation.TelefoneValido;
 import com.infinitysolutions.applicationservice.model.dto.endereco.EnderecoDTO;
 import com.infinitysolutions.applicationservice.model.dto.pessoa.fisica.PessoaFisicaCadastroDTO;
 import com.infinitysolutions.applicationservice.model.dto.pessoa.juridica.PessoaJuridicaCadastroDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
@@ -40,14 +40,11 @@ public abstract class UsuarioCadastroDTO {
         private String nome;
 
         @NotBlank(message = "O telefone celular é obrigatório")
-        @Pattern(
-                regexp = "^\\(?[1-9]{2}\\)? ?(?:[2-8]|9[1-9])[0-9]{3}\\-?[0-9]{4}$",
-                message = "Telefone inválido. Formatos aceitos: (99) 99999-9999 ou 99999999999"
-        )
+        @TelefoneValido(fixo = false, message = "Telefone celular inválido. Formato esperado: (99) 99999-9999")
         @Schema(
                 description = "Telefone celular de contato com DDD",
-                example = "(11) 98765-4321",
-                pattern = "(99) 99999-9999 ou 99999999999",
+                example = "(11) 99999-9999",
+                pattern = "(99) 99999-9999 ou 9999999999",
                 requiredMode = Schema.RequiredMode.REQUIRED
         )
         @JsonProperty("telefone_celular")

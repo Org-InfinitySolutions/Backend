@@ -1,0 +1,37 @@
+package com.infinitysolutions.applicationservice.model.dto.produto;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@Schema(description = "DTO para criação de um produto")
+public class ProdutoCriacaoDTO {
+    @NotBlank(message = "O modelo é obrigatório")
+    @Schema(description = "Modelo do produto", example = "XYZ-1000", requiredMode = Schema.RequiredMode.REQUIRED)
+    private String modelo;
+    
+    @NotBlank(message = "A marca é obrigatória")
+    @Schema(description = "Marca do produto", example = "TechBrand", requiredMode = Schema.RequiredMode.REQUIRED)
+    private String marca;
+
+    @Schema(description = "URL do fabricante do produto", example = "https://fabricante.com/xyz1000")
+    @JsonProperty("url_fabricante")
+    private String urlFrabricante;
+
+    @Schema(description = "Imagem do produto em formato de bytes")
+    private byte[] imagem;
+
+    @NotBlank(message = "A descrição é obrigatória")
+    @Schema(description = "Descrição detalhada do produto", example = "Produto de alta qualidade com garantia de 12 meses", requiredMode = Schema.RequiredMode.REQUIRED)
+    private String descricao;
+
+    @Schema(description = "Quantidade disponível em estoque", example = "50", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Positive
+    @JsonProperty("qtd_estoque")
+    private Integer qtdEstoque;
+}

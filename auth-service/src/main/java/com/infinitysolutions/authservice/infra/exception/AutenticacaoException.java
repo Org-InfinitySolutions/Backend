@@ -11,7 +11,7 @@ public class AutenticacaoException extends AuthServiceException {
     }
     
     public static AutenticacaoException credenciaisInvalidas() {
-        return new AutenticacaoException("Email ou senha incorretos");
+        return new AutenticacaoException("Credenciais incorretas");
     }
     
     public static AutenticacaoException tokenInvalido() {

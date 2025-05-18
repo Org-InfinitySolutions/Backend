@@ -46,11 +46,12 @@ public class CredencialService {
         }
     }
 
-    public void atualizarEstado(UUID usuarioId, boolean ativo) {
-        log.info("Atualizando estado da credencial para usuário: {}", usuarioId);
-
+    @Transactional
+    public void deletar(UUID usuarioId, String senha) {
+        log.info("Deletando a credencial para o usuário: {}", usuarioId);
         Credencial credencialEncontrada = procurarCredencial(usuarioId);
-        credencialEncontrada.setAtivo(ativo);
+        validarSenha(senha, credencialEncontrada);
+        credencialEncontrada.setAtivo(false);
         repository.save(credencialEncontrada);
     }
 
@@ -75,15 +76,24 @@ public class CredencialService {
 
     public Credencial obterCredencial(String email, String senha) {
         Credencial credencial = procurarCredencial(email);
+        validarSenha(senha, credencial);
+        return credencial;
+    }
+
+    private void validarSenha(String senha, Credencial credencial) {
         if (!encoder.matches(senha, credencial.getHashSenha())) {
-            log.warn("Senha inválida para o email: {}", email);
+            log.warn("Senha inválida para o email: {}", credencial.getEmail());
             throw AutenticacaoException.credenciaisInvalidas();
         }
-        return credencial;
     }
 
     public RespostaEmail buscarEmail(UUID usuarioId) {
         Credencial credencial = procurarCredencial(usuarioId);
         return new RespostaEmail(credencial.getEmail());
+    }
+
+    public boolean verificarEmailExiste(String email) {
+        log.info("Verificando se o email {} já existe", email);
+        return repository.existsByEmailAndAtivoTrue(email);
     }
 }

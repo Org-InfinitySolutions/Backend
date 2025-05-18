@@ -24,6 +24,9 @@ public class ResourceServerConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.POST, "/api/usuarios").permitAll()
+                        .requestMatchers("/api/usuarios/cpf").permitAll()
+                        .requestMatchers("/api/usuarios/cnpj").permitAll()
+                        .requestMatchers("/api/emails/**").permitAll()
                         .requestMatchers("/swagger-ui/**", "/swagger-ui.html").permitAll()
                         .requestMatchers("/v3/api-docs/**").permitAll()
                         .requestMatchers("/swagger-resources/**").permitAll()

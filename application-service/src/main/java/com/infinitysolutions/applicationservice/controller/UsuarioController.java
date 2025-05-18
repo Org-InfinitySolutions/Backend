@@ -4,12 +4,15 @@ import com.infinitysolutions.applicationservice.model.dto.usuario.UsuarioAtualiz
 import com.infinitysolutions.applicationservice.model.dto.usuario.UsuarioCadastroDTO;
 import com.infinitysolutions.applicationservice.model.dto.usuario.UsuarioRespostaCadastroDTO;
 import com.infinitysolutions.applicationservice.model.dto.usuario.UsuarioRespostaDTO;
+import com.infinitysolutions.applicationservice.model.dto.validacao.RespostaVerificacao;
 import com.infinitysolutions.applicationservice.service.UsuarioService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,6 +22,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/usuarios")
 @AllArgsConstructor
+@Validated
 @Tag(name = "Usuários", description = "Endpoints para gerenciamento de usuários")
 public class UsuarioController {
     
@@ -72,5 +76,40 @@ public class UsuarioController {
     )
     public UsuarioRespostaCadastroDTO atualizar(@PathVariable UUID usuarioId, @Valid @RequestBody UsuarioAtualizacaoDTO usuarioAtualizacaoDTO) {
         return service.atualizar(usuarioId, usuarioAtualizacaoDTO);
+    }
+
+    @GetMapping("/cpf")
+    @Operation(
+            summary = "Verificar um CPF",
+            description = "Verificar se um determinado CPF está disponível"
+    )
+    public ResponseEntity<?> verificarCpf(
+            @RequestParam(value = "cpf_like") @Valid @NotBlank(message = "Cpf obrigatório") String cpf
+    ) {
+        RespostaVerificacao respostaVerificacao = service.verificarCpf(cpf);
+        if (respostaVerificacao.disponivel()){
+            return ResponseEntity.ok(respostaVerificacao);
+        }else {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(respostaVerificacao);
+        }
+    }
+
+
+    @GetMapping("/cnpj")
+    @Operation(
+            summary = "Verificar um CNPJ",
+            description = "Verificar se um determinado CPF está disponível"
+    )
+    public ResponseEntity<?> verificarCnpj(
+            @RequestParam(value = "cnpj_like") @Valid @NotBlank(message = "Cnpj obrigatório") String cnpj
+    ) {
+        RespostaVerificacao respostaVerificacao = service.verificarCnpj(cnpj);
+        if (respostaVerificacao.disponivel()){
+            return ResponseEntity.ok(respostaVerificacao);
+        }else {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(respostaVerificacao);
+        }
     }
 }
