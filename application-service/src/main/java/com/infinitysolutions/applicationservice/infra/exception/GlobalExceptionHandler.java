@@ -15,6 +15,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Slf4j
@@ -110,22 +111,34 @@ public class GlobalExceptionHandler {
     }
     
     // Trata quaisquer outras exceções não capturadas
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleGeneralException(
-            Exception ex, HttpServletRequest request) {
-        
-        ErrorResponse errorResponse = ErrorResponse.builder()
-                .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
-                .error("Erro Interno")
-                .message("Ocorreu um erro interno no servidor")
-                .path(request.getRequestURI())
-                .build();
-        
+//    @ExceptionHandler(Exception.class)
+//    public ResponseEntity<ErrorResponse> handleGeneralException(
+//            Exception ex, HttpServletRequest request) {
+//
+//        ErrorResponse errorResponse = ErrorResponse.builder()
+//                .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+//                .error("Erro Interno")
+//                .message("Ocorreu um erro interno no servidor")
+//                .path(request.getRequestURI())
+//                .build();
+//
         // Em ambiente de produção, não devemos expor detalhes de erros internos
         // Para debug/desenvolvimento, podemos ativar esta linha:
-        // errorResponse.setMessage(ex.getMessage());
-        
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+//         errorResponse.setMessage(ex.getMessage());
+//
+//        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+//    }
+
+    @ExceptionHandler(OperacaoNaoPermitidaException.class)
+    public ResponseEntity<ErrorResponse> handleOperacaoNaoPermitida(OperacaoNaoPermitidaException ex, HttpServletRequest request) {
+        ErrorResponse errorResponse =  ErrorResponse.builder()
+                .status(HttpStatus.FORBIDDEN.value())
+                .error("OPERACAO_NAO_PERMITIDA")
+                .message(ex.getMessage())
+                .path(request.getRequestURI())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorResponse);
     }
 
     @ExceptionHandler(AuthServiceCommunicationException.class)
@@ -153,7 +166,23 @@ public class GlobalExceptionHandler {
             return HttpStatus.UNPROCESSABLE_ENTITY;
         } else if (ex instanceof AuthServiceCommunicationException) {
             return HttpStatus.SERVICE_UNAVAILABLE;
+        } else if (ex instanceof TokenExpiradoException) {
+            return HttpStatus.UNAUTHORIZED;
         }
         return HttpStatus.INTERNAL_SERVER_ERROR;
+    }
+
+    @ExceptionHandler(TokenExpiradoException.class)
+    public ResponseEntity<ErrorResponse> handleTokenExpirado(TokenExpiradoException ex, HttpServletRequest request) {
+        log.warn("Token expirado detectado para o path: {}", request.getRequestURI());
+
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .status(HttpStatus.UNAUTHORIZED.value())
+                .error("TOKEN_EXPIRADO")
+                .message(ex.getMessage())
+                .path(request.getRequestURI())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
     }
 }

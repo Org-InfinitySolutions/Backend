@@ -9,6 +9,14 @@ public class RecursoNaoEncontradoException extends ApplicationServiceException{
         super("recurso_nao_encontrado", message);
     }
 
+    public static RecursoNaoEncontradoException pedidoNaoEncontrado(Integer id){
+        return new RecursoNaoEncontradoException("Pedido não encontrado com o ID: " + id);
+    }
+
+    public static RecursoNaoEncontradoException pedidoNaoEncontradoComUsuario(Integer id, UUID userId){
+        return new RecursoNaoEncontradoException("O usuário de ID " + userId.toString() + " não possui um Pedido de ID " + id);
+    }
+
     public static RecursoNaoEncontradoException usuarioNaoEncontrado(UUID uuid){
         return new RecursoNaoEncontradoException("Usuário não encontrado com o ID: " + uuid);
     }

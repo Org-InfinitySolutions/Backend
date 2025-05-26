@@ -33,6 +33,10 @@ public class Produto {
     @Column(name = "is_ativo", nullable = false)
     private boolean isAtivo;
 
+    @ManyToOne
+    @JoinColumn(name ="categoria_id")
+    private Categoria categoria;
+
     @PrePersist
     public void prePersist() {
         this.isAtivo = true;

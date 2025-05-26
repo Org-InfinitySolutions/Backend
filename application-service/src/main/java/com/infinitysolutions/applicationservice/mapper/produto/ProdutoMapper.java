@@ -1,8 +1,11 @@
 package com.infinitysolutions.applicationservice.mapper.produto;
 
 import com.infinitysolutions.applicationservice.model.dto.produto.ProdutoCriacaoDTO;
+import com.infinitysolutions.applicationservice.model.dto.produto.ProdutoPedidoRespostaDTO;
 import com.infinitysolutions.applicationservice.model.dto.produto.ProdutoRespostaDTO;
+import com.infinitysolutions.applicationservice.model.produto.Categoria;
 import com.infinitysolutions.applicationservice.model.produto.Produto;
+import com.infinitysolutions.applicationservice.model.produto.ProdutoPedido;
 
 public class ProdutoMapper {
     
@@ -14,11 +17,14 @@ public class ProdutoMapper {
                 produto.getUrlFrabricante(),
                 produto.getImagem(),
                 produto.getDescricao(),
-                produto.getQtdEstoque()
+                produto.getQtdEstoque(),
+                produto.getCategoria() != null ?
+                        CategoriaMapper.toCategoriaRespostaDTO(produto.getCategoria()) : null,
+                produto.isAtivo()
         );
     }
 
-    public static Produto toProduto(ProdutoCriacaoDTO dto) {
+    public static Produto toProduto(ProdutoCriacaoDTO dto, Categoria categoria) {
         Produto produto = new Produto();
         produto.setModelo(dto.getModelo());
         produto.setMarca(dto.getMarca());
@@ -26,10 +32,26 @@ public class ProdutoMapper {
         produto.setImagem(dto.getImagem());
         produto.setDescricao(dto.getDescricao());
         produto.setQtdEstoque(dto.getQtdEstoque());
+        produto.setCategoria(categoria);
         return produto;
     }
-    
-    public static void atualizarProduto(Produto produto, ProdutoCriacaoDTO dto) {
+
+    public static ProdutoPedidoRespostaDTO toProdutoPedidoRespostaDTO(ProdutoPedido produtoPedido){
+        ProdutoPedidoRespostaDTO.ProdutoResumidoDTO produtoResumidoDTO = ProdutoPedidoRespostaDTO.ProdutoResumidoDTO.builder()
+                .id(produtoPedido.getProduto().getId())
+                .marca(produtoPedido.getProduto().getMarca())
+                .urlFrabricante(produtoPedido.getProduto().getUrlFrabricante())
+                .modelo(produtoPedido.getProduto().getModelo())
+                .imagem(produtoPedido.getProduto().getImagem())
+                .build();
+        ProdutoPedidoRespostaDTO produtoPedidoRespostaDTO = new ProdutoPedidoRespostaDTO();
+        produtoPedidoRespostaDTO.setProduto(produtoResumidoDTO);
+        produtoPedidoRespostaDTO.setQtdAlugada(produtoPedido.getQtd());
+        return produtoPedidoRespostaDTO;
+
+    }
+
+    public static void atualizarProduto(Produto produto, ProdutoCriacaoDTO dto, Categoria categoria) {
         produto.setModelo(dto.getModelo());
         produto.setMarca(dto.getMarca());
         produto.setUrlFrabricante(dto.getUrlFrabricante());
@@ -40,5 +62,6 @@ public class ProdutoMapper {
         
         produto.setDescricao(dto.getDescricao());
         produto.setQtdEstoque(dto.getQtdEstoque());
+        produto.setCategoria(categoria);
     }
 }

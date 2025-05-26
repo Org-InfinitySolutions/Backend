@@ -1,6 +1,7 @@
 package com.infinitysolutions.applicationservice.service.strategy;
 
 import com.infinitysolutions.applicationservice.model.Endereco;
+import com.infinitysolutions.applicationservice.model.Usuario;
 import com.infinitysolutions.applicationservice.model.dto.usuario.UsuarioAtualizacaoDTO;
 import com.infinitysolutions.applicationservice.model.dto.usuario.UsuarioCadastroDTO;
 import com.infinitysolutions.applicationservice.model.dto.usuario.UsuarioRespostaCadastroDTO;

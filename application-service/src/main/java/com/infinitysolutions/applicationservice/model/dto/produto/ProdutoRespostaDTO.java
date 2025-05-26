@@ -35,4 +35,11 @@ public class ProdutoRespostaDTO {
     @JsonProperty("qtd_estoque")
     private Integer qtdEstoque;
 
+    @Schema(description = "Categoria do produto")
+    private CategoriaRespostaDTO categoria;
+
+
+    @Schema(description = "Estado do produto", example = "true")
+    @JsonProperty("is_ativo")
+    private boolean isAtivo;
 }

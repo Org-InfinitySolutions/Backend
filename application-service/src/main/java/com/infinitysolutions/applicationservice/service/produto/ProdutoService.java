@@ -5,6 +5,7 @@ import com.infinitysolutions.applicationservice.infra.exception.RecursoNaoEncont
 import com.infinitysolutions.applicationservice.mapper.produto.ProdutoMapper;
 import com.infinitysolutions.applicationservice.model.dto.produto.ProdutoCriacaoDTO;
 import com.infinitysolutions.applicationservice.model.dto.produto.ProdutoRespostaDTO;
+import com.infinitysolutions.applicationservice.model.produto.Categoria;
 import com.infinitysolutions.applicationservice.model.produto.Produto;
 import com.infinitysolutions.applicationservice.repository.produto.ProdutoRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +20,8 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Slf4j
 public class ProdutoService {
-    
+
+    private final CategoriaService categoriaService;
     private final ProdutoRepository repository;
     
     public List<ProdutoRespostaDTO> listarTodosProdutos() {
@@ -45,7 +47,9 @@ public class ProdutoService {
     
     @Transactional
     public ProdutoRespostaDTO criar(ProdutoCriacaoDTO dto) {
-        Produto produto = ProdutoMapper.toProduto(dto);
+        Categoria categoria = categoriaService.findById(dto.getCategoriaId());
+
+        Produto produto = ProdutoMapper.toProduto(dto, categoria);
         Produto produtoSalvo = repository.save(produto);
         
         return ProdutoMapper.toProdutoGenericoRespostaDTO(produtoSalvo);
@@ -54,7 +58,10 @@ public class ProdutoService {
     @Transactional
     public ProdutoRespostaDTO atualizar(Integer id, ProdutoCriacaoDTO dto) {
         Produto produto = findById(id);
-        ProdutoMapper.atualizarProduto(produto, dto);
+
+        Categoria categoria = categoriaService.findById(dto.getCategoriaId());
+
+        ProdutoMapper.atualizarProduto(produto, dto, categoria);
         Produto produtoAtualizado = repository.save(produto);
         return ProdutoMapper.toProdutoGenericoRespostaDTO(produtoAtualizado);
     }

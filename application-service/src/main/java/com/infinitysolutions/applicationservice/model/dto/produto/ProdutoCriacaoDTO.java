@@ -3,6 +3,7 @@ package com.infinitysolutions.applicationservice.model.dto.produto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -23,7 +24,7 @@ public class ProdutoCriacaoDTO {
     @JsonProperty("url_fabricante")
     private String urlFrabricante;
 
-    @Schema(description = "Imagem do produto em formato de bytes")
+    @Schema(description = "Imagem do produto em formato de bytes", example = "")
     private byte[] imagem;
 
     @NotBlank(message = "A descrição é obrigatória")
@@ -34,4 +35,10 @@ public class ProdutoCriacaoDTO {
     @Positive
     @JsonProperty("qtd_estoque")
     private Integer qtdEstoque;
+
+    @NotNull(message = "A categoria é obrigatória")
+    @Positive(message = "O ID da categoria deve ser positivo")
+    @Schema(description = "ID da categoria do produto", example = "1", requiredMode = Schema.RequiredMode.REQUIRED)
+    @JsonProperty("categoria_id")
+    private Integer categoriaId;
 }

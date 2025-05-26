@@ -71,7 +71,7 @@ public class PessoaFisicaImpl implements UsuarioStrategy<PessoaFisicaCadastroDTO
     }
 
 
-    private PessoaFisica findById(UUID id) {
+    public PessoaFisica findById(UUID id) {
         log.info("Buscando pessoa fisica com ID: {}", id);
         Optional<PessoaFisica> optPessoaFisica = pessoaFisicaRepository.findByIdAndUsuario_IsAtivoTrue(id);
         if (optPessoaFisica.isEmpty()){
