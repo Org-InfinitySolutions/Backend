@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -25,8 +27,8 @@ public class ProdutoRespostaDTO {
     @JsonProperty("url_fabricante")
     private String urlFabricante;
 
-    @Schema(description = "Imagem do produto em formato de bytes", example = "[bytes]")
-    private byte[] imagem;
+    @Schema(description = "Urls das Imagens do produto", example = "")
+    private List<String> imagem;
 
     @Schema(description = "Descrição detalhada do produto", example = "Monitor LED 24 polegadas com resolução Full HD e taxa de atualização de 144Hz")
     private String descricao;

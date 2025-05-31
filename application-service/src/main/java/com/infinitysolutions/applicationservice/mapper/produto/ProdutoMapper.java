@@ -1,5 +1,6 @@
 package com.infinitysolutions.applicationservice.mapper.produto;
 
+import com.infinitysolutions.applicationservice.model.ArquivoMetadados;
 import com.infinitysolutions.applicationservice.model.dto.produto.ProdutoCriacaoDTO;
 import com.infinitysolutions.applicationservice.model.dto.produto.ProdutoPedidoRespostaDTO;
 import com.infinitysolutions.applicationservice.model.dto.produto.ProdutoRespostaDTO;
@@ -15,7 +16,7 @@ public class ProdutoMapper {
                 produto.getModelo(), 
                 produto.getMarca(),
                 produto.getUrlFrabricante(),
-                produto.getImagem(),
+                produto.getImagens().stream().map(ArquivoMetadados::getBlobUrl).toList(),
                 produto.getDescricao(),
                 produto.getQtdEstoque(),
                 produto.getCategoria() != null ?
@@ -29,7 +30,6 @@ public class ProdutoMapper {
         produto.setModelo(dto.getModelo());
         produto.setMarca(dto.getMarca());
         produto.setUrlFrabricante(dto.getUrlFrabricante());
-        produto.setImagem(dto.getImagem());
         produto.setDescricao(dto.getDescricao());
         produto.setQtdEstoque(dto.getQtdEstoque());
         produto.setCategoria(categoria);
@@ -42,7 +42,6 @@ public class ProdutoMapper {
                 .marca(produtoPedido.getProduto().getMarca())
                 .urlFrabricante(produtoPedido.getProduto().getUrlFrabricante())
                 .modelo(produtoPedido.getProduto().getModelo())
-                .imagem(produtoPedido.getProduto().getImagem())
                 .build();
         ProdutoPedidoRespostaDTO produtoPedidoRespostaDTO = new ProdutoPedidoRespostaDTO();
         produtoPedidoRespostaDTO.setProduto(produtoResumidoDTO);
@@ -55,11 +54,7 @@ public class ProdutoMapper {
         produto.setModelo(dto.getModelo());
         produto.setMarca(dto.getMarca());
         produto.setUrlFrabricante(dto.getUrlFrabricante());
-        
-        if (dto.getImagem() != null) {
-            produto.setImagem(dto.getImagem());
-        }
-        
+
         produto.setDescricao(dto.getDescricao());
         produto.setQtdEstoque(dto.getQtdEstoque());
         produto.setCategoria(categoria);

@@ -32,6 +32,7 @@ public class Pedido {
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "pedido_id")
     @Column(name = "produtos_pedido")
+    @ToString.Exclude
     private List<ProdutoPedido> produtosPedido;
 
     @ManyToOne(fetch = FetchType.EAGER)
@@ -63,19 +64,21 @@ public class Pedido {
     @Column(name = "descricao")
     private String descricao;
 
-    @Column(name = "documento_auxiliar")
-    private byte[] documentoAuxiliar;
+    @OneToMany(
+            mappedBy = "pedido",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.LAZY
+    )
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private List<ArquivoMetadados> documentos = new ArrayList<>();
 
     public Pedido(PedidoCadastroDTO dto, Usuario usuario, Endereco endereco) {
         this.tipo = dto.tipo();
         this.dataEntrega = dto.dataEntrega();
         this.dataRetirada = dto.dataRetirada();
         this.descricao = dto.descricao();
-        if (dto.documentoAuxiliar() != null) {
-            this.documentoAuxiliar = dto.documentoAuxiliar();
-        }else {
-            this.documentoAuxiliar = null;
-        }
         this.usuario = usuario;
         this.endereco = endereco;
     }

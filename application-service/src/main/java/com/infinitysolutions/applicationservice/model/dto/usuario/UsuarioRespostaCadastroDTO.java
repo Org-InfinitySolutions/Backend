@@ -1,5 +1,6 @@
 package com.infinitysolutions.applicationservice.model.dto.usuario;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.infinitysolutions.applicationservice.model.dto.endereco.EnderecoResumidoDTO;
@@ -27,6 +28,8 @@ public abstract class UsuarioRespostaCadastroDTO {
     private UUID id;
 
     private String nome;
+
+    @JsonProperty("telefone_celular")
     private String telefone;
 
     private EnderecoResumidoDTO endereco;

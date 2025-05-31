@@ -46,11 +46,11 @@ public class GlobalExceptionHandler {
         log.error("Exceção de serviço: {}", ex.getMessage());
 
         ErrorResponse errorResponse = ErrorResponse.builder()
-                .status(HttpStatus.BAD_REQUEST.value())
+                .status(getStatusForException(ex).value())
                 .error(ex.getMessage())
                 .path(request.getRequestURI())
                 .build();
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        return ResponseEntity.status(getStatusForException(ex)).body(errorResponse);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

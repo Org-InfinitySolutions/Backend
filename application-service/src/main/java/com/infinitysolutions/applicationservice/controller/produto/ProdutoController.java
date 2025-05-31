@@ -5,13 +5,17 @@ import com.infinitysolutions.applicationservice.model.dto.produto.ProdutoRespost
 import com.infinitysolutions.applicationservice.service.produto.ProdutoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Encoding;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -45,15 +49,28 @@ public class ProdutoController {
         return produtoService.buscarPorId(id);
     }
     
-    @PostMapping
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(
             summary = "Criar um novo produto",
             description = "Cria um novo produto no sistema a partir dos dados fornecidos"
     )
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(
+            content = @Content(
+                    mediaType = MediaType.MULTIPART_FORM_DATA_VALUE,
+                    encoding = {
+                            @Encoding(name = "produto", contentType = MediaType.APPLICATION_JSON_VALUE),
+                            @Encoding(name = "imagem", contentType = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+                    }
+            )
+    )
     public ProdutoRespostaDTO criarProduto(
-            @Valid @RequestBody ProdutoCriacaoDTO dto) {
-        return produtoService.criar(dto);
+            @Parameter(description = "Dados do produto em JSON", required = true)
+            @RequestPart("produto") @Valid ProdutoCriacaoDTO dto,
+            @Parameter(description = "Imagem do produto")
+            @RequestPart(value = "imagem", required = false) MultipartFile imagemProduto
+            ) {
+        return produtoService.criar(dto, imagemProduto);
     }
 
 

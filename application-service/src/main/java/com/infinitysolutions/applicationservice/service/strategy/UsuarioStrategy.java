@@ -16,7 +16,7 @@ public interface UsuarioStrategy < T extends UsuarioCadastroDTO, U extends Usuar
     R atualizar(U usuarioAtualizacaoDTO, UUID usuarioId);
     void excluir(UUID id);
     D buscarPorId(UUID id);
-    List<D> listarTodos();
+    List<R> listarTodos();
 
 
     Class<T> getTipoDTO();

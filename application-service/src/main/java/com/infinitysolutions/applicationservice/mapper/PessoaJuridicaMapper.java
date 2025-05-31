@@ -11,8 +11,6 @@ import org.mapstruct.ReportingPolicy;
 public interface PessoaJuridicaMapper {
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "contratoSocial", ignore = true)
-    @Mapping(target = "cartaoCnpj", ignore = true)
 
     @Mapping(target = "usuario.nome", source = "nome")
     @Mapping(target = "usuario.telefoneCelular", source = "telefoneCelular")

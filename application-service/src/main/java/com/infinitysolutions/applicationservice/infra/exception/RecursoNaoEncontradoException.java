@@ -17,6 +17,7 @@ public class RecursoNaoEncontradoException extends ApplicationServiceException{
         return new RecursoNaoEncontradoException("O usuário de ID " + userId.toString() + " não possui um Pedido de ID " + id);
     }
 
+
     public static RecursoNaoEncontradoException usuarioNaoEncontrado(UUID uuid){
         return new RecursoNaoEncontradoException("Usuário não encontrado com o ID: " + uuid);
     }

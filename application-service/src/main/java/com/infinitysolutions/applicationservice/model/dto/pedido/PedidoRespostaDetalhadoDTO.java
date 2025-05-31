@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Schema(
     name = "PedidoRespostaDetalhado",
@@ -60,4 +61,16 @@ public class PedidoRespostaDetalhadoDTO {
             requiredMode = Schema.RequiredMode.REQUIRED
     )
     private SituacaoPedido situacao;
+
+    @Schema(
+            description = "URLs de download dos documentos associados a esse pedido."
+    )
+    private List<DocumentoPedidoDTO> documentos;
+
+    public record DocumentoPedidoDTO(
+            String originalFilename,
+            String downloadUrl,
+            String mimeType
+    ) {
+    }
 }

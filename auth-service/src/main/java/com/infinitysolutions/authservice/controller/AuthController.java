@@ -3,6 +3,8 @@ package com.infinitysolutions.authservice.controller;
 
 import com.infinitysolutions.authservice.infra.validation.EmailValido;
 import com.infinitysolutions.authservice.model.dto.*;
+
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -77,6 +79,7 @@ public class AuthController {
 
     @PostMapping("/cadastrar")
     @ResponseStatus(HttpStatus.CREATED)
+    @Hidden
     @Operation(
             summary = "Cadastrar nova credencial",
             description = "Cadastra uma nova credencial de um usuário com base no seu id e informações de login"

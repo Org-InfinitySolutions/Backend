@@ -1,13 +1,12 @@
 package com.infinitysolutions.applicationservice.model.dto.pedido;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+
 import com.infinitysolutions.applicationservice.infra.validation.ProdutosSemDuplicata;
 import com.infinitysolutions.applicationservice.model.dto.endereco.EnderecoDTO;
 import com.infinitysolutions.applicationservice.model.enums.TipoPedido;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
-
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -42,7 +41,7 @@ public record PedidoCadastroDTO(
         TipoPedido tipo,
         
         @Schema(
-            description = "Data e hora programada para entrega dos produtos",
+            description = "Data e hora programada para entrega dos equipamentos",
             example = "2024-12-25T10:00:00",
             type = "string",
             format = "date-time"
@@ -51,7 +50,7 @@ public record PedidoCadastroDTO(
         LocalDateTime dataEntrega,
         
         @Schema(
-            description = "Data e hora programada para retirada dos produtos ",
+            description = "Data e hora programada para retirada dos equipamentos ",
             example = "2024-12-30T16:00:00",
             type = "string",
             format = "date-time"
@@ -66,17 +65,7 @@ public record PedidoCadastroDTO(
             maxLength = 500
         )
         @NotBlank(message = "Descrição é obrigatória")
-        String descricao,
-
-        @Schema(
-            description = "Documento auxiliar em formato binário (PDF, imagem, etc.)",
-            example = "",
-            type = "string",
-            format = "byte",
-            nullable = true
-        )
-        @JsonProperty("documento_auxiliar")
-        byte[] documentoAuxiliar
+        String descricao
 ) {
     
     @Schema(

@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Schema(
     name = "PedidoResposta",
@@ -54,4 +55,7 @@ public class PedidoRespostaDTO {
             requiredMode = Schema.RequiredMode.REQUIRED
     )
     private SituacaoPedido situacao;
+
+
+
 }

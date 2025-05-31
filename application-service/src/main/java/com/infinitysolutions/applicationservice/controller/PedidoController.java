@@ -5,16 +5,20 @@ import com.infinitysolutions.applicationservice.model.dto.pedido.*;
 import com.infinitysolutions.applicationservice.service.PedidoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Encoding;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
@@ -33,24 +37,29 @@ public class PedidoController {
     private final PedidoService service;
     private final AuthenticationUtils authUtil;
 
-    @PostMapping
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(
         summary = "Criar um novo pedido",
-        description = "Cria um novo pedido no sistema com os produtos especificados. " +
-                     "O pedido é associado ao usuário informado e inclui endereço de entrega, " +
-                     "tipo de pedido e lista de produtos com suas quantidades."
+        description = "Cria um novo pedido no sistema com os produtos especificados."
+    )
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(
+        content = @Content(
+            mediaType = MediaType.MULTIPART_FORM_DATA_VALUE,
+            encoding = {
+                @Encoding(name = "pedido", contentType = MediaType.APPLICATION_JSON_VALUE),
+                @Encoding(name = "documento_auxiliar", contentType = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+            }
+        )
     )
     public PedidoRespostaCadastroDTO cadastrar(
-        @Parameter(
-            description = "Dados completos do pedido a ser criado",
-            required = true,
-            schema = @Schema(implementation = PedidoCadastroDTO.class)
-        )
-        @Valid @RequestBody PedidoCadastroDTO dto,
+        @Parameter(description = "Dados do pedido em JSON", required = true)
+        @RequestPart("pedido") @Valid PedidoCadastroDTO dto,
+        @Parameter(description = "Documento auxiliar (PDF ou imagem)", required = false)
+        @RequestPart(value = "documento_auxiliar", required = false) MultipartFile documentoAuxiliar,
         Authentication auth
     ) {
-        return service.cadastrar(dto, UUID.fromString(auth.getName()));
+        return service.cadastrar(dto, documentoAuxiliar, UUID.fromString(auth.getName()));
     }
 
 

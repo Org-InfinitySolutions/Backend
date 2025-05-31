@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -32,11 +33,11 @@ public class PessoaJuridicaDTO extends UsuarioRespostaDTO {
     @Schema(description = "Indica se a empresa possui contrato social cadastrado")
     @JsonProperty("possui_contrato_social")
     private boolean possuiContratoSocial;
-    
+
     @Schema(description = "Indica se a empresa possui cartão CNPJ cadastrado")
     @JsonProperty("possui_cartao_cnpj")
     private boolean possuiCartaoCnpj;
-    
+
     @Schema(description = "Indica se o cadastro da empresa está completo")
     @JsonProperty("cadastro_completo")
     private boolean cadastroCompleto;
@@ -54,9 +55,10 @@ public class PessoaJuridicaDTO extends UsuarioRespostaDTO {
             String razaoSocial,
             boolean possuiContratoSocial,
             boolean possuiCartaoCnpj,
-            boolean cadastroCompleto) {
+            boolean cadastroCompleto,
+            List<DocumentoUsuarioDTO> documentosUsuario) {
 
-        super(id, nome, telefoneCelular, "PJ", endereco, dataCriacao, dataAtualizacao);
+        super(id, nome, telefoneCelular, "PJ", endereco, dataCriacao, dataAtualizacao, documentosUsuario);
         this.cnpj = cnpj;
         this.razaoSocial = razaoSocial;
         this.telefoneResidencial = telefoneResidencial;

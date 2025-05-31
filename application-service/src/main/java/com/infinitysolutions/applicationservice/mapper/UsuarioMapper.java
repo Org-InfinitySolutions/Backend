@@ -9,6 +9,9 @@ import com.infinitysolutions.applicationservice.model.dto.pessoa.fisica.PessoaFi
 import com.infinitysolutions.applicationservice.model.dto.pessoa.fisica.PessoaFisicaRespostaCadastroDTO;
 import com.infinitysolutions.applicationservice.model.dto.pessoa.juridica.PessoaJuridicaDTO;
 import com.infinitysolutions.applicationservice.model.dto.pessoa.juridica.PessoaJuridicaRespostaCadastroDTO;
+import com.infinitysolutions.applicationservice.model.dto.usuario.UsuarioRespostaDTO;
+
+import java.util.List;
 
 public class UsuarioMapper {
 
@@ -61,7 +64,7 @@ public class UsuarioMapper {
         );
     }
 
-    public static PessoaFisicaDTO toPessoaFisicaDTO(PessoaFisica pessoaFisica, boolean possuiCopiaRG, boolean cadastroCompleto) {
+    public static PessoaFisicaDTO toPessoaFisicaDTO(PessoaFisica pessoaFisica, boolean possuiCopiaRG, boolean cadastroCompleto, List<UsuarioRespostaDTO.DocumentoUsuarioDTO> documentosUsuario) {
         return new PessoaFisicaDTO(
                 pessoaFisica.getId(),
                 pessoaFisica.getUsuario().getNome(),
@@ -80,11 +83,13 @@ public class UsuarioMapper {
                 pessoaFisica.getCpf(),
                 pessoaFisica.getRg(),
                 possuiCopiaRG,
-                cadastroCompleto
+                cadastroCompleto,
+                documentosUsuario
         );
     }
 
-    public static PessoaJuridicaDTO toPessoaJuridicaDTO(PessoaJuridica pessoaJuridica, boolean possuiCartaoCnpj, boolean possuiContratoSocial, boolean cadastroCompleto) {
+    public static PessoaJuridicaDTO toPessoaJuridicaDTO(PessoaJuridica pessoaJuridica, boolean possuiCartaoCnpj, boolean possuiContratoSocial, boolean cadastroCompleto, List<UsuarioRespostaDTO.DocumentoUsuarioDTO> documentosUsuario) {
+
         return new PessoaJuridicaDTO(
                 pessoaJuridica.getId(),
                 pessoaJuridica.getUsuario().getNome(),
@@ -105,7 +110,8 @@ public class UsuarioMapper {
                 pessoaJuridica.getRazaoSocial(),
                 possuiContratoSocial,
                 possuiCartaoCnpj,
-                cadastroCompleto
+                cadastroCompleto,
+                documentosUsuario
         );
     }
 }

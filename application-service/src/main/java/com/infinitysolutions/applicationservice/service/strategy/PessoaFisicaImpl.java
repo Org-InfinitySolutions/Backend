@@ -4,6 +4,7 @@ import com.infinitysolutions.applicationservice.infra.exception.RecursoExistente
 import com.infinitysolutions.applicationservice.infra.exception.RecursoNaoEncontradoException;
 import com.infinitysolutions.applicationservice.mapper.PessoaFisicaMapper;
 import com.infinitysolutions.applicationservice.mapper.UsuarioMapper;
+import com.infinitysolutions.applicationservice.model.ArquivoMetadados;
 import com.infinitysolutions.applicationservice.model.Endereco;
 import com.infinitysolutions.applicationservice.model.PessoaFisica;
 import com.infinitysolutions.applicationservice.model.Usuario;
@@ -11,11 +12,15 @@ import com.infinitysolutions.applicationservice.model.dto.pessoa.fisica.PessoaFi
 import com.infinitysolutions.applicationservice.model.dto.pessoa.fisica.PessoaFisicaCadastroDTO;
 import com.infinitysolutions.applicationservice.model.dto.pessoa.fisica.PessoaFisicaDTO;
 import com.infinitysolutions.applicationservice.model.dto.pessoa.fisica.PessoaFisicaRespostaCadastroDTO;
+import com.infinitysolutions.applicationservice.model.dto.usuario.UsuarioRespostaDTO;
+import com.infinitysolutions.applicationservice.model.enums.TipoAnexo;
 import com.infinitysolutions.applicationservice.repository.PessoaFisicaRepository;
+import com.infinitysolutions.applicationservice.service.FileUploadService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -27,6 +32,7 @@ public class PessoaFisicaImpl implements UsuarioStrategy<PessoaFisicaCadastroDTO
 
     private final PessoaFisicaRepository pessoaFisicaRepository;
     private final PessoaFisicaMapper pessoaFisicaMapper;
+    private final FileUploadService fileUploadService;
 
     @Override
     public PessoaFisicaRespostaCadastroDTO cadastrar(PessoaFisicaCadastroDTO usuarioCadastroDTO, Endereco usuarioEndereco) {
@@ -84,18 +90,27 @@ public class PessoaFisicaImpl implements UsuarioStrategy<PessoaFisicaCadastroDTO
     @Override
     public PessoaFisicaDTO buscarPorId(UUID id) {
         PessoaFisica pessoaFisica = findById(id);
-        boolean possuiCopiaRG = pessoaFisica.getCopiaRg() != null;
-        return UsuarioMapper.toPessoaFisicaDTO(pessoaFisica, possuiCopiaRG, possuiCopiaRG);
+        boolean possuiCopiaRG = false;
+        List<UsuarioRespostaDTO.DocumentoUsuarioDTO> documentosUsuario = new ArrayList<>();
+        if (pessoaFisica.getUsuario().temDocumentos()){
+            List<ArquivoMetadados> documentos = pessoaFisica.getUsuario().getDocumentos();
+            possuiCopiaRG = documentos.stream().anyMatch(documento -> documento.getTipoAnexo().equals(TipoAnexo.COPIA_RG));
+            documentosUsuario = documentos.stream().map(documento -> new UsuarioRespostaDTO.DocumentoUsuarioDTO(
+                    documento.getOriginalFilename(),
+                    fileUploadService.generatePrivateFileSasUrl(documento.getBlobName(), 60),
+                    documento.getMimeType(),
+                    documento.getTipoAnexo().toString()
+            )).toList();
+
+        }
+        return UsuarioMapper.toPessoaFisicaDTO(pessoaFisica, possuiCopiaRG, possuiCopiaRG, documentosUsuario);
     }
 
     @Override
-    public List<PessoaFisicaDTO> listarTodos() {
+    public List<PessoaFisicaRespostaCadastroDTO> listarTodos() {
         return pessoaFisicaRepository.findAllByUsuario_IsAtivoTrue()
                 .stream()
-                .map(pessoaFisica -> {
-                    boolean possuiCopiaRG = pessoaFisica.getCopiaRg() != null;
-                    return UsuarioMapper.toPessoaFisicaDTO(pessoaFisica, possuiCopiaRG, possuiCopiaRG);
-                })
+                .map(UsuarioMapper::toPessoaFisicaRespostaCadastroDTO)
                 .toList();
     }
 

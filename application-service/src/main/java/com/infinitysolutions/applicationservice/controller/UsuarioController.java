@@ -44,7 +44,7 @@ public class UsuarioController {
         summary = "Listar todos os usuários",
         description = "Retorna uma lista de todos os usuários cadastrados no sistema"
     )
-    public List<UsuarioRespostaDTO> listarTodos() {
+    public List<UsuarioRespostaCadastroDTO> listarTodos() {
         return service.listarTodos();
     }
 
@@ -58,15 +58,15 @@ public class UsuarioController {
         return service.buscarPorId(usuarioId);
     }
 
-    @DeleteMapping("/{usuarioId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    @Operation(
-        summary = "Excluir usuário por ID",
-        description = "Remove um usuário específico do sistema com base no ID fornecido"
-    )
-    public void excluir(@PathVariable UUID usuarioId) {
-        service.excluir(usuarioId);
-    }
+//    @DeleteMapping("/{usuarioId}")
+//    @ResponseStatus(HttpStatus.NO_CONTENT)
+//    @Operation(
+//        summary = "Excluir usuário por ID",
+//        description = "Remove um usuário específico do sistema com base no ID fornecido"
+//    )
+//    public void excluir(@PathVariable UUID usuarioId) {
+//        service.excluir(usuarioId);
+//    }
 
     @PutMapping("/{usuarioId}")
     @ResponseStatus(HttpStatus.OK)

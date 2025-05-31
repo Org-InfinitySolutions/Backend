@@ -8,6 +8,7 @@ import com.infinitysolutions.applicationservice.model.Pedido;
 import com.infinitysolutions.applicationservice.model.Usuario;
 import com.infinitysolutions.applicationservice.model.dto.pedido.*;
 import com.infinitysolutions.applicationservice.model.enums.SituacaoPedido;
+import com.infinitysolutions.applicationservice.model.enums.TipoAnexo;
 import com.infinitysolutions.applicationservice.model.produto.Produto;
 import com.infinitysolutions.applicationservice.model.produto.ProdutoPedido;
 import com.infinitysolutions.applicationservice.repository.PedidoRepository;
@@ -17,6 +18,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
 import java.util.function.Function;
@@ -32,45 +34,56 @@ public class PedidoService {
     private final UsuarioService usuarioService;
     private final ProdutoRepository produtoRepository;
     private final EnderecoService enderecoService;
+    private final ArquivoMetadadosService arquivoMetadadosService;
+    private final FileUploadService fileUploadService;
 
     @Transactional
-    public PedidoRespostaCadastroDTO cadastrar(PedidoCadastroDTO dto, UUID usuarioId) {
-        Usuario usuario = usuarioRepository.findByIdAndIsAtivoTrue(usuarioId).orElseThrow(() -> RecursoNaoEncontradoException.usuarioNaoEncontrado(usuarioId));
+    public PedidoRespostaCadastroDTO cadastrar(PedidoCadastroDTO dto, MultipartFile documentoAuxiliar, UUID usuarioId) {
+            Usuario usuario = usuarioRepository.findByIdAndIsAtivoTrue(usuarioId).orElseThrow(() -> RecursoNaoEncontradoException.usuarioNaoEncontrado(usuarioId));
 
-        Map<Integer, PedidoCadastroDTO.ProdutoPedidoDTO> mapaDtos =
-        dto.produtos().stream().collect(Collectors.toMap(
-                PedidoCadastroDTO.ProdutoPedidoDTO::produtoId,
-                Function.identity()
-        ));
+            Map<Integer, PedidoCadastroDTO.ProdutoPedidoDTO> mapaDtos = dto.produtos()
+                    .stream().collect(Collectors.toMap(PedidoCadastroDTO.ProdutoPedidoDTO::produtoId, Function.identity()));
 
-        Set<Integer> produtoIds = new HashSet<>(mapaDtos.keySet());
-        List<Produto> produtos = produtoRepository.findAllById(produtoIds);
+            Set<Integer> produtoIds = new HashSet<>(mapaDtos.keySet());
 
-        if (produtos.size() != produtoIds.size()) {
-            Set<Integer> idsEncontrados = produtos.stream()
-                    .map(Produto::getId)
-                    .collect(Collectors.toSet());
+            List<Produto> produtos = produtoRepository.findAllById(produtoIds);
 
-            List<Integer> idsNaoEncontrados = produtoIds.stream()
-                    .filter(id -> !idsEncontrados.contains(id))
-                    .toList();
+            if (produtos.size() != produtoIds.size()) {
+                Set<Integer> idsEncontrados = produtos.stream()
+                        .map(Produto::getId).collect(Collectors.toSet());
 
-            throw new RecursoNaoEncontradoException(
-                    "Produtos não encontrados: " + idsNaoEncontrados
-            );
+                List<Integer> idsNaoEncontrados = produtoIds.stream()
+                        .filter(id -> !idsEncontrados.contains(id)).toList();
+
+                throw new RecursoNaoEncontradoException("Produtos não encontrados: " + idsNaoEncontrados);
+            }
+
+            Endereco enderecoEncontrado = enderecoService.buscarEndereco(dto.endereco());
+
+            Pedido pedidoCriado = PedidoMapper.toPedido(dto, usuario, enderecoEncontrado);
+
+            Pedido pedidoSalvo = pedidoRepository.save(pedidoCriado);
+            List<ProdutoPedido> produtosPedido = produtos.stream()
+                    .map(produto -> {
+                        PedidoCadastroDTO.ProdutoPedidoDTO dtoCorrespondente = mapaDtos.get(produto.getId());
+                        return createProdutoPedido(produto, pedidoSalvo, dtoCorrespondente);
+                    }).collect(Collectors.toList());
+
+            pedidoSalvo.setProdutosPedido(produtosPedido);
+            if (documentoAuxiliar != null && !documentoAuxiliar.isEmpty()) {
+                enviarDocumentoAuxiliar(documentoAuxiliar, pedidoSalvo);
+            }
+
+            return PedidoMapper.toPedidoRespostaCadastroDTO(pedidoRepository.save(pedidoSalvo));
+    }
+
+    private void enviarDocumentoAuxiliar(MultipartFile arquivo, Pedido pedido) {
+        long maxSize = 20L * 1024L * 1024L; // 20MB
+        if (arquivo.getSize() > maxSize) {
+            throw new IllegalArgumentException("Arquivo muito grande. Tamanho máximo: 20MB");
         }
-
-        Endereco enderecoEncontrado = enderecoService.buscarEndereco(dto.endereco());
-
-        Pedido pedido = pedidoRepository.save(PedidoMapper.toPedido(dto, usuario, enderecoEncontrado));
-        Pedido pedidoSalvo = pedido;
-        List<ProdutoPedido> produtosPedido = produtos.stream()
-                .map(produto -> {
-                    PedidoCadastroDTO.ProdutoPedidoDTO dtoCorrespondente = mapaDtos.get(produto.getId());
-                    return createProdutoPedido(produto, pedidoSalvo, dtoCorrespondente);
-                }).collect(Collectors.toList());
-        pedidoSalvo.setProdutosPedido(produtosPedido);
-        return PedidoMapper.toPedidoRespostaCadastroDTO(pedidoRepository.save(pedidoSalvo));
+        log.info("Documento auxiliar está pronto para ser enviado ao bucket!!!");
+        arquivoMetadadosService.uploadAndPersistArquivo(arquivo, TipoAnexo.DOCUMENTO_AUXILIAR, pedido);
     }
 
     private static ProdutoPedido createProdutoPedido(Produto produto, Pedido pedidoSalvo, PedidoCadastroDTO.ProdutoPedidoDTO dtoCorrespondente) {
@@ -113,12 +126,38 @@ public class PedidoService {
     public PedidoRespostaDetalhadoDTO buscarPorIdAdmin(Integer id) {
         Pedido pedidoEncontrado = pedidoRepository.findWithUsuarioById(id).orElseThrow(() -> RecursoNaoEncontradoException.pedidoNaoEncontrado(id));
         var usuarioEncontrado = usuarioService.buscarPorId(pedidoEncontrado.getUsuario().getId());
-        return PedidoMapper.toPedidoRespostaDetalhadoAdminDTO(pedidoEncontrado, usuarioEncontrado);
+        List<PedidoRespostaDetalhadoDTO.DocumentoPedidoDTO> urlDocumentos = new ArrayList<>();
+        pedidoEncontrado.getDocumentos().forEach(documento -> {
+            String blobName = documento.getBlobName();
+            String originalFilename = documento.getOriginalFilename();
+            String mimeType = documento.getMimeType();
+            urlDocumentos.add(
+                    new PedidoRespostaDetalhadoDTO.DocumentoPedidoDTO(
+                            originalFilename,
+                            fileUploadService.generatePrivateFileSasUrl(blobName, 60),
+                            mimeType
+                    )
+            );
+        });
+        return PedidoMapper.toPedidoRespostaDetalhadoAdminDTO(pedidoEncontrado, usuarioEncontrado, urlDocumentos);
     }
 
     public PedidoRespostaDetalhadoDTO buscarPorId(Integer id, UUID idUsuario) {
         Pedido pedidoEncontrado = pedidoRepository.findWithUsuarioByIdAndByUsuarioId(id, idUsuario).orElseThrow(() -> RecursoNaoEncontradoException.pedidoNaoEncontradoComUsuario(id, idUsuario));
         var usuarioEncontrado = usuarioService.buscarPorId(idUsuario);
-        return PedidoMapper.toPedidoRespostaDetalhadoAdminDTO(pedidoEncontrado, usuarioEncontrado);
+        List<PedidoRespostaDetalhadoDTO.DocumentoPedidoDTO> urlDocumentos = new ArrayList<>();
+        pedidoEncontrado.getDocumentos().forEach(documento -> {
+            String originalFilename = documento.getOriginalFilename();
+            String blobName = documento.getBlobName();
+            String mimeType = documento.getMimeType();
+            urlDocumentos.add(
+                    new PedidoRespostaDetalhadoDTO.DocumentoPedidoDTO(
+                            originalFilename,
+                            fileUploadService.generatePrivateFileSasUrl(blobName, 60),
+                            mimeType
+                    )
+            );
+        });
+        return PedidoMapper.toPedidoRespostaDetalhadoAdminDTO(pedidoEncontrado, usuarioEncontrado, urlDocumentos);
     }
 }

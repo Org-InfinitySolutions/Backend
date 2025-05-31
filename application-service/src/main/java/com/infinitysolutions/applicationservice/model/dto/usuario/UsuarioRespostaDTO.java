@@ -11,6 +11,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @JsonTypeInfo(
@@ -70,6 +72,8 @@ public abstract class UsuarioRespostaDTO {
     @JsonProperty("data_atualizacao")
     private LocalDateTime dataAtualizacao;
 
+    private List<DocumentoUsuarioDTO> documentos;
+
     protected UsuarioRespostaDTO(
             UUID id, 
             String nome, 
@@ -77,7 +81,8 @@ public abstract class UsuarioRespostaDTO {
             String tipo,
             EnderecoDTO endereco,
             LocalDateTime dataCriacao,
-            LocalDateTime dataAtualizacao
+            LocalDateTime dataAtualizacao,
+            List<DocumentoUsuarioDTO> documentos
             ) {
         this.id = id;
         this.nome = nome;
@@ -86,5 +91,15 @@ public abstract class UsuarioRespostaDTO {
         this.tipo = tipo;
         this.dataCriacao = dataCriacao;
         this.dataAtualizacao = dataAtualizacao;
+        this.documentos = documentos;
+    }
+
+    public record DocumentoUsuarioDTO(
+            String originalFilename,
+            String downloadUrl,
+            String mimeType,
+            String tipoAnexo
+    ){
+
     }
 }

@@ -24,9 +24,6 @@ public class ProdutoCriacaoDTO {
     @JsonProperty("url_fabricante")
     private String urlFrabricante;
 
-    @Schema(description = "Imagem do produto em formato de bytes", example = "")
-    private byte[] imagem;
-
     @NotBlank(message = "A descrição é obrigatória")
     @Schema(description = "Descrição detalhada do produto", example = "Produto de alta qualidade com garantia de 12 meses", requiredMode = Schema.RequiredMode.REQUIRED)
     private String descricao;

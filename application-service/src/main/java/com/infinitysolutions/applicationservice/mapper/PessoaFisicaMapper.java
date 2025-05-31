@@ -10,9 +10,7 @@ import org.mapstruct.ReportingPolicy;
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface PessoaFisicaMapper {
 
-    @Mapping(target = "copiaRg", ignore = true)
     @Mapping(target = "id", ignore = true)
-
 
     @Mapping(target = "usuario.nome", source = "nome")
     @Mapping(target = "usuario.telefoneCelular", source = "telefoneCelular")

@@ -2,16 +2,20 @@ package com.infinitysolutions.applicationservice.service.produto;
 
 import com.infinitysolutions.applicationservice.infra.exception.EntidadeNaoEncontradaException;
 import com.infinitysolutions.applicationservice.infra.exception.RecursoNaoEncontradoException;
+import com.infinitysolutions.applicationservice.mapper.ArquivoMetadadosMapper;
 import com.infinitysolutions.applicationservice.mapper.produto.ProdutoMapper;
 import com.infinitysolutions.applicationservice.model.dto.produto.ProdutoCriacaoDTO;
 import com.infinitysolutions.applicationservice.model.dto.produto.ProdutoRespostaDTO;
+import com.infinitysolutions.applicationservice.model.enums.TipoAnexo;
 import com.infinitysolutions.applicationservice.model.produto.Categoria;
 import com.infinitysolutions.applicationservice.model.produto.Produto;
 import com.infinitysolutions.applicationservice.repository.produto.ProdutoRepository;
+import com.infinitysolutions.applicationservice.service.ArquivoMetadadosService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
@@ -23,7 +27,9 @@ public class ProdutoService {
 
     private final CategoriaService categoriaService;
     private final ProdutoRepository repository;
-    
+    private final ArquivoMetadadosService arquivoMetadadosService;
+
+
     public List<ProdutoRespostaDTO> listarTodosProdutos() {
         return repository.findAllByIsAtivoTrue()
                 .stream()
@@ -46,12 +52,15 @@ public class ProdutoService {
     }
     
     @Transactional
-    public ProdutoRespostaDTO criar(ProdutoCriacaoDTO dto) {
+    public ProdutoRespostaDTO criar(ProdutoCriacaoDTO dto, MultipartFile imagem) {
         Categoria categoria = categoriaService.findById(dto.getCategoriaId());
 
         Produto produto = ProdutoMapper.toProduto(dto, categoria);
+        if (imagem != null && !imagem.isEmpty()) {
+            arquivoMetadadosService.uploadAndPersistArquivo(imagem, TipoAnexo.IMAGEM_PRODUTO, produto);
+        }
+
         Produto produtoSalvo = repository.save(produto);
-        
         return ProdutoMapper.toProdutoGenericoRespostaDTO(produtoSalvo);
     }
     

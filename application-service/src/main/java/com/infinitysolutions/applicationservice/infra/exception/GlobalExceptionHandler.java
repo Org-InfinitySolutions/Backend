@@ -168,6 +168,10 @@ public class GlobalExceptionHandler {
             return HttpStatus.SERVICE_UNAVAILABLE;
         } else if (ex instanceof TokenExpiradoException) {
             return HttpStatus.UNAUTHORIZED;
+        } else if (ex instanceof DocumentoInvalidoException) {
+            return HttpStatus.UNPROCESSABLE_ENTITY;
+        } else if (ex instanceof DocumentoNaoEncontradoException) {
+            return HttpStatus.NOT_FOUND;
         }
         return HttpStatus.INTERNAL_SERVER_ERROR;
     }

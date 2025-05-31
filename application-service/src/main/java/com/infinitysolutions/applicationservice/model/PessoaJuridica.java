@@ -3,6 +3,7 @@ package com.infinitysolutions.applicationservice.model;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.util.UUID;
 
@@ -24,6 +25,7 @@ public class PessoaJuridica {
     @OneToOne(fetch = FetchType.EAGER)
     @MapsId
     @JoinColumn(name = "fk_usuario")
+    @ToString.Exclude
     private Usuario usuario;
 
     @Column(name = "telefone_residencial", nullable = false, length = 20)
@@ -34,14 +36,6 @@ public class PessoaJuridica {
 
     @Column(name = "razao_social", nullable = false)
     private String razaoSocial;
-
-    @Lob
-    @Column(name = "contrato_social")
-    private byte[] contratoSocial;
-
-    @Lob
-    @Column(name = "cartao_cnpj")
-    private byte[] cartaoCnpj;
 
     public PessoaJuridica(Usuario usuario, String telefoneResidencial, String cnpj, String razaoSocial) {
         this.usuario = usuario;

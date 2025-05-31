@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -34,17 +35,18 @@ public class PessoaFisicaDTO extends UsuarioRespostaDTO {
     
     @Builder
     public PessoaFisicaDTO(
-            UUID id, 
-            String nome, 
-            String telefone, 
+            UUID id,
+            String nome,
+            String telefone,
             EnderecoDTO endereco,
             LocalDateTime dataCriacao,
             LocalDateTime dataAtualizacao,
             String cpf,
             String rg,
             boolean possuiCopiaRg,
-            boolean cadastroCompleto) {
-        super(id, nome, telefone, "PF", endereco, dataCriacao, dataAtualizacao);
+            boolean cadastroCompleto,
+            List<DocumentoUsuarioDTO> documentosUsuario) {
+        super(id, nome, telefone, "PF", endereco, dataCriacao, dataAtualizacao, documentosUsuario);
         this.cpf = cpf;
         this.rg = rg;
         this.possuiCopiaRg = possuiCopiaRg;

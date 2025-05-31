@@ -1,8 +1,12 @@
 package com.infinitysolutions.applicationservice.model.produto;
 
+import com.infinitysolutions.applicationservice.model.ArquivoMetadados;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @Entity
@@ -23,7 +27,13 @@ public class Produto {
     @Column(name = "url_fabricante")
     private String urlFrabricante;
 
-    private byte[] imagem;
+    @OneToMany(
+            mappedBy = "produto",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.LAZY
+    )
+    private List<ArquivoMetadados> imagens = new ArrayList<>();
 
     private String descricao;
 

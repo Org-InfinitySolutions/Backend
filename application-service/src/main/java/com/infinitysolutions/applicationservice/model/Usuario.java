@@ -3,11 +3,15 @@ package com.infinitysolutions.applicationservice.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -46,22 +50,23 @@ public class Usuario {
     @Column(name = "is_ativo", nullable = false)
     private boolean isAtivo;
 
-    @Lob
-    @Column(name = "comprovante_endereco")
-    private byte[] comprovanteEndereco;
-    
-    @Column(name = "comprovante_nome_arquivo")
-    private String comprovanteNomeArquivo;
-    
-    @Column(name = "comprovante_tipo_arquivo") 
-    private String comprovanteTipoArquivo;
-    
-    @Column(name = "comprovante_data_upload")
-    private LocalDateTime comprovanteDataUpload;
+    @OneToMany(
+            mappedBy = "usuario",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.LAZY
+    )
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private List<ArquivoMetadados> documentos = new ArrayList<>();
 
     public Usuario(String nome, String telefoneCelular) {
         this.nome = nome;
         this.telefoneCelular = telefoneCelular;
         this.isAtivo = true;
+    }
+
+    public boolean temDocumentos() {
+        return !this.documentos.isEmpty();
     }
 }

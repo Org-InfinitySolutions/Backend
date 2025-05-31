@@ -3,6 +3,7 @@ package com.infinitysolutions.applicationservice.model;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.util.UUID;
 
@@ -18,6 +19,7 @@ public class PessoaFisica {
     @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     @MapsId
     @JoinColumn(name = "fk_usuario")
+    @ToString.Exclude
     private Usuario usuario;
 
     @Column(length = 11, nullable = false, unique = true)

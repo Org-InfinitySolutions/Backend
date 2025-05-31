@@ -7,13 +7,14 @@ import com.infinitysolutions.applicationservice.model.Usuario;
 import com.infinitysolutions.applicationservice.model.dto.endereco.EnderecoResumidoDTO;
 import com.infinitysolutions.applicationservice.model.dto.pedido.*;
 import com.infinitysolutions.applicationservice.model.dto.usuario.UsuarioRespostaDTO;
-import com.infinitysolutions.applicationservice.model.produto.Produto;
-import com.infinitysolutions.applicationservice.model.produto.ProdutoPedido;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
+
 public class PedidoMapper {
+
 
     private PedidoMapper() {
         throw new IllegalStateException("Utility class");
@@ -56,7 +57,7 @@ public class PedidoMapper {
         return dto;
     }
 
-    public static PedidoRespostaDetalhadoDTO toPedidoRespostaDetalhadoAdminDTO(Pedido pedido, UsuarioRespostaDTO usuarioRespostaDTO) {
+    public static PedidoRespostaDetalhadoDTO toPedidoRespostaDetalhadoAdminDTO(Pedido pedido, UsuarioRespostaDTO usuarioRespostaDTO, List<PedidoRespostaDetalhadoDTO.DocumentoPedidoDTO> documentos) {
         PedidoRespostaDetalhadoDTO dto = new PedidoRespostaDetalhadoDTO();
         dto.setId(pedido.getId());
         dto.setUsuario(usuarioRespostaDTO);
@@ -65,6 +66,7 @@ public class PedidoMapper {
         dto.setQtdItens(pedido.getQtdItens());
         dto.setData(pedido.getDataCriacao());
         dto.setSituacao(pedido.getSituacao());
+        dto.setDocumentos(documentos);
         return dto;
     }
 

@@ -1,5 +1,6 @@
 package com.infinitysolutions.applicationservice.service;
 
+import com.infinitysolutions.applicationservice.infra.exception.DocumentoNaoEncontradoException;
 import com.infinitysolutions.applicationservice.infra.exception.ErroInesperadoException;
 import com.infinitysolutions.applicationservice.infra.exception.RecursoIncompativelException;
 import com.infinitysolutions.applicationservice.infra.exception.RecursoNaoEncontradoException;
@@ -68,11 +69,11 @@ public class UsuarioService {
       return usuarioCadastrado;
     }
 
-    public List<UsuarioRespostaDTO> listarTodos() {
+    public List<UsuarioRespostaCadastroDTO> listarTodos() {
         log.info("Listando todos os usuários");
-        List<UsuarioRespostaDTO> usuariosTotais = new ArrayList<>();
+        List<UsuarioRespostaCadastroDTO> usuariosTotais = new ArrayList<>();
         for (UsuarioStrategy<?, ?, ?, ?> strategy : strategies) {
-            List<? extends UsuarioRespostaDTO> usuariosDaVez = strategy.listarTodos();
+            List<? extends UsuarioRespostaCadastroDTO> usuariosDaVez = strategy.listarTodos();
             usuariosTotais.addAll(usuariosDaVez);
         }
         log.info("Total de usuários encontrados: {}", usuariosTotais.size());
@@ -87,6 +88,9 @@ public class UsuarioService {
                 return usuarioEncontrado;
             } catch (RecursoNaoEncontradoException e) {
                 log.debug("Estratégia {} não encontrou o usuário com ID: {}", strategy.getClass().getSimpleName(), usuarioId);
+            } catch (DocumentoNaoEncontradoException e) {
+                log.error(e.getMessage());
+                throw e;
             } catch (Exception e) {
                 log.error("Erro inesperado ao buscar usuário com ID {} usando a estratégia {}: {}", usuarioId, strategy.getClass().getSimpleName(), e.getMessage());
             }
