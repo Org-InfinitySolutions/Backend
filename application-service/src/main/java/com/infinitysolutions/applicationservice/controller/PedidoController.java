@@ -14,7 +14,6 @@ import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -63,7 +62,6 @@ public class PedidoController {
     }
 
 
-    @PreAuthorize("hasAuthority('SCOPE_ROLE_ADMIN')")
     @PutMapping("/{id}/situacao")
     @ResponseStatus(HttpStatus.OK)
     @Operation(
@@ -75,9 +73,10 @@ public class PedidoController {
             @Parameter(description = "ID do pedido a ser atualizado", required = true)
             @PathVariable @Positive Integer id,
             @Parameter(description = "Nova situação do pedido", required = true)
-            @Valid @RequestBody PedidoAtualizacaoSituacaoDTO dto
+            @Valid @RequestBody PedidoAtualizacaoSituacaoDTO dto,
+            Authentication auth
             ) {
-        return service.atualizarSituacao(id, dto);
+        return service.atualizarSituacao(id, dto, authUtil.isCustomer(auth));
     }
 
     @GetMapping

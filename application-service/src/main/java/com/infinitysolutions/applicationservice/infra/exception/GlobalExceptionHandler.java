@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -15,7 +16,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Slf4j
@@ -110,6 +110,36 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
     
+    // Trata erros de integridade de dados (ex: chave estrangeira, entrada duplicada)
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ErrorResponse> handleDataIntegrityViolationException(
+            DataIntegrityViolationException ex, HttpServletRequest request) {
+        
+        log.error("Violação de integridade de dados: {}", ex.getMessage());
+        
+        String errorMessage = "Operação não permitida devido a restrições de integridade de dados";
+        String rootCause = ex.getMostSpecificCause().getMessage();
+        
+        if (rootCause != null) {
+            if (rootCause.contains("produto_pedido") && rootCause.contains("FK8kkew2u78bwq2d6cwbll9hx0g")) {
+                errorMessage = "Não é possível excluir este produto pois ele está vinculado a um ou mais pedidos. Para excluir o produto, primeiro é necessário remover ou alterar os pedidos que o utilizam.";
+            } else if (rootCause.contains("Duplicate entry")) {
+                errorMessage = "Já existe um registro com essas informações no sistema";
+            } else if (rootCause.contains("foreign key constraint")) {
+                errorMessage = "Não é possível realizar esta operação pois existem registros relacionados no sistema";
+            }
+        }
+        
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .status(HttpStatus.CONFLICT.value())
+                .error("VIOLACAO_INTEGRIDADE_DADOS")
+                .message(errorMessage)
+                .path(request.getRequestURI())
+                .build();
+        
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
+    }
+
     // Trata quaisquer outras exceções não capturadas
 //    @ExceptionHandler(Exception.class)
 //    public ResponseEntity<ErrorResponse> handleGeneralException(
@@ -121,10 +151,10 @@ public class GlobalExceptionHandler {
 //                .message("Ocorreu um erro interno no servidor")
 //                .path(request.getRequestURI())
 //                .build();
-//
-        // Em ambiente de produção, não devemos expor detalhes de erros internos
-        // Para debug/desenvolvimento, podemos ativar esta linha:
-//         errorResponse.setMessage(ex.getMessage());
+////
+////         Em ambiente de produção, não devemos expor detalhes de erros internos
+////         Para debug/desenvolvimento, podemos ativar esta linha:
+////         errorResponse.setMessage(ex.getMessage());
 //
 //        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
 //    }
@@ -155,9 +185,7 @@ public class GlobalExceptionHandler {
                     .path(request.getRequestURI())
                     .build();
         return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(errorResponse);
-    }
-
-    private HttpStatus getStatusForException(ApplicationServiceException ex) {
+    }    private HttpStatus getStatusForException(ApplicationServiceException ex) {
         if (ex instanceof RecursoExistenteException) {
             return HttpStatus.CONFLICT;
         } else if (ex instanceof RecursoNaoEncontradoException) {
@@ -172,6 +200,8 @@ public class GlobalExceptionHandler {
             return HttpStatus.UNPROCESSABLE_ENTITY;
         } else if (ex instanceof DocumentoNaoEncontradoException) {
             return HttpStatus.NOT_FOUND;
+        } else if (ex instanceof VinculoExistenteException) {
+            return HttpStatus.CONFLICT;
         }
         return HttpStatus.INTERNAL_SERVER_ERROR;
     }

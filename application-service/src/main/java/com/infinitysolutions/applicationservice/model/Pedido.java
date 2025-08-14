@@ -49,11 +49,21 @@ public class Pedido {
 
     @Column(name = "data_criacao", nullable = false, updatable = false)
     @CreationTimestamp
-    private LocalDateTime dataCriacao;
-
-    @Column(name = "data_atualizacao", nullable = false)
+    private LocalDateTime dataCriacao;    @Column(name = "data_atualizacao", nullable = false)
     @UpdateTimestamp
     private LocalDateTime dataAtualizacao;
+
+    @Column(name = "data_aprovacao")
+    private LocalDateTime dataAprovacao;
+
+    @Column(name = "data_inicio_evento")
+    private LocalDateTime dataInicioEvento;
+
+    @Column(name = "data_finalizacao")
+    private LocalDateTime dataFinalizacao;
+
+    @Column(name = "data_cancelamento")
+    private LocalDateTime dataCancelamento;
 
     @Column(name = "data_entrega")
     private LocalDateTime dataEntrega;

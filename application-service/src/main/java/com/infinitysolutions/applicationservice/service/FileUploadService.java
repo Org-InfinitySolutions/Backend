@@ -10,18 +10,15 @@ import com.azure.storage.blob.sas.BlobServiceSasSignatureValues;
 import com.infinitysolutions.applicationservice.infra.exception.DocumentoNaoEncontradoException;
 import com.infinitysolutions.applicationservice.infra.exception.ErroInesperadoException;
 import com.infinitysolutions.applicationservice.infra.exception.RecursoNaoEncontradoException;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.OffsetDateTime;
 import java.util.Objects;
-import java.util.UUID;
 
 @Slf4j
 @Service
@@ -118,9 +115,85 @@ public class FileUploadService {
         log.info("Arquivo '{}' enviado com sucesso para container '{}' como '{}' com tipo de conteúdo '{}'",
                  blobName, containerClient.getBlobContainerName(), blobName, contentType);
         return blobClient.getBlobUrl();
-    }
-
+    }    /**
+     * Deleta um arquivo do Azure Blob Storage.
+     * Determina automaticamente se o arquivo está no container público ou privado baseado na URL.
+     * @param blobUrl A URL completa do blob a ser deletado.
+     * @throws ErroInesperadoException Se houver erro ao deletar o arquivo.
+     */
     public void deletarArquivo(String blobUrl) {
+        if (!StringUtils.hasText(blobUrl)) {
+            log.warn("URL do blob está vazia, não há arquivo para deletar.");
+            return;
+        }
+        
+        try {
+            // Extrair o nome do blob da URL
+            String blobName = extrairBlobNameDaUrl(blobUrl);
+            
+            // Determinar se é público ou privado baseado no nome do blob
+            boolean isPublic = isArquivoPublico(blobName);
+            
+            BlobContainerClient containerClient = isPublic ? publicBlobContainerClient : privateBlobContainerClient;
+            BlobClient blobClient = containerClient.getBlobClient(blobName);
+            
+            if (blobClient.exists()) {
+                blobClient.delete();
+                log.info("Arquivo '{}' deletado com sucesso do container '{}'", blobName, containerClient.getBlobContainerName());
+            } else {
+                log.warn("Arquivo '{}' não encontrado no container '{}' para deletar", blobName, containerClient.getBlobContainerName());
+            }
+            
+        } catch (BlobStorageException e) {
+            log.error("Erro ao deletar arquivo do blob storage. URL: {}, Erro: {}", blobUrl, e.getMessage());
+            throw new ErroInesperadoException("Erro ao deletar arquivo do blob storage: " + e.getMessage());
+        } catch (Exception e) {
+            log.error("Erro inesperado ao deletar arquivo. URL: {}, Erro: {}", blobUrl, e.getMessage());
+            throw new ErroInesperadoException("Erro inesperado ao deletar arquivo: " + e.getMessage());
+        }
+    }
+    
+    /**
+     * Extrai o nome do blob da URL completa.
+     * @param blobUrl A URL completa do blob.
+     * @return O nome do blob extraído da URL.
+     */
+    private String extrairBlobNameDaUrl(String blobUrl) {
+        try {
+            // Remove parâmetros de query (como SAS token) se existirem
+            String urlSemParametros = blobUrl.split("\\?")[0];
+            
+            // Extrai o nome do blob da URL
+            // Exemplo: https://storage.blob.core.windows.net/container/pasta/arquivo.jpg
+            String[] parts = urlSemParametros.split("/");
+            if (parts.length < 4) {
+                throw new IllegalArgumentException("URL do blob inválida: " + blobUrl);
+            }
+            
+            // Reconstrói o nome do blob (tudo após o nome do container)
+            StringBuilder blobName = new StringBuilder();
+            for (int i = 4; i < parts.length; i++) {
+                if (i > 4) {
+                    blobName.append("/");
+                }
+                blobName.append(parts[i]);
+            }
+            
+            return blobName.toString();
+        } catch (Exception e) {
+            log.error("Erro ao extrair nome do blob da URL: {}", blobUrl);
+            throw new IllegalArgumentException("Não foi possível extrair o nome do blob da URL: " + blobUrl, e);
+        }
+    }
+    
+    /**
+     * Determina se um arquivo é público baseado no nome do blob.
+     * @param blobName O nome do blob.
+     * @return true se o arquivo é público, false se é privado.
+     */
+    private boolean isArquivoPublico(String blobName) {
+        // Arquivos públicos são apenas imagens de produtos
+        return blobName.startsWith("produtos/imagens");
     }
 
     /**

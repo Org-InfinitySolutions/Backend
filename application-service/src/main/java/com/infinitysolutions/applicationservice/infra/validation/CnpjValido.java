@@ -11,7 +11,8 @@ import java.lang.annotation.Target;
 @Constraint(validatedBy = ValidadorCnpj.class)
 @Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface CnpjValido {
+public @interface
+CnpjValido {
     String message() default "CNPJ inválido";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};

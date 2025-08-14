@@ -1,19 +1,17 @@
 package com.infinitysolutions.applicationservice.model.dto.pedido;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.infinitysolutions.applicationservice.model.dto.endereco.EnderecoResumidoDTO;
 import com.infinitysolutions.applicationservice.model.dto.produto.ProdutoPedidoRespostaDTO;
-import com.infinitysolutions.applicationservice.model.dto.produto.ProdutoRespostaDTO;
 import com.infinitysolutions.applicationservice.model.dto.usuario.UsuarioRespostaDTO;
 import com.infinitysolutions.applicationservice.model.enums.SituacaoPedido;
+import com.infinitysolutions.applicationservice.model.enums.TipoPedido;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 
 @Schema(
     name = "PedidoRespostaDetalhado",
@@ -53,7 +51,34 @@ public class PedidoRespostaDetalhadoDTO {
         type = "string",
         format = "date-time"
     )
-    private LocalDateTime data;
+    private LocalDateTime dataCriacao;
+
+    @Schema(
+            description = "Data e hora de entrega do pedido",
+            example = "2024-12-20T14:30:00",
+            requiredMode = Schema.RequiredMode.REQUIRED,
+            type = "string",
+            format = "date-time"
+    )
+    private LocalDateTime dataEntrega;
+
+
+    @Schema(
+            description = "Data e hora de retirada do pedido",
+            example = "2024-12-20T14:30:00",
+            requiredMode = Schema.RequiredMode.REQUIRED,
+            type = "string",
+            format = "date-time"
+    )
+    private LocalDateTime dataRetirada;
+
+    @Schema(
+            description = "Tipo do pedido (INDOOR, OUTDOOR)",
+            example = "INDOOR",
+            requiredMode = Schema.RequiredMode.REQUIRED,
+            type = "string"
+    )
+    private TipoPedido tipoPedido;
 
     @Schema(
             description = "Nova situação do pedido.",
@@ -61,6 +86,11 @@ public class PedidoRespostaDetalhadoDTO {
             requiredMode = Schema.RequiredMode.REQUIRED
     )
     private SituacaoPedido situacao;
+
+    @Schema(
+            description = "descrição do pedido"
+    )
+    private String descricao;
 
     @Schema(
             description = "URLs de download dos documentos associados a esse pedido."

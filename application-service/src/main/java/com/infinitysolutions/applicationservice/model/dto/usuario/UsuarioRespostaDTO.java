@@ -42,6 +42,12 @@ public abstract class UsuarioRespostaDTO {
     private String nome;
     
     @Schema(
+            description = "Email do usuário",
+            example = "usuario@example.com"
+    )
+    private String email;
+    
+    @Schema(
             description = "Telefone celular de contato com DDD",
             example = "(11) 98765-4321"
     )
@@ -77,6 +83,7 @@ public abstract class UsuarioRespostaDTO {
     protected UsuarioRespostaDTO(
             UUID id, 
             String nome, 
+            String email,
             String telefone,
             String tipo,
             EnderecoDTO endereco,
@@ -86,6 +93,7 @@ public abstract class UsuarioRespostaDTO {
             ) {
         this.id = id;
         this.nome = nome;
+        this.email = email;
         this.telefoneCelular = telefone;
         this.endereco = endereco;
         this.tipo = tipo;

@@ -42,7 +42,8 @@ public class PedidoMapper {
         PedidoRespostaDTO dto = new PedidoRespostaDTO();
         dto.setId(pedido.getId());
         dto.setQtdItens(pedido.getQtdItens());
-        dto.setData(pedido.getDataCriacao());
+        dto.setDataCriacao(pedido.getDataCriacao());
+        dto.setDataEntrega(pedido.getDataEntrega());
         dto.setSituacao(pedido.getSituacao());
         return dto;
     }
@@ -51,7 +52,8 @@ public class PedidoMapper {
         PedidoRespostaAdminDTO dto = new PedidoRespostaAdminDTO();
         dto.setId(pedido.getId());
         dto.setQtdItens(pedido.getQtdItens());
-        dto.setData(pedido.getDataCriacao());
+        dto.setDataCriacao(pedido.getDataCriacao());
+        dto.setDataEntrega(pedido.getDataEntrega());
         dto.setNome(pedido.getUsuario().getNome());
         dto.setSituacao(pedido.getSituacao());
         return dto;
@@ -64,9 +66,13 @@ public class PedidoMapper {
         dto.setProdutos(pedido.getProdutosPedido().stream().map(ProdutoMapper::toProdutoPedidoRespostaDTO).toList());
         dto.setEndereco(new EnderecoResumidoDTO(pedido.getEndereco().getCep(), pedido.getEndereco().getLogradouro(), pedido.getEndereco().getNumero(), pedido.getEndereco().getCidade(), pedido.getEndereco().getEstado()));
         dto.setQtdItens(pedido.getQtdItens());
-        dto.setData(pedido.getDataCriacao());
+        dto.setDataCriacao(pedido.getDataCriacao());
+        dto.setDataEntrega(pedido.getDataEntrega());
+        dto.setDataRetirada(pedido.getDataRetirada());
         dto.setSituacao(pedido.getSituacao());
         dto.setDocumentos(documentos);
+        dto.setDescricao(pedido.getDescricao());
+        dto.setTipoPedido(pedido.getTipo());
         return dto;
     }
 

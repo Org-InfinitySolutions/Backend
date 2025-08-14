@@ -57,5 +57,7 @@ services:
   auth:
     url: http://${AUTH_SERVICE_URL:localhost}:8081
     apikey: ${AUTH_SERVICE_API_KEY:seu-api-key-aqui}
+  admin:
+    email: ${ADMIN_EMAIL:filipefranca876@gmail.com}
 jwt:
   public-key: classpath:publicKey.pem

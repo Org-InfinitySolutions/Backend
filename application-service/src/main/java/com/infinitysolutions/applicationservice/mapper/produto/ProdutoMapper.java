@@ -1,6 +1,7 @@
 package com.infinitysolutions.applicationservice.mapper.produto;
 
 import com.infinitysolutions.applicationservice.model.ArquivoMetadados;
+import com.infinitysolutions.applicationservice.model.dto.produto.ProdutoAtualizacaoDTO;
 import com.infinitysolutions.applicationservice.model.dto.produto.ProdutoCriacaoDTO;
 import com.infinitysolutions.applicationservice.model.dto.produto.ProdutoPedidoRespostaDTO;
 import com.infinitysolutions.applicationservice.model.dto.produto.ProdutoRespostaDTO;
@@ -41,7 +42,9 @@ public class ProdutoMapper {
                 .id(produtoPedido.getProduto().getId())
                 .marca(produtoPedido.getProduto().getMarca())
                 .urlFrabricante(produtoPedido.getProduto().getUrlFrabricante())
+                .qtdDisponivel(produtoPedido.getProduto().getQtdEstoque())
                 .modelo(produtoPedido.getProduto().getModelo())
+                .imagens(produtoPedido.getProduto().getImagens().stream().map(ArquivoMetadados::getBlobUrl).toList())
                 .build();
         ProdutoPedidoRespostaDTO produtoPedidoRespostaDTO = new ProdutoPedidoRespostaDTO();
         produtoPedidoRespostaDTO.setProduto(produtoResumidoDTO);
@@ -50,10 +53,11 @@ public class ProdutoMapper {
 
     }
 
-    public static void atualizarProduto(Produto produto, ProdutoCriacaoDTO dto, Categoria categoria) {
+    public static void atualizarProduto(Produto produto, ProdutoAtualizacaoDTO dto, Categoria categoria) {
         produto.setModelo(dto.getModelo());
         produto.setMarca(dto.getMarca());
         produto.setUrlFrabricante(dto.getUrlFrabricante());
+        produto.setAtivo(dto.isAtivo());
 
         produto.setDescricao(dto.getDescricao());
         produto.setQtdEstoque(dto.getQtdEstoque());

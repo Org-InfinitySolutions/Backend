@@ -95,6 +95,23 @@ public class UsuarioController {
         }
     }
 
+    @GetMapping("/rg")
+    @Operation(
+            summary = "Verificar um RG",
+            description = "Verificar se um determinado RG está disponível"
+    )
+    public ResponseEntity<?> verificarRg(
+            @RequestParam(value = "rg_like") @Valid @NotBlank(message = "rg obrigatório") String rg
+    ) {
+        RespostaVerificacao respostaVerificacao = service.verificarRg(rg);
+        if (respostaVerificacao.disponivel()){
+            return ResponseEntity.ok(respostaVerificacao);
+        }else {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(respostaVerificacao);
+        }
+    }
+
 
     @GetMapping("/cnpj")
     @Operation(

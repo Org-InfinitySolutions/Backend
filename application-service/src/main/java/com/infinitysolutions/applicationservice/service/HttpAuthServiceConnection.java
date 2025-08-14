@@ -5,6 +5,7 @@ import com.infinitysolutions.applicationservice.infra.exception.AuthServiceCommu
 import com.infinitysolutions.applicationservice.infra.exception.ErroInesperadoException;
 import com.infinitysolutions.applicationservice.model.dto.auth.AuthServiceCadastroRequestDTO;
 import com.infinitysolutions.applicationservice.model.dto.auth.DesativarCredenciaisRequestDTO;
+import com.infinitysolutions.applicationservice.model.dto.auth.RespostaEmailDTO;
 import com.infinitysolutions.applicationservice.service.strategy.AuthServiceConnection;
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
@@ -71,6 +72,30 @@ public class HttpAuthServiceConnection implements AuthServiceConnection {
             throw AuthServiceCommunicationException.servicoIndisponivel();
         } catch (Exception e) {
             log.error("Erro inesperado ao desativar credenciais para AuthService para o usuário ID: {}", idUsuario, e);
+            throw ErroInesperadoException.erroInesperado("Erro inesperado na comunicação com AuthService.", e.getMessage());
+        }
+    }
+    
+    @Override
+    public RespostaEmailDTO buscarEmailUsuario(UUID idUsuario) {
+        log.info("Buscando email do usuário ID: {} no AuthService", idUsuario);
+        
+        try {
+            RespostaEmailDTO resposta = authServiceClient.buscarEmail(idUsuario, authApiKey);
+            log.info("Email do usuário ID: {} obtido com sucesso", idUsuario);
+            return resposta;
+        } catch (FeignException e) {
+            log.error("Erro ao buscar email do usuário no AuthService para o usuário ID: {}. Status: {}, Response: {}", 
+                    idUsuario, e.status(), e.getMessage());
+                    
+            if (e.status() == 404) {
+                throw new com.infinitysolutions.applicationservice.infra.exception.RecursoNaoEncontradoException(
+                    "Credencial para o usuário de ID " + idUsuario + " não encontrada");
+            }
+            
+            throw AuthServiceCommunicationException.servicoIndisponivel();
+        } catch (Exception e) {
+            log.error("Erro inesperado ao buscar email do usuário no AuthService para o usuário ID: {}", idUsuario, e);
             throw ErroInesperadoException.erroInesperado("Erro inesperado na comunicação com AuthService.", e.getMessage());
         }
     }

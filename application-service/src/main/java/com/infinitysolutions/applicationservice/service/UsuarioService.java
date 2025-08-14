@@ -6,16 +6,17 @@ import com.infinitysolutions.applicationservice.infra.exception.RecursoIncompati
 import com.infinitysolutions.applicationservice.infra.exception.RecursoNaoEncontradoException;
 import com.infinitysolutions.applicationservice.model.Endereco;
 import com.infinitysolutions.applicationservice.model.dto.auth.AuthServiceCadastroRequestDTO;
-import com.infinitysolutions.applicationservice.model.dto.usuario.UsuarioAtualizacaoDTO;
-import com.infinitysolutions.applicationservice.model.dto.usuario.UsuarioCadastroDTO;
-import com.infinitysolutions.applicationservice.model.dto.usuario.UsuarioRespostaCadastroDTO;
-import com.infinitysolutions.applicationservice.model.dto.usuario.UsuarioRespostaDTO;
+import com.infinitysolutions.applicationservice.model.dto.auth.RespostaEmailDTO;
+import com.infinitysolutions.applicationservice.model.dto.usuario.*;
 import com.infinitysolutions.applicationservice.model.dto.validacao.RespostaVerificacao;
 import com.infinitysolutions.applicationservice.service.adapter.AuthServiceCredencialAdapter;
+import com.infinitysolutions.applicationservice.service.email.EnvioEmailService;
 import com.infinitysolutions.applicationservice.service.strategy.PessoaFisicaImpl;
 import com.infinitysolutions.applicationservice.service.strategy.PessoaJuridicaImpl;
 import com.infinitysolutions.applicationservice.service.strategy.UsuarioStrategy;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -38,7 +39,7 @@ public class UsuarioService {
     private final AuthServiceCredencialAdapter credencialAdapter;
     private final PessoaFisicaImpl pessoaFisica;
     private final PessoaJuridicaImpl pessoaJuridica;
-
+    private final EnvioEmailService envioEmailService;
 
     @Transactional
     public UsuarioRespostaCadastroDTO cadastrar(UsuarioCadastroDTO usuarioCadastroDTO) {
@@ -57,15 +58,33 @@ public class UsuarioService {
       log.info("Estratégia encontrada: {}", estrategia.getClass().getSimpleName());
 
       log.info("Configurando endereço do Usuario");
-      Endereco enderecoEncontrado = enderecoService.buscarEndereco(usuarioCadastroDTO.getEndereco());
-
-
-      var usuarioCadastrado = estrategia.get().cadastrar(usuarioCadastroDTO, enderecoEncontrado);
+      Endereco enderecoEncontrado = enderecoService.buscarEndereco(usuarioCadastroDTO.getEndereco());      var usuarioCadastrado = estrategia.get().cadastrar(usuarioCadastroDTO, enderecoEncontrado);
 
       AuthServiceCadastroRequestDTO authServiceCadastroRequestDTO = credencialAdapter.adaptarParaCadastroRequest(usuarioCadastrado.getId(), usuarioCadastroDTO);
 
       httpAuthServiceConnection.enviarCredenciais(authServiceCadastroRequestDTO);
 
+      // Preparar o DTO para os emails
+      UsuarioAutenticacaoCadastroDTO dto = new UsuarioAutenticacaoCadastroDTO(usuarioCadastroDTO.getNome(), usuarioCadastroDTO.getEmail());
+      
+      // Enviar email de cadastro completo para o usuário
+      try {
+          envioEmailService.enviarCadastroSucessoUsuario(dto);
+          log.info("Email de cadastro completo enviado com sucesso para o usuário: {}", dto.email());
+      } catch (Exception e) {
+          log.error("Erro ao enviar email de cadastro completo para o usuário: {}", e.getMessage());
+          // Não interrompe o fluxo se houver erro no envio
+      }
+      
+      // Enviar notificação de novo cadastro para o administrador
+      try {
+          envioEmailService.enviarNotificacaoNovoCadastro(dto);
+          log.info("Email de notificação de novo cadastro enviado para o administrador");
+      } catch (Exception e) {
+          log.error("Erro ao enviar email de notificação de novo cadastro para o administrador: {}", e.getMessage());
+          // Não interrompe o fluxo se houver erro no envio
+      }
+      
       return usuarioCadastrado;
     }
 
@@ -78,14 +97,15 @@ public class UsuarioService {
         }
         log.info("Total de usuários encontrados: {}", usuariosTotais.size());
         return usuariosTotais;
-    }
-
-    public UsuarioRespostaDTO buscarPorId(UUID usuarioId) {
+    }    public UsuarioRespostaDTO buscarPorId(UUID usuarioId) {
+        UsuarioRespostaDTO usuarioEncontrado = null;
+        
+        // Busca o usuário usando as estratégias disponíveis
         for (UsuarioStrategy<?, ?, ?, ?> strategy : strategies) {
             try {
-                UsuarioRespostaDTO usuarioEncontrado = strategy.buscarPorId(usuarioId);
+                usuarioEncontrado = strategy.buscarPorId(usuarioId);
                 log.info("Usuário encontrado pela estratégia: {}", strategy.getClass().getSimpleName());
-                return usuarioEncontrado;
+                break;
             } catch (RecursoNaoEncontradoException e) {
                 log.debug("Estratégia {} não encontrou o usuário com ID: {}", strategy.getClass().getSimpleName(), usuarioId);
             } catch (DocumentoNaoEncontradoException e) {
@@ -95,8 +115,26 @@ public class UsuarioService {
                 log.error("Erro inesperado ao buscar usuário com ID {} usando a estratégia {}: {}", usuarioId, strategy.getClass().getSimpleName(), e.getMessage());
             }
         }
-        log.warn("Nenhuma estratégia encontrou o usuário com ID: {}", usuarioId);
-        throw RecursoNaoEncontradoException.usuarioNaoEncontrado(usuarioId);
+        
+        if (usuarioEncontrado == null) {
+            log.warn("Nenhuma estratégia encontrou o usuário com ID: {}", usuarioId);
+            throw RecursoNaoEncontradoException.usuarioNaoEncontrado(usuarioId);
+        }
+        
+        // Busca o email do usuário no serviço de autenticação
+        try {
+            RespostaEmailDTO respostaEmail = httpAuthServiceConnection.buscarEmailUsuario(usuarioId);
+            if (respostaEmail != null && respostaEmail.email() != null) {
+                // Define o email no DTO de resposta
+                usuarioEncontrado.setEmail(respostaEmail.email());
+                log.info("Email do usuário ID {} adicionado à resposta", usuarioId);
+            }
+        } catch (Exception e) {
+            log.warn("Não foi possível obter o email do usuário ID {}: {}", usuarioId, e.getMessage());
+            // Continua sem o email, não bloqueia a resposta
+        }
+        
+        return usuarioEncontrado;
     }
     @Transactional
     public void excluir(UUID usuarioId) {
@@ -167,5 +205,10 @@ public class UsuarioService {
         boolean cnpjDisponivel = !pessoaJuridica.verificarCnpj(cnpj);
         return new RespostaVerificacao(cnpj, cnpjDisponivel);
 
+    }
+
+    public RespostaVerificacao verificarRg(String rg) {
+        boolean rgDisponivel = !pessoaFisica.verificarRg(rg);
+        return new RespostaVerificacao(rg, rgDisponivel);
     }
 }

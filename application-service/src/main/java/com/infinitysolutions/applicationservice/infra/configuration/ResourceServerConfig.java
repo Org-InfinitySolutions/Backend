@@ -32,9 +32,10 @@ public class ResourceServerConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.POST, "/api/usuarios").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/produtos").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/produtos", "/api/produtos/*").permitAll()
                         .requestMatchers("/api/usuarios/cpf").permitAll()
                         .requestMatchers("/api/usuarios/cnpj").permitAll()
+                        .requestMatchers("/api/usuarios/rg").permitAll()
                         .requestMatchers("/api/emails/**").permitAll()
                         .requestMatchers("/swagger-ui/**", "/swagger-ui.html").permitAll()
                         .requestMatchers("/v3/api-docs/**").permitAll()

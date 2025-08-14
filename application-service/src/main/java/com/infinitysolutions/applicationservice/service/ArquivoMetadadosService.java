@@ -2,7 +2,6 @@ package com.infinitysolutions.applicationservice.service;
 
 import com.infinitysolutions.applicationservice.infra.exception.DocumentoNaoEncontradoException;
 import com.infinitysolutions.applicationservice.infra.exception.ErroInesperadoException;
-import com.infinitysolutions.applicationservice.infra.exception.RecursoNaoEncontradoException;
 import com.infinitysolutions.applicationservice.mapper.ArquivoMetadadosMapper;
 import com.infinitysolutions.applicationservice.model.ArquivoMetadados;
 import com.infinitysolutions.applicationservice.model.Pedido;
@@ -19,17 +18,16 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 @Validated
-public class ArquivoMetadadosService {
-
+public class ArquivoMetadadosService {    
     private final FileUploadService fileUploadService;
     private final ArquivoMetadadosRepository repository;
-    private final ArquivoMetadadosRepository arquivoMetadadosRepository;
 
     private String gerarFileName(String originalFileName) {
         return UUID.randomUUID().toString() + "-" + StringUtils.cleanPath(originalFileName);
@@ -104,6 +102,35 @@ public class ArquivoMetadadosService {
         ArquivoMetadados arquivoMetadados = findById(arquivoId);
         fileUploadService.deletarArquivo(arquivoMetadados.getBlobUrl());
         repository.delete(arquivoMetadados);
+    }
+
+
+
+    @Transactional
+    public ArquivoMetadados atualizarImagemProduto(MultipartFile novaImagem, Produto produto) {
+        if (novaImagem.isEmpty()) {
+            throw new IllegalArgumentException("O arquivo de imagem não pode estar vazio.");
+        }
+        
+        log.info("Iniciando atualização de imagem para produto ID: {}", produto.getId());
+        
+        // Buscar as imagens existentes do produto para excluir do blob storage
+        List<ArquivoMetadados> imagensExistentes = repository.findByProduto(produto);
+        
+        // Excluir as imagens antigas do blob storage
+        for (ArquivoMetadados imagemAntiga : imagensExistentes) {
+            try {
+                fileUploadService.deletarArquivo(imagemAntiga.getBlobUrl());
+                repository.delete(imagemAntiga);
+                log.info("Arquivo excluído do blob storage: {}", imagemAntiga.getBlobName());
+            } catch (Exception e) {
+                log.warn("Erro ao excluir arquivo do blob storage: {}, erro: {}", imagemAntiga.getBlobName(), e.getMessage());
+            }
+        }
+        
+        // Fazer upload da nova imagem
+        log.info("Fazendo upload da nova imagem: {}", novaImagem.getOriginalFilename());
+        return uploadAndPersistArquivo(novaImagem, TipoAnexo.IMAGEM_PRODUTO, produto);
     }
 
     private ArquivoMetadados findById(Long arquivoId) {

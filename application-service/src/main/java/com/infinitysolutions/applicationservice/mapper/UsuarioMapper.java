@@ -64,10 +64,11 @@ public class UsuarioMapper {
         );
     }
 
-    public static PessoaFisicaDTO toPessoaFisicaDTO(PessoaFisica pessoaFisica, boolean possuiCopiaRG, boolean cadastroCompleto, List<UsuarioRespostaDTO.DocumentoUsuarioDTO> documentosUsuario) {
+    public static PessoaFisicaDTO toPessoaFisicaDTO(PessoaFisica pessoaFisica, boolean possuiCopiaRG, boolean possuiComprovanteEndereco, boolean cadastroCompleto, List<UsuarioRespostaDTO.DocumentoUsuarioDTO> documentosUsuario) {
         return new PessoaFisicaDTO(
                 pessoaFisica.getId(),
                 pessoaFisica.getUsuario().getNome(),
+                null,
                 pessoaFisica.getUsuario().getTelefoneCelular(),
                 new EnderecoDTO(
                 pessoaFisica.getUsuario().getEndereco().getCep(),
@@ -83,16 +84,18 @@ public class UsuarioMapper {
                 pessoaFisica.getCpf(),
                 pessoaFisica.getRg(),
                 possuiCopiaRG,
+                possuiComprovanteEndereco,
                 cadastroCompleto,
                 documentosUsuario
         );
     }
 
-    public static PessoaJuridicaDTO toPessoaJuridicaDTO(PessoaJuridica pessoaJuridica, boolean possuiCartaoCnpj, boolean possuiContratoSocial, boolean cadastroCompleto, List<UsuarioRespostaDTO.DocumentoUsuarioDTO> documentosUsuario) {
+    public static PessoaJuridicaDTO toPessoaJuridicaDTO(PessoaJuridica pessoaJuridica, boolean possuiCartaoCnpj, boolean possuiContratoSocial, boolean possuiComprovanteEndereco, boolean cadastroCompleto, List<UsuarioRespostaDTO.DocumentoUsuarioDTO> documentosUsuario) {
 
         return new PessoaJuridicaDTO(
                 pessoaJuridica.getId(),
                 pessoaJuridica.getUsuario().getNome(),
+                null,
                 pessoaJuridica.getUsuario().getTelefoneCelular(),
                 pessoaJuridica.getTelefoneResidencial(),
                 new EnderecoDTO(
@@ -110,6 +113,7 @@ public class UsuarioMapper {
                 pessoaJuridica.getRazaoSocial(),
                 possuiContratoSocial,
                 possuiCartaoCnpj,
+                possuiComprovanteEndereco,
                 cadastroCompleto,
                 documentosUsuario
         );

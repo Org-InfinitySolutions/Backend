@@ -47,7 +47,18 @@ public class PedidoRespostaDTO {
         type = "string",
         format = "date-time"
     )
-    private LocalDateTime data;
+    private LocalDateTime dataCriacao;
+
+
+    @Schema(
+            description = "Data e hora de entrega do pedido",
+            example = "2024-12-20T14:30:00",
+            requiredMode = Schema.RequiredMode.REQUIRED,
+            type = "string",
+            format = "date-time"
+    )
+    private LocalDateTime dataEntrega;
+
 
     @Schema(
             description = "Nova situação do pedido.",

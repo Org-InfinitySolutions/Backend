@@ -38,6 +38,11 @@ public class PessoaJuridicaDTO extends UsuarioRespostaDTO {
     @JsonProperty("possui_cartao_cnpj")
     private boolean possuiCartaoCnpj;
 
+    @Schema(description = "Indica se a empresa possui comprovante de endereço cadastrado")
+    @JsonProperty("possui_comprovante_endereco")
+    private boolean possuiComprovanteEndereco;
+
+
     @Schema(description = "Indica se o cadastro da empresa está completo")
     @JsonProperty("cadastro_completo")
     private boolean cadastroCompleto;
@@ -46,6 +51,7 @@ public class PessoaJuridicaDTO extends UsuarioRespostaDTO {
     public PessoaJuridicaDTO(
             UUID id,
             String nome,
+            String email,
             String telefoneCelular,
             String telefoneResidencial,
             EnderecoDTO endereco,
@@ -55,15 +61,17 @@ public class PessoaJuridicaDTO extends UsuarioRespostaDTO {
             String razaoSocial,
             boolean possuiContratoSocial,
             boolean possuiCartaoCnpj,
+            boolean possuiComprovanteEndereco,
             boolean cadastroCompleto,
             List<DocumentoUsuarioDTO> documentosUsuario) {
 
-        super(id, nome, telefoneCelular, "PJ", endereco, dataCriacao, dataAtualizacao, documentosUsuario);
+        super(id, nome, email, telefoneCelular, "PJ", endereco, dataCriacao, dataAtualizacao, documentosUsuario);
         this.cnpj = cnpj;
         this.razaoSocial = razaoSocial;
         this.telefoneResidencial = telefoneResidencial;
         this.possuiContratoSocial = possuiContratoSocial;
         this.possuiCartaoCnpj = possuiCartaoCnpj;
+        this.possuiComprovanteEndereco = possuiComprovanteEndereco;
         this.cadastroCompleto = cadastroCompleto;
     }
 }

@@ -1,5 +1,6 @@
 package com.infinitysolutions.applicationservice.service.email;
 
+import com.infinitysolutions.applicationservice.infra.exception.ErroInesperadoException;
 import com.infinitysolutions.applicationservice.infra.validation.EmailValido;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
+import java.util.AbstractMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -34,7 +36,7 @@ public class CodigoAutenticacaoService {
         return codigo;
     }
 
-    public AutenticacaoResposta validarCodigo(@EmailValido String email, @NotNull String codigo) {
+    private AutenticacaoResposta validarCodigo(@EmailValido String email, @NotNull String codigo) {
         String emailNormalizado = email.toLowerCase().trim();
         CodigoAutenticacao codigoArmazenado = codigosAtivos.get(emailNormalizado);
 
@@ -105,6 +107,24 @@ public class CodigoAutenticacaoService {
             log.debug("Nenhum código expirado encontrado");
         }
     }
+
+
+    public Map.Entry<Boolean, String> validarCodigoAutenticacao(String email, String codigo) {
+        log.info("Validando código de autenticação para: {}", email);
+        try {
+            var response = validarCodigo(email, codigo);
+            if (response.valido()) {
+                log.info("Código validado com sucesso para: {}", email);
+            } else {
+                log.warn("Tentativa de validação com código inválido para: {}", email);
+            }
+            return new AbstractMap.SimpleEntry<>(response.valido(), response.mensagem());
+        } catch (Exception e) {
+            log.error("Erro ao validar código de autenticação para: {}", email, e);
+            throw ErroInesperadoException.erroInesperado("Erro ao validar código de verificação: ", e.getMessage());
+        }
+    }
+
     private record CodigoAutenticacao(String codigo, LocalDateTime expiracao, int tentativas) {}
 
     public record AutenticacaoResposta(boolean valido, String mensagem) {}

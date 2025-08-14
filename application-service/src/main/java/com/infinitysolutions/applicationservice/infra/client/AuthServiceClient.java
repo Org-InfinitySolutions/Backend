@@ -2,6 +2,7 @@ package com.infinitysolutions.applicationservice.infra.client;
 
 import com.infinitysolutions.applicationservice.model.dto.auth.AuthServiceCadastroRequestDTO;
 import com.infinitysolutions.applicationservice.model.dto.auth.DesativarCredenciaisRequestDTO;
+import com.infinitysolutions.applicationservice.model.dto.auth.RespostaEmailDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -18,5 +19,7 @@ public interface AuthServiceClient {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     void desativarCredenciais(@PathVariable UUID usuarioId, @RequestHeader("AUTH-API-KEY") String authApiKey, @RequestBody DesativarCredenciaisRequestDTO requestDTO);
 
-
+    @GetMapping("/credenciais/{usuarioId}/email")
+    @ResponseStatus(HttpStatus.OK)
+    RespostaEmailDTO buscarEmail(@PathVariable UUID usuarioId, @RequestHeader("AUTH-API-KEY") String authApiKey);
 }

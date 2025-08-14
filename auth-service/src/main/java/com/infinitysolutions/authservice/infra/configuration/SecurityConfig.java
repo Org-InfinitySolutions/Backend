@@ -33,20 +33,19 @@ public class SecurityConfig {
     private RSAPrivateKey privateKey;
 
     @Value("${jwt.public-key}")
-    private RSAPublicKey publicKey;
-
-    @Bean
+    private RSAPublicKey publicKey;    @Bean
     public SecurityFilterChain securityfilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers(HttpMethod.POST, "/login", "/cadastrar", "/test").permitAll()
+                        .requestMatchers(HttpMethod.POST, "auth/login", "auth/cadastrar", "auth/test", "auth/reset-senha/*").permitAll()
+                        .requestMatchers(HttpMethod.GET, "auth/email/verificar", "auth/credenciais/*/email").permitAll()
                         .requestMatchers("/swagger-ui/**", "/swagger-ui.html").permitAll()
                         .requestMatchers("/v3/api-docs/**").permitAll()
                         .requestMatchers("/swagger-resources/**").permitAll()
                         .requestMatchers("/webjars/**").permitAll()
                         .requestMatchers("/api/swagger-ui/**").permitAll()
                         .requestMatchers("/api/v3/api-docs/**").permitAll()
-                        .anyRequest().permitAll())
+                        .anyRequest().authenticated())
                 .csrf(AbstractHttpConfigurer::disable)
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));

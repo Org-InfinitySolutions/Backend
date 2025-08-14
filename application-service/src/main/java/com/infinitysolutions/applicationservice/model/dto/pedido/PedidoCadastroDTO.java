@@ -1,6 +1,7 @@
 package com.infinitysolutions.applicationservice.model.dto.pedido;
 
 
+import com.infinitysolutions.applicationservice.infra.validation.PeriodoMinimoEntreEntregaERetirada;
 import com.infinitysolutions.applicationservice.infra.validation.ProdutosSemDuplicata;
 import com.infinitysolutions.applicationservice.model.dto.endereco.EnderecoDTO;
 import com.infinitysolutions.applicationservice.model.enums.TipoPedido;
@@ -14,6 +15,7 @@ import java.util.List;
     name = "PedidoCadastro",
     description = "Dados necessários para criação de um novo pedido no sistema"
 )
+@PeriodoMinimoEntreEntregaERetirada
 public record PedidoCadastroDTO(
           @Schema(
             description = "Lista de produtos com suas respectivas quantidades",
@@ -39,8 +41,7 @@ public record PedidoCadastroDTO(
         )
         @NotNull(message = "Tipo do pedido é obrigatório")
         TipoPedido tipo,
-        
-        @Schema(
+          @Schema(
             description = "Data e hora programada para entrega dos equipamentos",
             example = "2024-12-25T10:00:00",
             type = "string",
@@ -50,8 +51,8 @@ public record PedidoCadastroDTO(
         LocalDateTime dataEntrega,
         
         @Schema(
-            description = "Data e hora programada para retirada dos equipamentos ",
-            example = "2024-12-30T16:00:00",
+            description = "Data e hora programada para retirada dos equipamentos (deve ser pelo menos 3 horas após a data de entrega)",
+            example = "2024-12-25T14:00:00",
             type = "string",
             format = "date-time"
         )
@@ -64,7 +65,6 @@ public record PedidoCadastroDTO(
             required = true,
             maxLength = 500
         )
-        @NotBlank(message = "Descrição é obrigatória")
         String descricao
 ) {
     

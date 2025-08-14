@@ -2,6 +2,7 @@ package com.infinitysolutions.authservice.infra.configuration;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.lang.NonNull;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -9,13 +10,10 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @RequiredArgsConstructor
 public class WebConfig implements WebMvcConfigurer {
 
-    private final ApiKeyAuthInterceptor apiKeyAuthInterceptor;
-
-    @Override
-    public void addInterceptors(InterceptorRegistry registry) {
+    private final ApiKeyAuthInterceptor apiKeyAuthInterceptor;    @Override
+    public void addInterceptors(@NonNull InterceptorRegistry registry) {
         registry.addInterceptor(apiKeyAuthInterceptor)
-                .addPathPatterns("/api/auth/cadastrar")
-                .addPathPatterns("/api/auth/credenciais/**")
+                .addPathPatterns("/auth/cadastrar", "/auth/credenciais/*/email")
                 .excludePathPatterns("/swagger-ui/**", "/v3/api-docs/**", "/actuator/**");
     }
 

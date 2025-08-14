@@ -91,10 +91,14 @@ public class PessoaFisicaImpl implements UsuarioStrategy<PessoaFisicaCadastroDTO
     public PessoaFisicaDTO buscarPorId(UUID id) {
         PessoaFisica pessoaFisica = findById(id);
         boolean possuiCopiaRG = false;
+        boolean possuiComprovanteEndereco = false;
+
         List<UsuarioRespostaDTO.DocumentoUsuarioDTO> documentosUsuario = new ArrayList<>();
         if (pessoaFisica.getUsuario().temDocumentos()){
             List<ArquivoMetadados> documentos = pessoaFisica.getUsuario().getDocumentos();
             possuiCopiaRG = documentos.stream().anyMatch(documento -> documento.getTipoAnexo().equals(TipoAnexo.COPIA_RG));
+            possuiComprovanteEndereco = documentos.stream().anyMatch(documento -> documento.getTipoAnexo().equals(TipoAnexo.COMPROVANTE_ENDERECO));
+
             documentosUsuario = documentos.stream().map(documento -> new UsuarioRespostaDTO.DocumentoUsuarioDTO(
                     documento.getOriginalFilename(),
                     fileUploadService.generatePrivateFileSasUrl(documento.getBlobName(), 60),
@@ -103,7 +107,10 @@ public class PessoaFisicaImpl implements UsuarioStrategy<PessoaFisicaCadastroDTO
             )).toList();
 
         }
-        return UsuarioMapper.toPessoaFisicaDTO(pessoaFisica, possuiCopiaRG, possuiCopiaRG, documentosUsuario);
+
+        boolean cadastroCompleto = possuiComprovanteEndereco && possuiCopiaRG;
+
+        return UsuarioMapper.toPessoaFisicaDTO(pessoaFisica, possuiCopiaRG, possuiComprovanteEndereco, cadastroCompleto, documentosUsuario);
     }
 
     @Override
@@ -126,5 +133,9 @@ public class PessoaFisicaImpl implements UsuarioStrategy<PessoaFisicaCadastroDTO
 
     public boolean verificarCpf(String cpf) {
         return pessoaFisicaRepository.existsByCpf(cpf.replaceAll("[.\\-\\s]", ""));
+    }
+
+    public boolean verificarRg(String rg) {
+        return pessoaFisicaRepository.existsByRg(rg);
     }
 }

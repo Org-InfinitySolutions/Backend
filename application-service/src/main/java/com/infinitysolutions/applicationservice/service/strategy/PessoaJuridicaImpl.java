@@ -82,11 +82,15 @@ public class PessoaJuridicaImpl implements UsuarioStrategy<PessoaJuridicaCadastr
         PessoaJuridica pessoaJuridica = findById(pessoaJuridicaId);
         boolean possuiContratoSocial = false;
         boolean possuiCartaoCnpj = false;
+        boolean possuiComprovanteEndereco = false;
+
         List<UsuarioRespostaDTO.DocumentoUsuarioDTO> documentosUsuario = new ArrayList<>();
         if (pessoaJuridica.getUsuario().temDocumentos()){
             List<ArquivoMetadados> documentos = pessoaJuridica.getUsuario().getDocumentos();
             possuiCartaoCnpj = documentos.stream().anyMatch(documento -> documento.getTipoAnexo().equals(TipoAnexo.COPIA_CNPJ));
             possuiContratoSocial = documentos.stream().anyMatch(documento -> documento.getTipoAnexo().equals(TipoAnexo.COPIA_CONTRATO_SOCIAL));
+            possuiComprovanteEndereco = documentos.stream().anyMatch(documento -> documento.getTipoAnexo().equals(TipoAnexo.COMPROVANTE_ENDERECO));
+
             documentosUsuario = documentos.stream().map(documento -> new UsuarioRespostaDTO.DocumentoUsuarioDTO(
               documento.getOriginalFilename(),
               fileUploadService.generatePrivateFileSasUrl(documento.getBlobName(), 60),
@@ -96,8 +100,8 @@ public class PessoaJuridicaImpl implements UsuarioStrategy<PessoaJuridicaCadastr
 
         }
 
-        boolean cadastroCompleto = possuiContratoSocial && possuiCartaoCnpj;
-        return UsuarioMapper.toPessoaJuridicaDTO(pessoaJuridica, possuiCartaoCnpj, possuiContratoSocial, cadastroCompleto, documentosUsuario);
+        boolean cadastroCompleto = possuiContratoSocial && possuiCartaoCnpj && possuiComprovanteEndereco;
+        return UsuarioMapper.toPessoaJuridicaDTO(pessoaJuridica, possuiCartaoCnpj, possuiContratoSocial, possuiComprovanteEndereco, cadastroCompleto, documentosUsuario);
     }
 
     @Override

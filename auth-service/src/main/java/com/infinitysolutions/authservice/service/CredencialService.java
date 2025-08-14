@@ -10,13 +10,11 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import com.infinitysolutions.authservice.mapper.CredencialMapper;
 import com.infinitysolutions.authservice.model.Credencial;
-import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.infinitysolutions.authservice.repository.CredencialRepository;
 
-import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -28,6 +26,7 @@ public class CredencialService {
     private final CredencialRepository repository;
     private final BCryptPasswordEncoder encoder;
     private final CargoService cargoSerivce;
+    private final EnvioEmailService envioEmailService;
 
     @Transactional
     public void criarCredencialUsuario(UUID idUsuario, String email, String senha, String tipoUsuario) {
@@ -74,6 +73,26 @@ public class CredencialService {
         return credencial.get();
     }
 
+    public Credencial procurarCredencialPorEmail(String email) {
+        return procurarCredencial(email);
+    }
+    
+    @Transactional
+    public void resetarSenhaPorEmail(String email, String novaSenha) {
+        log.info("Iniciando reset de senha para email: {}", email);
+        
+        Credencial credencial = procurarCredencial(email);
+        
+        String novaSenhaCriptografada = encoder.encode(novaSenha);
+        
+        credencial.setHashSenha(novaSenhaCriptografada);
+        
+        repository.save(credencial);
+        
+        log.info("Senha resetada com sucesso para email: {}", email);
+        envioEmailService.enviarConfirmacaoResetSenha(email);
+    }
+
     public Credencial obterCredencial(String email, String senha) {
         Credencial credencial = procurarCredencial(email);
         validarSenha(senha, credencial);
@@ -95,5 +114,46 @@ public class CredencialService {
     public boolean verificarEmailExiste(String email) {
         log.info("Verificando se o email {} já existe", email);
         return repository.existsByEmailAndAtivoTrue(email);
+    }
+
+    @Transactional
+    public void alterarSenha(UUID usuarioId, String senhaAtual, String novaSenha) {
+        log.info("Iniciando alteração de senha para usuário: {}", usuarioId);
+        
+        Credencial credencial = procurarCredencial(usuarioId);
+        
+        validarSenha(senhaAtual, credencial);
+        
+        String novaSenhaCriptografada = encoder.encode(novaSenha);
+        
+        credencial.setHashSenha(novaSenhaCriptografada);
+        
+        repository.save(credencial);
+        
+        log.info("Senha alterada com sucesso para usuário: {}", usuarioId);
+        envioEmailService.enviarConfirmacaoResetSenha(credencial.getEmail());
+    }
+
+    @Transactional
+    public void alterarEmail(UUID usuarioId, String senha, String novoEmail) {
+        log.info("Iniciando alteração de email para usuário: {}", usuarioId);
+        
+        if (verificarEmailExiste(novoEmail)) {
+            log.warn("Tentativa de alterar para email já existente: {}", novoEmail);
+            throw RecursoExistenteException.emailJaEmUso(novoEmail);
+        }
+
+        Credencial credencial = procurarCredencial(usuarioId);
+        validarSenha(senha, credencial);
+        credencial.setEmail(novoEmail);
+
+        try {
+            repository.save(credencial);
+            log.info("Email alterado com sucesso para usuário: {} - Novo email: {}", usuarioId, novoEmail);
+            envioEmailService.enviarConfirmacaoResetEmail(novoEmail);
+        } catch (DataIntegrityViolationException e) {
+            log.error("Falha ao alterar email devido a violação de integridade: {}", e.getMessage());
+            throw RecursoExistenteException.emailJaEmUso(novoEmail);
+        }
     }
 }

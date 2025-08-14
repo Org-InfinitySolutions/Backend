@@ -3,7 +3,8 @@ package com.infinitysolutions.applicationservice.controller;
 import com.infinitysolutions.applicationservice.model.dto.auth.UsuarioAutenticacaoValidarCodigoDTO;
 import com.infinitysolutions.applicationservice.model.dto.usuario.UsuarioAutenticacaoCadastroDTO;
 import com.infinitysolutions.applicationservice.model.dto.email.EmailResponseDTO;
-import com.infinitysolutions.applicationservice.service.EmailAutenticacaoService;
+import com.infinitysolutions.applicationservice.service.email.CodigoAutenticacaoService;
+import com.infinitysolutions.applicationservice.service.email.EnvioEmailService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -22,7 +23,8 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "Emails", description = "Endpoints para verificação de email e envio de códigos de autenticação")
 public class MailSenderController {
 
-    private final EmailAutenticacaoService emailAutenticacaoService;
+    private final EnvioEmailService emailAutenticacaoService;
+    private final CodigoAutenticacaoService codigoAutenticacaoService;
 
     @PostMapping("/enviar-codigo")
     @Operation(
@@ -51,7 +53,7 @@ public class MailSenderController {
         @ApiResponse(responseCode = "429", description = "Número máximo de tentativas excedido")
     })
     public ResponseEntity<EmailResponseDTO> validarCodigo(@RequestBody @Valid UsuarioAutenticacaoValidarCodigoDTO dto) {
-            var response = emailAutenticacaoService.validarCodigoAutenticacao(dto.email(), dto.codigo());
+            var response = codigoAutenticacaoService.validarCodigoAutenticacao(dto.email(), dto.codigo());
             if (response.getKey()) {
                 return ResponseEntity.ok(
                     new EmailResponseDTO(true, "Código validado com sucesso", response.getValue())

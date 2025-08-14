@@ -11,6 +11,7 @@ import java.util.UUID;
 public interface PessoaFisicaRepository extends JpaRepository<PessoaFisica, UUID> {
     boolean existsByCpf(String cpf);
     boolean existsById(UUID id);
+    boolean existsByRg(String rg);
     boolean existsByRgContaining(String rg);
     Optional<PessoaFisica> findByIdAndUsuario_IsAtivoTrue(UUID uuid);
     List<PessoaFisica> findAllByUsuario_IsAtivoTrue();

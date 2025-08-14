@@ -28,7 +28,13 @@ public class PessoaFisicaDTO extends UsuarioRespostaDTO {
     @Schema(description = "Indica se o usuário possui cópia do RG verificada")
     @JsonProperty("possui_copia_rg")
     private boolean possuiCopiaRg;
-    
+
+
+    @Schema(description = "Indica se o usuário possui comprovante de endereço")
+    @JsonProperty("possui_comprovante_endereco")
+    private boolean possuiComprovanteEndereco;
+
+
     @Schema(description = "Indica se o usuário está com o cadastro completo")
     @JsonProperty("cadastro_completo")
     private boolean cadastroCompleto;
@@ -37,6 +43,7 @@ public class PessoaFisicaDTO extends UsuarioRespostaDTO {
     public PessoaFisicaDTO(
             UUID id,
             String nome,
+            String email,
             String telefone,
             EnderecoDTO endereco,
             LocalDateTime dataCriacao,
@@ -44,12 +51,14 @@ public class PessoaFisicaDTO extends UsuarioRespostaDTO {
             String cpf,
             String rg,
             boolean possuiCopiaRg,
+            boolean possuiComprovanteEndereco,
             boolean cadastroCompleto,
             List<DocumentoUsuarioDTO> documentosUsuario) {
-        super(id, nome, telefone, "PF", endereco, dataCriacao, dataAtualizacao, documentosUsuario);
+        super(id, nome, email, telefone, "PF", endereco, dataCriacao, dataAtualizacao, documentosUsuario);
         this.cpf = cpf;
         this.rg = rg;
         this.possuiCopiaRg = possuiCopiaRg;
+        this.possuiComprovanteEndereco = possuiComprovanteEndereco;
         this.cadastroCompleto = cadastroCompleto;
     }
 }

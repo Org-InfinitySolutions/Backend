@@ -39,8 +39,6 @@ public class AuthController {
     public RespostaLogin login(@RequestBody RequisicaoLogin requisicaoLogin){
         return authService.realizarLogin(requisicaoLogin.email(), requisicaoLogin.senha());
     }
-
-
     @DeleteMapping("/credenciais/{usuarioId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(
@@ -53,6 +51,7 @@ public class AuthController {
 
     @GetMapping("/credenciais/{usuarioId}/email")
     @ResponseStatus(HttpStatus.OK)
+    @Hidden
     @Operation(
             summary = "Buscar email da credencial",
             description = "Busca o email de uma credencial de usuário com base no ID do usuário"
