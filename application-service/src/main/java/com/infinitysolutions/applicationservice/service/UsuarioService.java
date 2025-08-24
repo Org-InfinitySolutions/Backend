@@ -6,17 +6,16 @@ import com.infinitysolutions.applicationservice.infra.exception.RecursoIncompati
 import com.infinitysolutions.applicationservice.infra.exception.RecursoNaoEncontradoException;
 import com.infinitysolutions.applicationservice.model.Endereco;
 import com.infinitysolutions.applicationservice.model.dto.auth.AuthServiceCadastroRequestDTO;
-import com.infinitysolutions.applicationservice.model.dto.auth.RespostaEmailDTO;
+import com.infinitysolutions.applicationservice.model.dto.auth.RespostaEmail;
 import com.infinitysolutions.applicationservice.model.dto.usuario.*;
 import com.infinitysolutions.applicationservice.model.dto.validacao.RespostaVerificacao;
 import com.infinitysolutions.applicationservice.service.adapter.AuthServiceCredencialAdapter;
 import com.infinitysolutions.applicationservice.service.email.EnvioEmailService;
+import com.infinitysolutions.applicationservice.service.strategy.AuthServiceConnection;
 import com.infinitysolutions.applicationservice.service.strategy.PessoaFisicaImpl;
 import com.infinitysolutions.applicationservice.service.strategy.PessoaJuridicaImpl;
 import com.infinitysolutions.applicationservice.service.strategy.UsuarioStrategy;
 import jakarta.transaction.Transactional;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -35,7 +34,7 @@ public class UsuarioService {
 
     private final List<UsuarioStrategy> strategies;
     private final EnderecoService enderecoService;
-    private final HttpAuthServiceConnection httpAuthServiceConnection;
+    private final AuthServiceConnection httpAuthServiceConnection;
     private final AuthServiceCredencialAdapter credencialAdapter;
     private final PessoaFisicaImpl pessoaFisica;
     private final PessoaJuridicaImpl pessoaJuridica;
@@ -58,12 +57,16 @@ public class UsuarioService {
       log.info("Estratégia encontrada: {}", estrategia.getClass().getSimpleName());
 
       log.info("Configurando endereço do Usuario");
-      Endereco enderecoEncontrado = enderecoService.buscarEndereco(usuarioCadastroDTO.getEndereco());      var usuarioCadastrado = estrategia.get().cadastrar(usuarioCadastroDTO, enderecoEncontrado);
+      Endereco enderecoEncontrado = enderecoService.buscarEndereco(usuarioCadastroDTO.getEndereco());
+      var usuarioCadastrado = estrategia.get().cadastrar(usuarioCadastroDTO, enderecoEncontrado);
 
       AuthServiceCadastroRequestDTO authServiceCadastroRequestDTO = credencialAdapter.adaptarParaCadastroRequest(usuarioCadastrado.getId(), usuarioCadastroDTO);
 
       httpAuthServiceConnection.enviarCredenciais(authServiceCadastroRequestDTO);
 
+      // Se chegou até aqui, o cadastro foi bem-sucedido, então podemos enviar os emails
+      log.info("Credenciais criadas com sucesso, enviando emails de confirmação");
+      
       // Preparar o DTO para os emails
       UsuarioAutenticacaoCadastroDTO dto = new UsuarioAutenticacaoCadastroDTO(usuarioCadastroDTO.getNome(), usuarioCadastroDTO.getEmail());
       
@@ -97,7 +100,9 @@ public class UsuarioService {
         }
         log.info("Total de usuários encontrados: {}", usuariosTotais.size());
         return usuariosTotais;
-    }    public UsuarioRespostaDTO buscarPorId(UUID usuarioId) {
+    }
+
+    public UsuarioRespostaDTO buscarPorId(UUID usuarioId) {
         UsuarioRespostaDTO usuarioEncontrado = null;
         
         // Busca o usuário usando as estratégias disponíveis
@@ -123,7 +128,7 @@ public class UsuarioService {
         
         // Busca o email do usuário no serviço de autenticação
         try {
-            RespostaEmailDTO respostaEmail = httpAuthServiceConnection.buscarEmailUsuario(usuarioId);
+            RespostaEmail respostaEmail = httpAuthServiceConnection.buscarEmailUsuario(usuarioId);
             if (respostaEmail != null && respostaEmail.email() != null) {
                 // Define o email no DTO de resposta
                 usuarioEncontrado.setEmail(respostaEmail.email());
@@ -135,31 +140,6 @@ public class UsuarioService {
         }
         
         return usuarioEncontrado;
-    }
-    @Transactional
-    public void excluir(UUID usuarioId) {
-        log.info("Iniciando processo de exclusão do Usuario com ID: {}", usuarioId);
-        boolean encontrado = false;
-        for (UsuarioStrategy<?, ?, ?, ?> strategy : strategies) {
-            try {
-                strategy.buscarPorId(usuarioId);
-                log.info("Usuário encontrado pela estratégia: {}. Iniciando exclusão.", strategy.getClass().getSimpleName());
-                strategy.excluir(usuarioId);
-                httpAuthServiceConnection.desativarCredenciais(usuarioId);
-                encontrado = true;
-                break;
-            } catch (RecursoNaoEncontradoException e) {
-                log.debug("Estratégia {} não encontrou o usuário com ID {} para exclusão.", strategy.getClass().getSimpleName(), usuarioId);
-            } catch (Exception e) {
-                log.error("Erro inesperado ao tentar excluir usuário com ID {} usando a estratégia {}: {}", usuarioId, strategy.getClass().getSimpleName(), e.getMessage());
-                throw ErroInesperadoException.erroInesperado("Erro inesperado durante a exclusão do usuário " + usuarioId, e.getMessage());
-            }
-        }
-        if (!encontrado) {
-            log.warn("Nenhuma estratégia encontrou o usuário com ID {} para exclusão.", usuarioId);
-            throw RecursoNaoEncontradoException.usuarioNaoEncontrado(usuarioId);
-        }
-        log.info("Usuário com ID {} excluído com sucesso.", usuarioId);
     }
 
     @Transactional

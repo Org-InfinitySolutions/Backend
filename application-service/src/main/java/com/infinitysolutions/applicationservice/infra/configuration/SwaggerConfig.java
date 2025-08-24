@@ -18,9 +18,6 @@ import java.util.List;
 @Configuration
 public class SwaggerConfig {
 
-    @Value("${server.id}")
-    private String serverId;
-
     @Bean
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
@@ -40,20 +37,8 @@ public class SwaggerConfig {
                                 .bearerFormat("JWT")
                                 .description("Insira um token JWT válido para autenticar")
                         ))
-                .addSecurityItem(new SecurityRequirement().addList("bearer-jwt"))
-                .servers(getServers());
+                .addSecurityItem(new SecurityRequirement().addList("bearer-jwt"));
 
-    }
-
-    private List<Server> getServers() {
-        Server localServer = new Server()
-                .url("http://" + serverId + ":8081")
-                .description("Servidor de desenvolvimento local");
-        Server gatewayServer = new Server()
-                .url("http://" + serverId + ":8080")
-                .description("Servidor de desenvolvimento do gateway");
-
-        return Arrays.asList(gatewayServer, localServer);
     }
 
     @Bean

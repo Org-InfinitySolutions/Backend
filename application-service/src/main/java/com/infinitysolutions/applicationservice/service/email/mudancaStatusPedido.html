@@ -1,0 +1,347 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atualização do Status do Pedido</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+        body {
+            font-family: 'Roboto', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333333;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            border-radius: 4px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .email-header {
+            background-color: white;
+            color: black;
+            padding: 20px 30px;
+            text-align: left;
+            border-bottom: 1px solid #f1f1f1;
+            display: flex;
+            align-items: center;
+        }
+
+        .company-logo {
+            display: flex;
+            align-items: center;
+            font-weight: bold;
+        }
+
+        .logo-text {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .logo-icon {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            background-color: black;
+            margin-right: 10px;
+            border-radius: 2px;
+            position: relative;
+        }
+
+        .logo-icon::after {
+            content: '';
+            position: absolute;
+            right: -2px;
+            top: 5px;
+            height: 15px;
+            width: 4px;
+            background-color: #ff6600;
+        }
+
+        .gradient-line {
+            height: 4px;
+            background: linear-gradient(90deg, #EE1C27 0%, #3E5FA9 50%, #017D1D 100%);
+            margin: 0;
+        }
+
+        .email-content {
+            padding: 30px;
+            background-color: #ffffff;
+        }
+
+        h1 {
+            color: #333;
+            font-size: 24px;
+            font-weight: 500;
+            margin: 0 0 20px;
+            text-align: center;
+        }
+
+        .greeting {
+            font-size: 16px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .status-update-box {
+            background-color: #f0f7ff;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 25px 0;
+            text-align: center;
+            border: 1px solid #c3dfff;
+        }
+
+        .status-icon {
+            width: 60px;
+            height: 60px;
+            background-color: #3E5FA9;
+            border-radius: 50%;
+            display: inline-block;
+            margin-bottom: 15px;
+            position: relative;
+            line-height: 60px;
+            text-align: center;
+            color: white;
+            font-size: 25px;
+            font-weight: bold;
+        }
+
+        .status-icon::before {
+            content: '🔄';
+            font-size: 30px;
+            line-height: 60px;
+        }
+
+        .status-message {
+            font-size: 18px;
+            font-weight: 500;
+            color: #3E5FA9;
+            margin: 10px 0;
+        }
+
+        .order-details {
+            background-color: #f8f9fa;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 25px 0;
+            border-left: 4px solid #3E5FA9;
+        }
+
+        .order-details-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            font-weight: 500;
+            color: #555;
+        }
+
+        .detail-value {
+            color: #333;
+            font-weight: normal;
+        }
+
+        .status-change-highlight {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .status-from {
+            color: #856404;
+            text-decoration: line-through;
+            font-weight: 500;
+            margin-right: 10px;
+        }
+
+        .status-arrow {
+            color: #3E5FA9;
+            font-weight: bold;
+            margin: 0 10px;
+        }
+
+        .status-to {
+            color: #017D1D;
+            font-weight: bold;
+            background-color: #d4f0d4;
+            padding: 5px 10px;
+            border-radius: 15px;
+            display: inline-block;
+        }
+
+        .next-steps {
+            background-color: #e8f4f8;
+            border-left: 4px solid #17a2b8;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .next-steps-title {
+            font-weight: 600;
+            color: #0c5460;
+            margin-bottom: 10px;
+        }
+
+        .email-footer {
+            background-color: white;
+            padding: 20px 30px;
+            color: #666666;
+            font-size: 14px;
+            text-align: center;
+            border-top: 1px solid #e1e4e8;
+        }
+
+        .bottom-gradient {
+            height: 4px;
+            background: linear-gradient(90deg, #EE1C27 0%, #3E5FA9 50%, #017D1D 100%);
+            margin: 0;
+        }
+
+        .status-timeline {
+            margin: 20px 0;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 6px;
+        }
+
+        .timeline-item {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+            font-size: 14px;
+        }
+
+        .timeline-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .timeline-dot.completed {
+            background-color: #017D1D;
+        }
+
+        .timeline-dot.current {
+            background-color: #3E5FA9;
+            box-shadow: 0 0 0 3px rgba(62, 95, 169, 0.3);
+        }
+
+        .timeline-dot.pending {
+            background-color: #ddd;
+        }
+
+        .timeline-text {
+            color: #666;
+        }
+
+        .timeline-text.current {
+            color: #3E5FA9;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+<div class="email-container">
+    <div class="email-header">
+        <div class="company-logo">
+            <!-- <div class="logo-icon"></div> -->
+            <!-- <div class="logo-text">nova locações</div> -->
+        </div>
+    </div>
+    <div class="gradient-line"></div>
+
+    <div class="email-content">
+        <h1>Atualização do Seu Pedido</h1>
+        <p class="greeting">Olá <strong>Filipe</strong>,</p>
+
+        <p>Temos uma atualização importante sobre o seu pedido. O status foi alterado e queremos mantê-lo informado sobre o progresso.</p>
+
+        <div class="status-update-box">
+            <div class="status-icon"></div>
+            <div class="status-message">Status do Pedido Atualizado!</div>
+        </div>
+
+        <div class="order-details">
+            <div class="order-details-title">📋 Detalhes do Pedido</div>
+            <div class="detail-row">
+                <span class="detail-label">Número do Pedido:</span>
+                <span class="detail-value"><strong>#100</strong></span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Data da Atualização:</span>
+                <span class="detail-value">02/06/2025 - 22:00</span>
+            </div>
+        </div>
+
+        <div class="status-change-highlight">
+            <p><strong>Mudança de Status:</strong></p>
+            <span class="status-from">Em Evento</span>
+            <span class="status-arrow">→</span>
+            <span class="status-to">Finalizado</span>
+        </div>                        <div class="status-timeline">
+        <h3 style="margin-top: 0; color: #333; font-size: 16px;">🔄 Linha do Tempo do Pedido</h3>
+        <div class="timeline-item">
+            <div class="timeline-dot completed"></div>
+            <div class="timeline-text">1. Em Análise - Pedido criado e aguardando aprovação</div>
+        </div>
+        <div class="timeline-item">
+            <div class="timeline-dot completed"></div>
+            <div class="timeline-text">2. Aprovado - Pedido aprovado pelo administrador</div>
+        </div>
+        <div class="timeline-item">
+            <div class="timeline-dot completed"></div>
+            <div class="timeline-text">3. Em Evento - Produtos entregues no destino</div>
+        </div>
+        <div class="timeline-item">
+            <div class="timeline-dot current"></div>
+            <div class="timeline-text current">4. Finalizado - Evento concluído com sucesso</div>
+        </div>
+    </div>
+
+        <div class="next-steps">
+            <div class="next-steps-title">📌 Próximos Passos</div>
+            <p>Dependendo do novo status, você pode acompanhar o progresso do seu pedido através da nossa plataforma.
+                Se tiver alguma dúvida, nossa equipe está sempre disponível para ajudá-lo.</p>
+        </div>
+
+        <p>Agradecemos pela sua confiança e estamos trabalhando para garantir que sua experiência seja a melhor possível.</p>
+    </div>
+
+    <div class="email-footer">
+        <p>Atenciosamente,<br>Equipe NovaLocacoes</p>
+        <p>&copy; 2025 NovaLocacoes. Todos os direitos reservados.</p>
+    </div>
+    <div class="bottom-gradient"></div>
+</div>
+</body>
+</html>

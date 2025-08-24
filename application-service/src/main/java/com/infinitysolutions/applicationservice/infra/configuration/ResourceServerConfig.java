@@ -39,11 +39,15 @@ public class ResourceServerConfig {
                         .requestMatchers("/api/emails/**").permitAll()
                         .requestMatchers("/swagger-ui/**", "/swagger-ui.html").permitAll()
                         .requestMatchers("/v3/api-docs/**").permitAll()
+                        .requestMatchers("/api/v3/api-docs/**").permitAll()
                         .requestMatchers("/swagger-resources/**").permitAll()
                         .requestMatchers("/webjars/**").permitAll()
-                        .requestMatchers("/api/swagger-ui/**").permitAll()
-                        .requestMatchers("/api/v3/api-docs/**").permitAll()
+                        .requestMatchers("/swagger-ui/index.html").permitAll()
+                        .requestMatchers("/v3/api-docs/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "auth/login", "auth/cadastrar", "auth/test", "auth/reset-senha/*").permitAll()
+                        .requestMatchers(HttpMethod.GET, "auth/email/verificar", "auth/credenciais/*/email").permitAll()
                         .anyRequest().authenticated()
+
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .oauth2ResourceServer(oauth2 -> oauth2
@@ -53,7 +57,7 @@ public class ResourceServerConfig {
                 .exceptionHandling(exceptions -> exceptions
                         .authenticationEntryPoint(customAuthenticationEntryPoint)
                 );
-        
+
         return http.build();
     }
 

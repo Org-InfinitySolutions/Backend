@@ -26,7 +26,8 @@ public class EnvioEmailService {
     private final EmailTemplateService emailTemplateService;
     private final LocalJavaMailSenderStrategy emailSender;
     private static final String PATTERN_DATA = "dd/MM/yyyy - HH:mm";
-    
+    private final LocalJavaMailSenderStrategy localJavaMailSenderStrategy;
+
     @Value("${services.admin.email}")
     private String adminEmail;
 
@@ -120,6 +121,24 @@ public class EnvioEmailService {
             log.error("Erro ao enviar notificação de mudança de status do pedido #{} para: {}", dto.numeroPedido(), dto.emailUsuario(), e);
             throw ErroInesperadoException.erroInesperado("Erro ao enviar notificação de mudança de status do pedido: ", e.getMessage());
         }
+    }
+
+    public void enviarConfirmacaoResetEmail(String emailDestinatario) {
+        String assunto = "Novo email vinculado";
+        String conteudo = emailTemplateService.confirmacaoResetEmail(emailDestinatario);
+        localJavaMailSenderStrategy.enviarEmailHtmlAsync(emailDestinatario, assunto, conteudo);
+    }
+
+    public void enviarConfirmacaoResetSenha(String emailDestinatario) {
+        String assunto = "Sua senha foi alterada";
+        String conteudo = emailTemplateService.confirmacaoResetSenha();
+        localJavaMailSenderStrategy.enviarEmailHtmlAsync(emailDestinatario, assunto, conteudo);
+    }
+
+    public void enviarCodigoResetSenha(String emailDestinatario, String nome, String codigo) {
+        String assunto = "Código para Reset de Senha - NovaLocações";
+        String conteudo = emailTemplateService.gerarTemplateResetSenha(nome, codigo);
+        localJavaMailSenderStrategy.enviarEmailHtmlAsync(emailDestinatario, assunto, conteudo);
     }
 
 }

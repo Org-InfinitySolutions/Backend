@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Senha Alterada com Sucesso</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+        body {
+            font-family: 'Roboto', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333333;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            border-radius: 4px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .email-header {
+            background-color: white;
+            color: black;
+            padding: 20px 30px;
+            text-align: left;
+            border-bottom: 1px solid #f1f1f1;
+            display: flex;
+            align-items: center;
+        }
+
+        .company-logo {
+            display: flex;
+            align-items: center;
+            font-weight: bold;
+        }
+
+        .logo-text {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .logo-icon {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            background-color: black;
+            margin-right: 10px;
+            border-radius: 2px;
+            position: relative;
+        }
+
+        .logo-icon::after {
+            content: '';
+            position: absolute;
+            right: -2px;
+            top: 5px;
+            height: 15px;
+            width: 4px;
+            background-color: #ff6600;
+        }
+
+        .gradient-line {
+            height: 4px;
+            background: linear-gradient(90deg, #EE1C27 0%, #3E5FA9 50%, #017D1D 100%);
+            margin: 0;
+        }
+
+        .email-content {
+            padding: 30px;
+            background-color: #ffffff;
+        }
+
+        h1 {
+            color: #333;
+            font-size: 24px;
+            font-weight: 500;
+            margin: 0 0 20px;
+            text-align: center;
+        }
+
+        .success-box {
+            background-color: #f0f8f0;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 25px 0;
+            text-align: center;
+            border: 1px solid #d4e6d4;
+        }
+
+        .success-icon {
+            width: 60px;
+            height: 60px;
+            background-color: #017D1D;
+            border-radius: 50%;
+            display: inline-block;
+            margin-bottom: 15px;
+            position: relative;
+            line-height: 60px;
+            text-align: center;
+            color: white;
+            font-size: 30px;
+            font-weight: bold;
+            font-family: Arial, sans-serif;
+        }
+
+        .success-message {
+            font-size: 18px;
+            font-weight: 500;
+            color: #017D1D;
+            margin: 10px 0;
+        }
+
+        .info-note {
+            background-color: #e8f4f8;
+            border-left: 4px solid #3E5FA9;
+            padding: 12px 15px;
+            margin: 20px 0;
+            font-size: 14px;
+        }
+
+        .email-footer {
+            background-color: white;
+            padding: 20px 30px;
+            color: #666666;
+            font-size: 14px;
+            text-align: center;
+            border-top: 1px solid #e1e4e8;
+        }
+
+        .bottom-gradient {
+            height: 4px;
+            background: linear-gradient(90deg, #EE1C27 0%, #3E5FA9 50%, #017D1D 100%);
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+<div class="email-container">
+    <div class="email-header">
+        <div class="company-logo">
+            <!-- <div class="logo-icon"></div> -->
+            <!-- <div class="logo-text">nova locações</div> -->
+        </div>
+    </div>
+    <div class="gradient-line"></div>
+
+    <div class="email-content">
+        <h1>Senha Alterada com Sucesso</h1>
+
+        <div class="success-box">
+            <div class="success-icon">&#x2713;</div>
+            <p class="success-message">Sua senha foi alterada com sucesso!</p>
+            <p>Agora você já pode entrar na sua conta usando a nova senha.</p>
+        </div>
+
+        <div class="info-note">
+            <strong>Dica:</strong> Se não reconheceu esta alteração, entre em contato imediatamente com nosso suporte.
+        </div>
+    </div>
+
+    <div class="email-footer">
+        <p>Atenciosamente,<br>Equipe NovaLocacoes</p>
+        <p>&copy; 2025 NovaLocacoes. Todos os direitos reservados.</p>
+    </div>
+    <div class="bottom-gradient"></div>
+</div>
+</body>
+</html>

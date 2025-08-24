@@ -51,7 +51,7 @@ public class GlobalExceptionHandler {
         fieldErrors.forEach(fieldError -> 
             errorResponse.addValidationError(fieldError.getField(), fieldError.getDefaultMessage())
         );
-        
+        log.error("Erro de validação: {}", errorResponse.getValidationErrors());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
     
@@ -59,15 +59,15 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ErrorResponse> handleHttpMessageNotReadable(
             HttpMessageNotReadableException ex, HttpServletRequest request) {
-        
+
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .status(HttpStatus.BAD_REQUEST.value())
                 .error("Erro de Parse JSON")
                 .path(request.getRequestURI())
                 .build();
-        
+
         Throwable cause = ex.getCause();
-        
+
         if (cause instanceof InvalidTypeIdException) {
             // Erro específico quando o campo discriminador "tipo" tem valor inválido
             errorResponse.setMessage("Valor inválido para o campo 'tipo'. Valores permitidos: 'PF' (Pessoa Física) ou 'PJ' (Pessoa Jurídica)");
@@ -80,11 +80,13 @@ public class GlobalExceptionHandler {
         } else if (cause instanceof JsonMappingException) {
             // Erro genérico de mapeamento JSON
             errorResponse.setMessage("Erro no mapeamento do JSON: " + cause.getMessage());
+        } else if (ex.getMessage() != null && ex.getMessage().contains("UUID")) {
+            errorResponse.setMessage("O formato do ID é inválido. Utilize um UUID válido no formato: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx");
         } else {
             // Outros erros de leitura
             errorResponse.setMessage("Erro ao processar requisição: " + ex.getMessage());
         }
-        
+
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
     
@@ -127,6 +129,8 @@ public class GlobalExceptionHandler {
                 errorMessage = "Já existe um registro com essas informações no sistema";
             } else if (rootCause.contains("foreign key constraint")) {
                 errorMessage = "Não é possível realizar esta operação pois existem registros relacionados no sistema";
+            } else if (rootCause.contains("Duplicate entry") && rootCause.contains("email")) {
+                errorMessage = "Email já está em uso";
             }
         }
         
@@ -185,25 +189,33 @@ public class GlobalExceptionHandler {
                     .path(request.getRequestURI())
                     .build();
         return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(errorResponse);
-    }    private HttpStatus getStatusForException(ApplicationServiceException ex) {
-        if (ex instanceof RecursoExistenteException) {
-            return HttpStatus.CONFLICT;
-        } else if (ex instanceof RecursoNaoEncontradoException) {
-            return HttpStatus.NOT_FOUND;
-        } else if (ex instanceof RecursoIncompativelException) {
-            return HttpStatus.UNPROCESSABLE_ENTITY;
-        } else if (ex instanceof AuthServiceCommunicationException) {
+    }
+
+    private HttpStatus getStatusForException(ApplicationServiceException ex) {
+        if (ex instanceof AuthServiceCommunicationException) {
             return HttpStatus.SERVICE_UNAVAILABLE;
-        } else if (ex instanceof TokenExpiradoException) {
+        } else if (ex instanceof TokenExpiradoException || ex instanceof AutenticacaoException) {
             return HttpStatus.UNAUTHORIZED;
-        } else if (ex instanceof DocumentoInvalidoException) {
+        } else if (ex instanceof DocumentoInvalidoException || ex instanceof RecursoIncompativelException) {
             return HttpStatus.UNPROCESSABLE_ENTITY;
-        } else if (ex instanceof DocumentoNaoEncontradoException) {
+        } else if (ex instanceof DocumentoNaoEncontradoException || ex instanceof RecursoNaoEncontradoException) {
             return HttpStatus.NOT_FOUND;
-        } else if (ex instanceof VinculoExistenteException) {
+        } else if (ex instanceof VinculoExistenteException || ex instanceof RecursoExistenteException) {
             return HttpStatus.CONFLICT;
         }
         return HttpStatus.INTERNAL_SERVER_ERROR;
+    }
+
+    @ExceptionHandler(AutenticacaoException.class)
+    public ResponseEntity<ErrorResponse> handleAuthServiceException(AutenticacaoException ex, HttpServletRequest request) {
+        log.error("Exceção do serviço de autenticação: {}", ex.getMessage());
+
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .status(getStatusForException(ex).value())
+                .error(ex.getMessage())
+                .path(request.getRequestURI())
+                .build();
+        return ResponseEntity.status(getStatusForException(ex).value()).body(errorResponse);
     }
 
     @ExceptionHandler(TokenExpiradoException.class)

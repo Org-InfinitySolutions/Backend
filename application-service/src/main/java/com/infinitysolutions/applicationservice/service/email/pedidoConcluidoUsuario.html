@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pedido Realizado com Sucesso</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+        body {
+            font-family: 'Roboto', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333333;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            border-radius: 4px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .email-header {
+            background-color: white;
+            color: black;
+            padding: 20px 30px;
+            text-align: left;
+            border-bottom: 1px solid #f1f1f1;
+            display: flex;
+            align-items: center;
+        }
+
+        .company-logo {
+            display: flex;
+            align-items: center;
+            font-weight: bold;
+        }
+
+        .logo-text {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .logo-icon {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            background-color: black;
+            margin-right: 10px;
+            border-radius: 2px;
+            position: relative;
+        }
+
+        .logo-icon::after {
+            content: '';
+            position: absolute;
+            right: -2px;
+            top: 5px;
+            height: 15px;
+            width: 4px;
+            background-color: #ff6600;
+        }
+
+        .gradient-line {
+            height: 4px;
+            background: linear-gradient(90deg, #EE1C27 0%, #3E5FA9 50%, #017D1D 100%);
+            margin: 0;
+        }
+
+        .email-content {
+            padding: 30px;
+            background-color: #ffffff;
+        }
+
+        h1 {
+            color: #333;
+            font-size: 24px;
+            font-weight: 500;
+            margin: 0 0 20px;
+            text-align: center;
+        }
+
+        .greeting {
+            font-size: 16px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .order-confirmation-box {
+            background-color: #f0f8f0;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 25px 0;
+            text-align: center;
+            border: 1px solid #d4e6d4;
+        }
+
+        .order-icon {
+            width: 60px;
+            height: 60px;
+            background-color: #017D1D;
+            border-radius: 50%;
+            display: inline-block;
+            margin-bottom: 15px;
+            position: relative;
+            line-height: 60px;
+            text-align: center;
+            color: white;
+            font-size: 25px;
+            font-weight: bold;
+            font-family: Arial, sans-serif;
+        }
+
+        .order-message {
+            font-size: 18px;
+            font-weight: 500;
+            color: #017D1D;
+            margin: 10px 0;
+        }
+
+        .order-details {
+            background-color: #f8f9fa;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 25px 0;
+            border-left: 4px solid #3E5FA9;
+        }
+
+        .order-details-title {
+            font-size: 16px;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            font-weight: 500;
+            color: #555;
+            min-width: 140px;
+        }
+
+        .detail-value {
+            color: #333;
+            text-align: right;
+            word-break: break-word;
+        }
+
+        .order-number {
+            font-weight: 700;
+            color: #EE1C27;
+            font-size: 18px;
+        }
+
+        .status-badge {
+            background-color: #017D1D;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .next-steps-section {
+            background-color: #e8f4f8;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 25px 0;
+        }
+
+        .next-steps-title {
+            font-size: 16px;
+            font-weight: 500;
+            color: #3E5FA9;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .steps-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .steps-list li {
+            padding: 8px 0;
+            color: #555;
+            font-size: 14px;
+            position: relative;
+            padding-left: 25px;
+        }
+
+        .steps-list li::before {
+            content: counter(step-counter);
+            counter-increment: step-counter;
+            position: absolute;
+            left: 0;
+            top: 8px;
+            background-color: #3E5FA9;
+            color: white;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .steps-list {
+            counter-reset: step-counter;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(90deg, #EE1C27 0%, #3E5FA9 50%, #017D1D 100%);
+            color: white !important;
+            padding: 12px 25px;
+            text-decoration: none !important;
+            border-radius: 4px;
+            font-weight: 500;
+            margin: 20px 0;
+            text-align: center;
+            border: none;
+        }
+
+        .cta-button:hover {
+            color: white !important;
+            text-decoration: none !important;
+        }
+
+        .cta-button:visited {
+            color: white !important;
+        }
+
+        .cta-button:active {
+            color: white !important;
+        }
+
+        .cta-section {
+            text-align: center;
+            margin: 25px 0;
+        }
+
+        .support-note {
+            background-color: #fff3cd;
+            border-left: 4px solid #f3d57a;
+            padding: 12px 15px;
+            margin: 20px 0;
+            font-size: 14px;
+        }
+
+        .email-footer {
+            background-color: white;
+            padding: 20px 30px;
+            color: #666666;
+            font-size: 14px;
+            text-align: center;
+            border-top: 1px solid #e1e4e8;
+        }
+
+        .bottom-gradient {
+            height: 4px;
+            background: linear-gradient(90deg, #EE1C27 0%, #3E5FA9 50%, #017D1D 100%);
+            margin: 0;
+        }
+
+        @media only screen and (max-width: 600px) {
+            .detail-row {
+                flex-direction: column;
+            }
+
+            .detail-value {
+                text-align: left;
+                margin-top: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="email-container">
+    <div class="email-header">
+        <div class="company-logo">
+            <!-- <div class="logo-icon"></div> -->
+            <!-- <div class="logo-text">nova locações</div> -->
+        </div>
+    </div>
+    <div class="gradient-line"></div>
+
+    <div class="email-content">
+        <h1>Pedido Realizado com Sucesso!</h1>
+        <p class="greeting">Olá <strong>Filipe</strong>,</p>
+
+        <div class="order-confirmation-box">
+            <div class="order-icon">&#x1F4E6;</div>
+            <p class="order-message">Seu pedido foi realizado com sucesso!</p>
+            <p>Recebemos sua solicitação e ela já está sendo processada pela nossa equipe.</p>
+        </div>
+
+        <p>Obrigado por escolher a NovaLocacoes! Seu pedido foi registrado em nosso sistema e você receberá atualizações sobre o andamento.</p>
+
+        <div class="order-details">
+            <p class="order-details-title">&#x1F4CB; Detalhes do Pedido:</p>
+            <div class="detail-row">
+                <span class="detail-label">Número do Pedido:</span>
+                <span class="detail-value order-number">#100</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Status:</span>
+                <span class="detail-value"><span class="status-badge">Em análise</span></span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Data do Pedido:</span>
+                <span class="detail-value">02/06/2025 - 20:21</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Quantidade de Itens:</span>
+                <span class="detail-value"><strong>5 itens</strong></span>
+            </div>
+        </div>
+
+        <div class="next-steps-section">
+            <p class="next-steps-title">&#x1F680; Próximos Passos:</p>
+            <ul class="steps-list">
+                <li>Nossa equipe analisará seu pedido e verificará a disponibilidade dos equipamentos</li>
+                <li>Você receberá uma confirmação por email assim que o pedido for aprovado</li>
+                <li>Entraremos em contato para agendar a entrega ou retirada dos equipamentos</li>
+                <li>Acompanhe o status do seu pedido através do seu painel pessoal</li>
+            </ul>
+        </div>
+
+        <div class="cta-section">
+            <p>Acompanhe o status do seu pedido em tempo real:</p>
+            <a href="#" class="cta-button">Acompanhar Pedido</a>
+        </div>
+
+        <div class="support-note">
+            <strong>Precisa de ajuda?</strong> Nossa equipe de suporte está disponível para esclarecer dúvidas sobre seu pedido.
+            Entre em contato conosco a qualquer momento.
+        </div>
+    </div>
+
+    <div class="email-footer">
+        <p>Atenciosamente,<br>Equipe NovaLocacoes</p>
+        <p>&copy; 2025 NovaLocacoes. Todos os direitos reservados.</p>
+    </div>
+    <div class="bottom-gradient"></div>
+</div>
+</body>
+</html>

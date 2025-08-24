@@ -5,7 +5,7 @@ import com.infinitysolutions.applicationservice.infra.exception.AuthServiceCommu
 import com.infinitysolutions.applicationservice.infra.exception.ErroInesperadoException;
 import com.infinitysolutions.applicationservice.model.dto.auth.AuthServiceCadastroRequestDTO;
 import com.infinitysolutions.applicationservice.model.dto.auth.DesativarCredenciaisRequestDTO;
-import com.infinitysolutions.applicationservice.model.dto.auth.RespostaEmailDTO;
+import com.infinitysolutions.applicationservice.model.dto.auth.RespostaEmail;
 import com.infinitysolutions.applicationservice.service.strategy.AuthServiceConnection;
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
@@ -60,28 +60,11 @@ public class HttpAuthServiceConnection implements AuthServiceConnection {
     }
 
     @Override
-    public void desativarCredenciais(UUID idUsuario) {
-        log.info("Desativando credenciais para o usuário ID: {}", idUsuario);
-
-        try {
-            authServiceClient.desativarCredenciais(idUsuario, authApiKey, new DesativarCredenciaisRequestDTO(false));
-            log.info("Credenciais para o usuário ID: {} desativadas com sucesso.", idUsuario);
-        } catch (FeignException e) {
-            log.error("Erro ao desativar credenciais para AuthService para o usuário ID: {}. Status: {}, Response: {}",
-                    idUsuario, e.status(), e.getMessage());
-            throw AuthServiceCommunicationException.servicoIndisponivel();
-        } catch (Exception e) {
-            log.error("Erro inesperado ao desativar credenciais para AuthService para o usuário ID: {}", idUsuario, e);
-            throw ErroInesperadoException.erroInesperado("Erro inesperado na comunicação com AuthService.", e.getMessage());
-        }
-    }
-    
-    @Override
-    public RespostaEmailDTO buscarEmailUsuario(UUID idUsuario) {
+    public RespostaEmail buscarEmailUsuario(UUID idUsuario) {
         log.info("Buscando email do usuário ID: {} no AuthService", idUsuario);
         
         try {
-            RespostaEmailDTO resposta = authServiceClient.buscarEmail(idUsuario, authApiKey);
+            RespostaEmail resposta = authServiceClient.buscarEmail(idUsuario, authApiKey);
             log.info("Email do usuário ID: {} obtido com sucesso", idUsuario);
             return resposta;
         } catch (FeignException e) {
