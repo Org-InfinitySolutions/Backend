@@ -2,13 +2,13 @@ package com.infinitysolutions.applicationservice.service;
 
 import com.infinitysolutions.applicationservice.infra.exception.DocumentoNaoEncontradoException;
 import com.infinitysolutions.applicationservice.infra.exception.ErroInesperadoException;
-import com.infinitysolutions.applicationservice.mapper.ArquivoMetadadosMapper;
-import com.infinitysolutions.applicationservice.model.ArquivoMetadados;
-import com.infinitysolutions.applicationservice.model.Pedido;
-import com.infinitysolutions.applicationservice.model.Usuario;
-import com.infinitysolutions.applicationservice.model.enums.TipoAnexo;
-import com.infinitysolutions.applicationservice.model.produto.Produto;
-import com.infinitysolutions.applicationservice.repository.ArquivoMetadadosRepository;
+import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.entity.PedidoEntity;
+import com.infinitysolutions.applicationservice.infrastructure.mapper.ArquivoMetadadosMapper;
+import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.entity.ArquivoMetadadosEntity;
+import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.entity.UsuarioEntity;
+import com.infinitysolutions.applicationservice.core.domain.valueobject.TipoAnexo;
+import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.entity.produto.ProdutoEntity;
+import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.repository.ArquivoMetadadosRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -34,7 +34,7 @@ public class ArquivoMetadadosService {
     }
 
     @Transactional
-    public ArquivoMetadados uploadAndPersistArquivo(MultipartFile file, TipoAnexo tipoAnexo, Produto produto) {
+    public ArquivoMetadadosEntity uploadAndPersistArquivo(MultipartFile file, TipoAnexo tipoAnexo, ProdutoEntity produtoEntity) {
         if (file.isEmpty()) {
             throw new IllegalArgumentException("O arquivo não pode estar vazio.");
         }
@@ -47,14 +47,14 @@ public class ArquivoMetadadosService {
         } catch (IOException e) {
             throw new ErroInesperadoException("Erro ao enviar o arquivo privado.");
         }
-        ArquivoMetadados arquivoMetadadosSalvo = ArquivoMetadadosMapper.toEntity(blobFullName, blobUrl, file.getOriginalFilename(), file.getContentType(), file.getSize(), tipoAnexo);
-        arquivoMetadadosSalvo.setProduto(produto);
-        return repository.save(arquivoMetadadosSalvo);
+        ArquivoMetadadosEntity arquivoMetadadosEntitySalvo = ArquivoMetadadosMapper.toEntity(blobFullName, blobUrl, file.getOriginalFilename(), file.getContentType(), file.getSize(), tipoAnexo);
+        arquivoMetadadosEntitySalvo.setProduto(produtoEntity);
+        return repository.save(arquivoMetadadosEntitySalvo);
     }
 
 
     @Transactional
-    public ArquivoMetadados uploadAndPersistArquivo(MultipartFile file, TipoAnexo tipoAnexo, Usuario usuario) {
+    public ArquivoMetadadosEntity uploadAndPersistArquivo(MultipartFile file, TipoAnexo tipoAnexo, UsuarioEntity usuarioEntity) {
         if (file.isEmpty()) {
             throw new IllegalArgumentException("O arquivo não pode estar vazio.");
         }
@@ -73,13 +73,13 @@ public class ArquivoMetadadosService {
         } catch (IOException e) {
             throw new ErroInesperadoException("Erro ao enviar o arquivo privado.");
         }
-        ArquivoMetadados arquivoMetadadosSalvo = ArquivoMetadadosMapper.toEntity(blobFullName, blobUrl, file.getOriginalFilename(), file.getContentType(), file.getSize(), tipoAnexo);
-        arquivoMetadadosSalvo.setUsuario(usuario);
-        return repository.save(arquivoMetadadosSalvo);
+        ArquivoMetadadosEntity arquivoMetadadosEntitySalvo = ArquivoMetadadosMapper.toEntity(blobFullName, blobUrl, file.getOriginalFilename(), file.getContentType(), file.getSize(), tipoAnexo);
+        arquivoMetadadosEntitySalvo.setUsuario(usuarioEntity);
+        return repository.save(arquivoMetadadosEntitySalvo);
     }
 
     @Transactional
-    public ArquivoMetadados uploadAndPersistArquivo(MultipartFile file, TipoAnexo tipoAnexo, Pedido pedido) {
+    public ArquivoMetadadosEntity uploadAndPersistArquivo(MultipartFile file, TipoAnexo tipoAnexo, PedidoEntity pedidoEntity) {
         if (file.isEmpty()) {
             throw new IllegalArgumentException("O arquivo não pode estar vazio.");
         }
@@ -92,33 +92,33 @@ public class ArquivoMetadadosService {
         } catch (IOException e) {
             throw new ErroInesperadoException("Erro ao enviar o arquivo privado.");
         }
-        ArquivoMetadados arquivoMetadadosSalvo = ArquivoMetadadosMapper.toEntity(blobFullName, blobUrl, file.getOriginalFilename(), file.getContentType(), file.getSize(), tipoAnexo);
-        arquivoMetadadosSalvo.setPedido(pedido);
-        return repository.save(arquivoMetadadosSalvo);
+        ArquivoMetadadosEntity arquivoMetadadosEntitySalvo = ArquivoMetadadosMapper.toEntity(blobFullName, blobUrl, file.getOriginalFilename(), file.getContentType(), file.getSize(), tipoAnexo);
+        arquivoMetadadosEntitySalvo.setPedido(pedidoEntity);
+        return repository.save(arquivoMetadadosEntitySalvo);
     }
 
     @Transactional
     public void deleteArquivo(Long arquivoId) {
-        ArquivoMetadados arquivoMetadados = findById(arquivoId);
-        fileUploadService.deletarArquivo(arquivoMetadados.getBlobUrl());
-        repository.delete(arquivoMetadados);
+        ArquivoMetadadosEntity arquivoMetadadosEntity = findById(arquivoId);
+        fileUploadService.deletarArquivo(arquivoMetadadosEntity.getBlobUrl());
+        repository.delete(arquivoMetadadosEntity);
     }
 
 
 
     @Transactional
-    public ArquivoMetadados atualizarImagemProduto(MultipartFile novaImagem, Produto produto) {
+    public ArquivoMetadadosEntity atualizarImagemProduto(MultipartFile novaImagem, ProdutoEntity produtoEntity) {
         if (novaImagem.isEmpty()) {
             throw new IllegalArgumentException("O arquivo de imagem não pode estar vazio.");
         }
         
-        log.info("Iniciando atualização de imagem para produto ID: {}", produto.getId());
+        log.info("Iniciando atualização de imagem para produto ID: {}", produtoEntity.getId());
         
         // Buscar as imagens existentes do produto para excluir do blob storage
-        List<ArquivoMetadados> imagensExistentes = repository.findByProduto(produto);
+        List<ArquivoMetadadosEntity> imagensExistentes = repository.findByProduto(produtoEntity);
         
         // Excluir as imagens antigas do blob storage
-        for (ArquivoMetadados imagemAntiga : imagensExistentes) {
+        for (ArquivoMetadadosEntity imagemAntiga : imagensExistentes) {
             try {
                 fileUploadService.deletarArquivo(imagemAntiga.getBlobUrl());
                 repository.delete(imagemAntiga);
@@ -130,10 +130,10 @@ public class ArquivoMetadadosService {
         
         // Fazer upload da nova imagem
         log.info("Fazendo upload da nova imagem: {}", novaImagem.getOriginalFilename());
-        return uploadAndPersistArquivo(novaImagem, TipoAnexo.IMAGEM_PRODUTO, produto);
+        return uploadAndPersistArquivo(novaImagem, TipoAnexo.IMAGEM_PRODUTO, produtoEntity);
     }
 
-    private ArquivoMetadados findById(Long arquivoId) {
+    private ArquivoMetadadosEntity findById(Long arquivoId) {
         return repository.findById(arquivoId).orElseThrow(() -> DocumentoNaoEncontradoException.naoEncontradoPorId(arquivoId));
     }
 

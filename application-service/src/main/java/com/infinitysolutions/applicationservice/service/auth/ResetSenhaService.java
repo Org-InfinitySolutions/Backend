@@ -1,7 +1,7 @@
 package com.infinitysolutions.applicationservice.service.auth;
 
-import com.infinitysolutions.applicationservice.infra.exception.RecursoNaoEncontradoException;
-import com.infinitysolutions.applicationservice.model.dto.auth.RespostaResetSenha;
+import com.infinitysolutions.applicationservice.core.exception.RecursoNaoEncontradoException;
+import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.auth.RespostaResetSenha;
 import com.infinitysolutions.applicationservice.service.email.CodigoAutenticacaoService;
 import com.infinitysolutions.applicationservice.service.email.EnvioEmailService;
 import lombok.RequiredArgsConstructor;

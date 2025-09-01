@@ -1,18 +1,18 @@
 package com.infinitysolutions.applicationservice.service.produto;
 
 
+import com.infinitysolutions.applicationservice.core.exception.RecursoNaoEncontradoException;
 import com.infinitysolutions.applicationservice.infra.exception.EntidadeNaoEncontradaException;
-import com.infinitysolutions.applicationservice.infra.exception.RecursoNaoEncontradoException;
 import com.infinitysolutions.applicationservice.infra.exception.VinculoExistenteException;
-import com.infinitysolutions.applicationservice.mapper.produto.ProdutoMapper;
-import com.infinitysolutions.applicationservice.model.dto.produto.ProdutoAtualizacaoDTO;
-import com.infinitysolutions.applicationservice.model.dto.produto.ProdutoCriacaoDTO;
-import com.infinitysolutions.applicationservice.model.dto.produto.ProdutoRespostaDTO;
-import com.infinitysolutions.applicationservice.model.enums.TipoAnexo;
-import com.infinitysolutions.applicationservice.model.produto.Categoria;
-import com.infinitysolutions.applicationservice.model.produto.Produto;
-import com.infinitysolutions.applicationservice.repository.produto.ProdutoRepository;
-import com.infinitysolutions.applicationservice.repository.produto.ProdutoPedidoRepository;
+import com.infinitysolutions.applicationservice.infrastructure.mapper.produto.ProdutoMapper;
+import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.produto.ProdutoAtualizacaoDTO;
+import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.produto.ProdutoCriacaoDTO;
+import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.produto.ProdutoRespostaDTO;
+import com.infinitysolutions.applicationservice.core.domain.valueobject.TipoAnexo;
+import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.entity.produto.Categoria;
+import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.entity.produto.ProdutoEntity;
+import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.repository.produto.ProdutoRepository;
+import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.repository.produto.ProdutoPedidoRepository;
 import com.infinitysolutions.applicationservice.service.ArquivoMetadadosService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -46,9 +46,9 @@ public class ProdutoService {
                 .toList();
     }
 
-    private Produto findById(Integer id) {
+    private ProdutoEntity findById(Integer id) {
         log.info("Buscando produto com ID: {}", id);
-        Optional<Produto> produto = repository.findByIdAndIsAtivoTrue(id);
+        Optional<ProdutoEntity> produto = repository.findByIdAndIsAtivoTrue(id);
         if (produto.isEmpty()) {
             log.warn("Produto com o ID: {} não encontrado", id);
             throw RecursoNaoEncontradoException.produtoNaoEncontrado(id);
@@ -56,9 +56,9 @@ public class ProdutoService {
         return produto.get();
     }
 
-    private Produto findByIdAdmin(Integer id) {
+    private ProdutoEntity findByIdAdmin(Integer id) {
         log.info("Buscando produto com ID (admin): {}", id);
-        Optional<Produto> produto = repository.findById(id);
+        Optional<ProdutoEntity> produto = repository.findById(id);
         if (produto.isEmpty()) {
             log.warn("Produto com o ID: {} não encontrado", id);
             throw RecursoNaoEncontradoException.produtoNaoEncontrado(id);
@@ -78,36 +78,36 @@ public class ProdutoService {
     public ProdutoRespostaDTO criar(ProdutoCriacaoDTO dto, MultipartFile imagem) {
         Categoria categoria = categoriaService.findById(dto.getCategoriaId());
 
-        Produto produto = ProdutoMapper.toProduto(dto, categoria);
+        ProdutoEntity produtoEntity = ProdutoMapper.toProduto(dto, categoria);
         if (imagem != null && !imagem.isEmpty()) {
-            arquivoMetadadosService.uploadAndPersistArquivo(imagem, TipoAnexo.IMAGEM_PRODUTO, produto);
+            arquivoMetadadosService.uploadAndPersistArquivo(imagem, TipoAnexo.IMAGEM_PRODUTO, produtoEntity);
         }
 
-        Produto produtoSalvo = repository.save(produto);
-        return ProdutoMapper.toProdutoGenericoRespostaDTO(produtoSalvo);
+        ProdutoEntity produtoEntitySalvo = repository.save(produtoEntity);
+        return ProdutoMapper.toProdutoGenericoRespostaDTO(produtoEntitySalvo);
     }
     
     @Transactional
     public ProdutoRespostaDTO atualizar(Integer id, ProdutoAtualizacaoDTO dto) {
-        Produto produto = findByIdAdmin(id);
+        ProdutoEntity produtoEntity = findByIdAdmin(id);
 
         Categoria categoria = categoriaService.findById(dto.getCategoriaId());
 
-        ProdutoMapper.atualizarProduto(produto, dto, categoria);
-        Produto produtoAtualizado = repository.save(produto);
-        return ProdutoMapper.toProdutoGenericoRespostaDTO(produtoAtualizado);
+        ProdutoMapper.atualizarProduto(produtoEntity, dto, categoria);
+        ProdutoEntity produtoEntityAtualizado = repository.save(produtoEntity);
+        return ProdutoMapper.toProdutoGenericoRespostaDTO(produtoEntityAtualizado);
     }
     
     @Transactional
     public void atualizarImagem(Integer id, MultipartFile novaImagem) {
         log.info("Atualizando imagem do produto ID: {}", id);
-        Produto produto = findByIdAdmin(id);
+        ProdutoEntity produtoEntity = findByIdAdmin(id);
         
         if (novaImagem == null || novaImagem.isEmpty()) {
             throw new IllegalArgumentException("Arquivo de imagem é obrigatório");
         }
         
-        arquivoMetadadosService.atualizarImagemProduto(novaImagem, produto);
+        arquivoMetadadosService.atualizarImagemProduto(novaImagem, produtoEntity);
         log.info("Imagem do produto ID: {} atualizada com sucesso", id);
     }
       @Transactional
@@ -119,7 +119,7 @@ public class ProdutoService {
         }
         
         // Verificar se o produto está vinculado a algum pedido
-        if (produtoPedidoRepository.existsByProdutoId(id)) {
+        if (produtoPedidoRepository.existsByProdutoEntityId(id)) {
             log.warn("Tentativa de exclusão do produto {} que está vinculado a pedidos", id);
             throw VinculoExistenteException.produtoVinculadoAPedidos(id);
         }

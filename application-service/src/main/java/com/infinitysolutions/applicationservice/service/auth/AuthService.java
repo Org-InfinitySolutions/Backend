@@ -1,7 +1,7 @@
 package com.infinitysolutions.applicationservice.service.auth;
 
-import com.infinitysolutions.applicationservice.model.auth.Credencial;
-import com.infinitysolutions.applicationservice.model.dto.auth.RespostaLogin;
+import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.entity.CredencialEntity;
+import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.auth.RespostaLogin;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,24 +26,24 @@ public class AuthService {
     private long TEMPO_EXPIRACAO_SEGUNDOS;
 
     public RespostaLogin realizarLogin(String email, String senha) {
-       Credencial credencialEncontrada = credencialService.obterCredencial(email, senha);
+       CredencialEntity credencialEntityEncontrada = credencialService.obterCredencial(email, senha);
         Instant now = Instant.now();
         Instant expiresAt = now.plus(TEMPO_EXPIRACAO_SEGUNDOS, ChronoUnit.SECONDS);
 
-        String scope = credencialEncontrada.getCargos().stream()
+        String scope = credencialEntityEncontrada.getCargoEntities().stream()
                 .map(cargo -> "ROLE_" + cargo.getNome().name())
                 .collect(Collectors.joining(" "));
 
         JwtClaimsSet claims = JwtClaimsSet.builder()
                 .issuer("auth-service")
-                .subject(credencialEncontrada.getFkUsuario().toString())
+                .subject(credencialEntityEncontrada.getFkUsuario().toString())
                 .issuedAt(now)
                 .expiresAt(expiresAt)
                 .claim("scope", scope)
                 .build();
 
         String tokenValue = jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
-        log.info("Token JWT gerado com sucesso para o usuário: {}", credencialEncontrada.getFkUsuario());
+        log.info("Token JWT gerado com sucesso para o usuário: {}", credencialEntityEncontrada.getFkUsuario());
         return new RespostaLogin(tokenValue, (int) TEMPO_EXPIRACAO_SEGUNDOS);
     }
 }

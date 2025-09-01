@@ -1078,11 +1078,11 @@ public class EmailTemplateService {
                 
                         <div class="order-confirmation-box">
                             <div class="order-icon">&#x1F4E6;</div>
-                            <p class="order-message">Seu pedido foi realizado com sucesso!</p>
+                            <p class="order-message">Seu pedidoEntity foi realizado com sucesso!</p>
                             <p>Recebemos sua solicitação e ela já está sendo processada pela nossa equipe.</p>
                         </div>
                 
-                        <p>Obrigado por escolher a NovaLocacoes! Seu pedido foi registrado em nosso sistema e você receberá atualizações sobre o andamento.</p>
+                        <p>Obrigado por escolher a NovaLocacoes! Seu pedidoEntity foi registrado em nosso sistema e você receberá atualizações sobre o andamento.</p>
                 
                         <!-- Order Details -->
                                         <table cellpadding="0" cellspacing="0" border="0" width="100%%" style="background-color: #f8f9fa; border-radius: 6px; margin: 25px 0; border-left: 4px solid #3E5FA9;">
@@ -1145,7 +1145,7 @@ public class EmailTemplateService {
                                                                 <span style="background-color: #3E5FA9; color: white; width: 18px; height: 18px; border-radius: 50%%; display: inline-block; text-align: center; font-size: 11px; font-weight: bold; line-height: 18px;">1</span>
                                                             </td>
                                                             <td style="padding: 8px 0 8px 7px; color: #555; font-size: 14px;">
-                                                                Nossa equipe analisará seu pedido e verificará a disponibilidade dos equipamentos
+                                                                Nossa equipe analisará seu pedidoEntity e verificará a disponibilidade dos equipamentos
                                                             </td>
                                                         </tr>
                                                         <tr>
@@ -1153,7 +1153,7 @@ public class EmailTemplateService {
                                                                 <span style="background-color: #3E5FA9; color: white; width: 18px; height: 18px; border-radius: 50%%; display: inline-block; text-align: center; font-size: 11px; font-weight: bold; line-height: 18px;">2</span>
                                                             </td>
                                                             <td style="padding: 8px 0 8px 7px; color: #555; font-size: 14px;">
-                                                                Você receberá uma confirmação por email assim que o pedido for aprovado
+                                                                Você receberá uma confirmação por email assim que o pedidoEntity for aprovado
                                                             </td>
                                                         </tr>
                                                         <tr>
@@ -1169,7 +1169,7 @@ public class EmailTemplateService {
                                                                 <span style="background-color: #3E5FA9; color: white; width: 18px; height: 18px; border-radius: 50%%; display: inline-block; text-align: center; font-size: 11px; font-weight: bold; line-height: 18px;">4</span>
                                                             </td>
                                                             <td style="padding: 8px 0 8px 7px; color: #555; font-size: 14px;">
-                                                                Acompanhe o status do seu pedido através do seu painel pessoal
+                                                                Acompanhe o status do seu pedidoEntity através do seu painel pessoal
                                                             </td>
                                                         </tr>
                                                     </table>
@@ -1178,12 +1178,12 @@ public class EmailTemplateService {
                                         </table>
                 
                         <div class="cta-section">
-                            <p>Acompanhe o status do seu pedido em tempo real:</p>
+                            <p>Acompanhe o status do seu pedidoEntity em tempo real:</p>
                             <a href="#" class="cta-button">Acompanhar Pedido</a>
                         </div>
                 
                         <div class="support-note">
-                            <strong>Precisa de ajuda?</strong> Nossa equipe de suporte está disponível para esclarecer dúvidas sobre seu pedido. 
+                            <strong>Precisa de ajuda?</strong> Nossa equipe de suporte está disponível para esclarecer dúvidas sobre seu pedidoEntity. 
                             Entre em contato conosco a qualquer momento.
                         </div>
                     </div>
@@ -1527,11 +1527,11 @@ public class EmailTemplateService {
                 
                         <div class="notification-box">
                             <div class="notification-icon">&#x1F4E6;</div>
-                            <p class="notification-message">Um novo pedido foi realizado!</p>
-                            <p>Um cliente acabou de fazer um pedido na plataforma NovaLocacoes.</p>
+                            <p class="notification-message">Um novo pedidoEntity foi realizado!</p>
+                            <p>Um cliente acabou de fazer um pedidoEntity na plataforma NovaLocacoes.</p>
                         </div>
                 
-                        <p>Um novo pedido foi registrado em nossa plataforma e requer sua atenção. Confira os detalhes completos abaixo:</p>
+                        <p>Um novo pedidoEntity foi registrado em nossa plataforma e requer sua atenção. Confira os detalhes completos abaixo:</p>
                 
                         <div class="customer-info">
                             <p class="customer-info-title">&#x1F464; Informações do Cliente:</p>
@@ -1578,17 +1578,17 @@ public class EmailTemplateService {
                 
                         <div class="priority-section">
                             <p class="priority-title">&#x26A0; Ação Necessária:</p>
-                            <p class="priority-text">Este pedido está aguardando análise e precisa ser processado. 
+                            <p class="priority-text">Este pedidoEntity está aguardando análise e precisa ser processado. 
                             Verifique a disponibilidade dos itens e entre em contato com o cliente para confirmar detalhes.</p>
                         </div>
                 
                         <div class="cta-section">
-                            <p>Acesse o painel administrativo para gerenciar este pedido:</p>
+                            <p>Acesse o painel administrativo para gerenciar este pedidoEntity:</p>
                             <a href="#" class="cta-button">Gerenciar Pedido</a>
                         </div>
                 
                         <div class="admin-note">
-                            <strong>Lembrete:</strong> O cliente receberá atualizações automáticas sobre o status do pedido. 
+                            <strong>Lembrete:</strong> O cliente receberá atualizações automáticas sobre o status do pedidoEntity. 
                             Certifique-se de atualizar o status conforme o andamento do processo.
                         </div>
                     </div>
@@ -1920,7 +1920,7 @@ public class EmailTemplateService {
                         <h1>Atualização do Seu Pedido</h1>
                         <p class="greeting">Olá <strong>%s</strong>,</p>
                 
-                        <p>Temos uma atualização importante sobre o seu pedido. O status foi alterado e queremos mantê-lo informado sobre o progresso.</p>
+                        <p>Temos uma atualização importante sobre o seu pedidoEntity. O status foi alterado e queremos mantê-lo informado sobre o progresso.</p>
                 
                         <div class="status-update-box">
                             <div class="status-icon">🔄</div>
@@ -1966,7 +1966,7 @@ public class EmailTemplateService {
                 
                         <div class="next-steps">
                             <div class="next-steps-title">📌 Próximos Passos</div>
-                            <p>Dependendo do novo status, você pode acompanhar o progresso do seu pedido através da nossa plataforma. 
+                            <p>Dependendo do novo status, você pode acompanhar o progresso do seu pedidoEntity através da nossa plataforma. 
                             Se tiver alguma dúvida, nossa equipe está sempre disponível para ajudá-lo.</p>
                         </div>
                 

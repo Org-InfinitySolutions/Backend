@@ -1,8 +1,8 @@
 package com.infinitysolutions.applicationservice.infra.client;
 
-import com.infinitysolutions.applicationservice.model.dto.auth.AuthServiceCadastroRequestDTO;
-import com.infinitysolutions.applicationservice.model.dto.auth.DesativarCredenciaisRequestDTO;
-import com.infinitysolutions.applicationservice.model.dto.auth.RespostaEmail;
+import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.auth.AuthServiceCadastroRequestDTO;
+import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.auth.DesativarCredenciaisRequestDTO;
+import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.auth.RespostaEmail;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;

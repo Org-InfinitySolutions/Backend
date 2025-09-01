@@ -1,22 +1,24 @@
 package com.infinitysolutions.applicationservice.service;
 
+import com.infinitysolutions.applicationservice.core.exception.RecursoNaoEncontradoException;
+import com.infinitysolutions.applicationservice.core.usecases.usuario.BuscarUsuarioPorId;
 import com.infinitysolutions.applicationservice.infra.exception.OperacaoNaoPermitidaException;
-import com.infinitysolutions.applicationservice.infra.exception.RecursoNaoEncontradoException;
-import com.infinitysolutions.applicationservice.mapper.PedidoMapper;
-import com.infinitysolutions.applicationservice.model.Endereco;
-import com.infinitysolutions.applicationservice.model.Pedido;
-import com.infinitysolutions.applicationservice.model.Usuario;
-import com.infinitysolutions.applicationservice.model.dto.email.EmailNotificacaoMudancaStatusDTO;
-import com.infinitysolutions.applicationservice.model.dto.email.EmailNotificacaoPedidoConcluidoAdminDTO;
-import com.infinitysolutions.applicationservice.model.dto.email.EmailNotificacaoPedidoConcluidoDTO;
-import com.infinitysolutions.applicationservice.model.dto.pedido.*;
-import com.infinitysolutions.applicationservice.model.enums.SituacaoPedido;
-import com.infinitysolutions.applicationservice.model.enums.TipoAnexo;
-import com.infinitysolutions.applicationservice.model.produto.Produto;
-import com.infinitysolutions.applicationservice.model.produto.ProdutoPedido;
-import com.infinitysolutions.applicationservice.repository.PedidoRepository;
-import com.infinitysolutions.applicationservice.repository.produto.ProdutoRepository;
-import com.infinitysolutions.applicationservice.repository.UsuarioRepository;
+import com.infinitysolutions.applicationservice.infrastructure.mapper.UsuarioEntityMapper;
+import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.entity.EnderecoEntity;
+import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.entity.PedidoEntity;
+import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.entity.UsuarioEntity;
+import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.pedido.*;
+import com.infinitysolutions.applicationservice.infrastructure.mapper.PedidoMapper;
+import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.email.EmailNotificacaoMudancaStatusDTO;
+import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.email.EmailPedidoConcluidoAdminDTO;
+import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.email.EmailNotificacaoPedidoConcluidoDTO;
+import com.infinitysolutions.applicationservice.core.domain.valueobject.SituacaoPedido;
+import com.infinitysolutions.applicationservice.core.domain.valueobject.TipoAnexo;
+import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.entity.produto.ProdutoEntity;
+import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.entity.produto.ProdutoPedido;
+import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.repository.PedidoRepository;
+import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.repository.produto.ProdutoRepository;
+import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.repository.UsuarioRepository;
 import com.infinitysolutions.applicationservice.service.email.EnvioEmailService;
 import com.infinitysolutions.applicationservice.service.strategy.AuthServiceConnection;
 import jakarta.transaction.Transactional;
@@ -36,28 +38,30 @@ import java.util.stream.Collectors;
 public class PedidoService {
     private final PedidoRepository pedidoRepository;
     private final UsuarioRepository usuarioRepository;
-    private final UsuarioService usuarioService;
     private final ProdutoRepository produtoRepository;
     private final EnderecoService enderecoService;
     private final ArquivoMetadadosService arquivoMetadadosService;
     private final FileUploadService fileUploadService;
     private final EnvioEmailService envioEmailService;
     private final AuthServiceConnection authServiceConnection;
+
+    private final BuscarUsuarioPorId buscarUsuarioPorId;
+    private final UsuarioEntityMapper usuarioMapper;
     
     @Transactional
     public PedidoRespostaCadastroDTO cadastrar(PedidoCadastroDTO dto, MultipartFile documentoAuxiliar, UUID usuarioId) {
-            Usuario usuario = usuarioRepository.findByIdAndIsAtivoTrue(usuarioId).orElseThrow(() -> RecursoNaoEncontradoException.usuarioNaoEncontrado(usuarioId));
+            UsuarioEntity usuarioEntity = usuarioRepository.findByIdAndIsAtivoTrue(usuarioId).orElseThrow(() -> RecursoNaoEncontradoException.usuarioNaoEncontrado(usuarioId));
 
             Map<Integer, PedidoCadastroDTO.ProdutoPedidoDTO> mapaDtos = dto.produtos()
                     .stream().collect(Collectors.toMap(PedidoCadastroDTO.ProdutoPedidoDTO::produtoId, Function.identity()));
 
             Set<Integer> produtoIds = new HashSet<>(mapaDtos.keySet());
 
-            List<Produto> produtos = produtoRepository.findAllById(produtoIds);
+            List<ProdutoEntity> produtoEntities = produtoRepository.findAllById(produtoIds);
 
-            if (produtos.size() != produtoIds.size()) {
-                Set<Integer> idsEncontrados = produtos.stream()
-                        .map(Produto::getId).collect(Collectors.toSet());
+            if (produtoEntities.size() != produtoIds.size()) {
+                Set<Integer> idsEncontrados = produtoEntities.stream()
+                        .map(ProdutoEntity::getId).collect(Collectors.toSet());
 
                 List<Integer> idsNaoEncontrados = produtoIds.stream()
                         .filter(id -> !idsEncontrados.contains(id)).toList();
@@ -65,24 +69,24 @@ public class PedidoService {
                 throw new RecursoNaoEncontradoException("Produtos não encontrados: " + idsNaoEncontrados);
             }
 
-            Endereco enderecoEncontrado = enderecoService.buscarEndereco(dto.endereco());
+            EnderecoEntity enderecoEntityEncontrado = enderecoService.buscarEndereco(dto.endereco());
 
-            Pedido pedidoCriado = PedidoMapper.toPedido(dto, usuario, enderecoEncontrado);
+            PedidoEntity pedidoEntityCriado = PedidoMapper.toPedido(dto, usuarioEntity, enderecoEntityEncontrado);
 
-            Pedido pedidoSalvo = pedidoRepository.save(pedidoCriado);
-            List<ProdutoPedido> produtosPedido = produtos.stream()
+            PedidoEntity pedidoEntitySalvo = pedidoRepository.save(pedidoEntityCriado);
+            List<ProdutoPedido> produtosPedido = produtoEntities.stream()
                     .map(produto -> {
                         PedidoCadastroDTO.ProdutoPedidoDTO dtoCorrespondente = mapaDtos.get(produto.getId());
-                        return createProdutoPedido(produto, pedidoSalvo, dtoCorrespondente);
+                        return createProdutoPedido(produto, pedidoEntitySalvo, dtoCorrespondente);
                     }).collect(Collectors.toList());
 
-            pedidoSalvo.setProdutosPedido(produtosPedido);
+            pedidoEntitySalvo.setProdutosPedido(produtosPedido);
             if (documentoAuxiliar != null && !documentoAuxiliar.isEmpty()) {
-                enviarDocumentoAuxiliar(documentoAuxiliar, pedidoSalvo);
+                enviarDocumentoAuxiliar(documentoAuxiliar, pedidoEntitySalvo);
             }
             
             // Salvar o pedido no banco de dados
-            PedidoRespostaCadastroDTO pedidoRespostaCadastroDTO = PedidoMapper.toPedidoRespostaCadastroDTO(pedidoRepository.save(pedidoSalvo));
+            PedidoRespostaCadastroDTO pedidoRespostaCadastroDTO = PedidoMapper.toPedidoRespostaCadastroDTO(pedidoRepository.save(pedidoEntitySalvo));
             
             // Buscar o email do usuário
             String usuarioEmail = "";
@@ -99,8 +103,8 @@ public class PedidoService {
                 try {
                     int qtdItens = produtosPedido.size();
                     envioEmailService.enviarPedidoConcluidoUsuario(new EmailNotificacaoPedidoConcluidoDTO(
-                            usuario.getNome(),
-                            pedidoSalvo.getId().toString(),
+                            usuarioEntity.getNome(),
+                            pedidoEntitySalvo.getId().toString(),
                             usuarioEmail,
                             String.valueOf(qtdItens)
                     ));
@@ -113,16 +117,16 @@ public class PedidoService {
                     int qtdItens = produtosPedido.size();
                     
                     // Usa a descrição do próprio pedido
-                    String descricaoPedido = pedidoSalvo.getDescricao() != null && !pedidoSalvo.getDescricao().trim().isEmpty() 
-                            ? pedidoSalvo.getDescricao() 
+                    String descricaoPedido = pedidoEntitySalvo.getDescricao() != null && !pedidoEntitySalvo.getDescricao().trim().isEmpty()
+                            ? pedidoEntitySalvo.getDescricao()
                             : "Sem descrição";
                     
-                    envioEmailService.enviarNotificacaoNovoPedido(new EmailNotificacaoPedidoConcluidoAdminDTO(
-                            usuario.getNome(),
-                            pedidoSalvo.getId().toString(),
+                    envioEmailService.enviarNotificacaoNovoPedido(new EmailPedidoConcluidoAdminDTO(
+                            usuarioEntity.getNome(),
+                            pedidoEntitySalvo.getId().toString(),
                             usuarioEmail,
                             String.valueOf(qtdItens),
-                            usuario.getTelefoneCelular(),
+                            usuarioEntity.getTelefoneCelular(),
                             descricaoPedido
                     ));
                     log.info("Email de notificação de novo pedido enviado para o administrador");
@@ -135,53 +139,53 @@ public class PedidoService {
             return pedidoRespostaCadastroDTO;
     }
 
-    private void enviarDocumentoAuxiliar(MultipartFile arquivo, Pedido pedido) {
+    private void enviarDocumentoAuxiliar(MultipartFile arquivo, PedidoEntity pedidoEntity) {
         long maxSize = 20L * 1024L * 1024L; // 20MB
         if (arquivo.getSize() > maxSize) {
             throw new IllegalArgumentException("Arquivo muito grande. Tamanho máximo: 20MB");
         }
         log.info("Documento auxiliar está pronto para ser enviado ao bucket!!!");
-        arquivoMetadadosService.uploadAndPersistArquivo(arquivo, TipoAnexo.DOCUMENTO_AUXILIAR, pedido);
-    }    private static ProdutoPedido createProdutoPedido(Produto produto, Pedido pedidoSalvo, PedidoCadastroDTO.ProdutoPedidoDTO dtoCorrespondente) {
+        arquivoMetadadosService.uploadAndPersistArquivo(arquivo, TipoAnexo.DOCUMENTO_AUXILIAR, pedidoEntity);
+    }    private static ProdutoPedido createProdutoPedido(ProdutoEntity produtoEntity, PedidoEntity pedidoEntitySalvo, PedidoCadastroDTO.ProdutoPedidoDTO dtoCorrespondente) {
         ProdutoPedido produtoPedido = new ProdutoPedido();
-        produtoPedido.setPedido(pedidoSalvo);
-        produtoPedido.setProduto(produto);
+        produtoPedido.setPedidoEntity(pedidoEntitySalvo);
+        produtoPedido.setProdutoEntity(produtoEntity);
         produtoPedido.setQtd(dtoCorrespondente.quantidade());
         return produtoPedido;
     }
       @Transactional
     public PedidoRespostaDTO atualizarSituacao(Integer pedidoId, PedidoAtualizacaoSituacaoDTO dto, boolean isCustomer) {
-        Pedido pedido = findById(pedidoId);
-        var statusAntigo = pedido.getSituacao();
-        if (dto.situacao() == SituacaoPedido.CANCELADO && pedido.getSituacao() != SituacaoPedido.EM_ANALISE && isCustomer) {
+        PedidoEntity pedidoEntity = findById(pedidoId);
+        var statusAntigo = pedidoEntity.getSituacao();
+        if (dto.situacao() == SituacaoPedido.CANCELADO && pedidoEntity.getSituacao() != SituacaoPedido.EM_ANALISE && isCustomer) {
              log.warn("Tentativa do usuário comum de cancelar pedido {} que não está em análise. Situação atual: {}",
-                     pedidoId, pedido.getSituacao());
+                     pedidoId, pedidoEntity.getSituacao());
             throw OperacaoNaoPermitidaException.cancelamentoPedido(pedidoId);
         }        log.info("Atualizando situação do pedido {} de {} para {}",
-                pedidoId, pedido.getSituacao(), dto.situacao());
+                pedidoId, pedidoEntity.getSituacao(), dto.situacao());
         
-        ajustarEstoque(pedido, statusAntigo, dto.situacao());
+        ajustarEstoque(pedidoEntity, statusAntigo, dto.situacao());
           // Definir a data específica baseada no novo status
         LocalDateTime agora = LocalDateTime.now();
         switch (dto.situacao()) {
-            case APROVADO -> pedido.setDataAprovacao(agora);
-            case EM_EVENTO -> pedido.setDataInicioEvento(agora);
-            case FINALIZADO -> pedido.setDataFinalizacao(agora);
-            case CANCELADO -> pedido.setDataCancelamento(agora);
+            case APROVADO -> pedidoEntity.setDataAprovacao(agora);
+            case EM_EVENTO -> pedidoEntity.setDataInicioEvento(agora);
+            case FINALIZADO -> pedidoEntity.setDataFinalizacao(agora);
+            case CANCELADO -> pedidoEntity.setDataCancelamento(agora);
             case EM_ANALISE -> {
                 // Não precisa definir data específica, pois já é o estado inicial
             }
         }
         
-        pedido.setSituacao(dto.situacao());
-        PedidoRespostaDTO pedidoRespostaDTO = PedidoMapper.toPedidoRespostaDTO(pedidoRepository.save(pedido));
+        pedidoEntity.setSituacao(dto.situacao());
+        PedidoRespostaDTO pedidoRespostaDTO = PedidoMapper.toPedidoRespostaDTO(pedidoRepository.save(pedidoEntity));
 
-        String usuarioEmail = authServiceConnection.buscarEmailUsuario(pedido.getUsuario().getId()).email();
+        String usuarioEmail = authServiceConnection.buscarEmailUsuario(pedidoEntity.getUsuarioEntity().getId()).email();
         
         envioEmailService.enviarNotificacaoMudancaStatusPedido(
             new EmailNotificacaoMudancaStatusDTO(
-                pedido.getUsuario().getNome(), 
-                pedido.getId().toString(), 
+                pedidoEntity.getUsuarioEntity().getNome(),
+                pedidoEntity.getId().toString(),
                 statusAntigo.getNome(),
                 dto.situacao().getNome(),
                 usuarioEmail
@@ -191,18 +195,18 @@ public class PedidoService {
         return pedidoRespostaDTO;
     }
 
-    private void ajustarEstoque(Pedido pedido, SituacaoPedido statusAntigo, SituacaoPedido novoStatus) {
+    private void ajustarEstoque(PedidoEntity pedidoEntity, SituacaoPedido statusAntigo, SituacaoPedido novoStatus) {
         log.info("Iniciando ajuste de estoque para pedido {} - Status: {} -> {}", 
-                pedido.getId(), statusAntigo, novoStatus);        
+                pedidoEntity.getId(), statusAntigo, novoStatus);
         if (statusAntigo == SituacaoPedido.EM_ANALISE && novoStatus == SituacaoPedido.APROVADO) {
-            reduzirEstoque(pedido);
+            reduzirEstoque(pedidoEntity);
         }
         else if ((novoStatus == SituacaoPedido.FINALIZADO || novoStatus == SituacaoPedido.CANCELADO) && 
                  estoqueJaFoiReduzido(statusAntigo)) {
-            devolverEstoque(pedido);
+            devolverEstoque(pedidoEntity);
         }
         
-        log.info("Ajuste de estoque concluído para pedido {}", pedido.getId());
+        log.info("Ajuste de estoque concluído para pedido {}", pedidoEntity.getId());
     }
 
     private boolean estoqueJaFoiReduzido(SituacaoPedido statusAnterior) {
@@ -211,66 +215,66 @@ public class PedidoService {
     }
 
 
-    private void reduzirEstoque(Pedido pedido) {
-        log.info("Reduzindo estoque dos produtos do pedido {}", pedido.getId());
+    private void reduzirEstoque(PedidoEntity pedidoEntity) {
+        log.info("Reduzindo estoque dos produtos do pedido {}", pedidoEntity.getId());
         
-        for (ProdutoPedido produtoPedido : pedido.getProdutosPedido()) {
-            Produto produto = produtoPedido.getProduto();
+        for (ProdutoPedido produtoPedido : pedidoEntity.getProdutosPedido()) {
+            ProdutoEntity produtoEntity = produtoPedido.getProdutoEntity();
             int quantidadePedida = produtoPedido.getQtd();
-            int estoqueAtual = produto.getQtdEstoque();
+            int estoqueAtual = produtoEntity.getQtdEstoque();
             
             if (estoqueAtual < quantidadePedida) {
                 log.error("Estoque insuficiente para produto {} (ID: {}). Disponível: {}, Solicitado: {}", 
-                        produto.getModelo(), produto.getId(), estoqueAtual, quantidadePedida);
+                        produtoEntity.getModelo(), produtoEntity.getId(), estoqueAtual, quantidadePedida);
                 throw new OperacaoNaoPermitidaException(
                     String.format("Estoque insuficiente para o produto %s. Disponível: %d, Solicitado: %d",
-                            produto.getModelo(), estoqueAtual, quantidadePedida));
+                            produtoEntity.getModelo(), estoqueAtual, quantidadePedida));
             }
             
             int novoEstoque = estoqueAtual - quantidadePedida;
-            produto.setQtdEstoque(novoEstoque);
-            produtoRepository.save(produto);
+            produtoEntity.setQtdEstoque(novoEstoque);
+            produtoRepository.save(produtoEntity);
             
             log.info("Estoque reduzido para produto {} (ID: {}): {} -> {}", 
-                    produto.getModelo(), produto.getId(), estoqueAtual, novoEstoque);
+                    produtoEntity.getModelo(), produtoEntity.getId(), estoqueAtual, novoEstoque);
         }
     }
-    private void devolverEstoque(Pedido pedido) {
-        log.info("Devolvendo estoque dos produtos do pedido {}", pedido.getId());
+    private void devolverEstoque(PedidoEntity pedidoEntity) {
+        log.info("Devolvendo estoque dos produtos do pedido {}", pedidoEntity.getId());
         
-        for (ProdutoPedido produtoPedido : pedido.getProdutosPedido()) {
-            Produto produto = produtoPedido.getProduto();
+        for (ProdutoPedido produtoPedido : pedidoEntity.getProdutosPedido()) {
+            ProdutoEntity produtoEntity = produtoPedido.getProdutoEntity();
             int quantidadePedida = produtoPedido.getQtd();
-            int estoqueAtual = produto.getQtdEstoque();
+            int estoqueAtual = produtoEntity.getQtdEstoque();
             int novoEstoque = estoqueAtual + quantidadePedida;
             
-            produto.setQtdEstoque(novoEstoque);
-            produtoRepository.save(produto);
+            produtoEntity.setQtdEstoque(novoEstoque);
+            produtoRepository.save(produtoEntity);
             
             log.info("Estoque devolvido para produto {} (ID: {}): {} -> {}", 
-                    produto.getModelo(), produto.getId(), estoqueAtual, novoEstoque);
+                    produtoEntity.getModelo(), produtoEntity.getId(), estoqueAtual, novoEstoque);
         }
     }
 
-    public Pedido findById(Integer id){
+    public PedidoEntity findById(Integer id){
         return pedidoRepository.findById(id).orElseThrow(() -> new RecursoNaoEncontradoException("Pedido não encontrado"));
     }
 
     public List<PedidoRespostaDTO> listar(UUID id) {
-        List<Pedido> pedidos = pedidoRepository.findByUsuarioIdOrderByDataCriacaoDesc(id);
-        return PedidoMapper.toPedidoRespostaDTOList(pedidos);
+        List<PedidoEntity> pedidoEntities = pedidoRepository.findByUsuarioEntityIdOrderByDataCriacaoDesc(id);
+        return PedidoMapper.toPedidoRespostaDTOList(pedidoEntities);
     }
 
     public List<PedidoRespostaDTO> listarAdmin() {
-        List<Pedido> pedidos = pedidoRepository.findAllWithUsuarioOrderByDataCriacaoDesc();
-        return PedidoMapper.toPedidoRespostaAdminDTOList(pedidos);
+        List<PedidoEntity> pedidoEntities = pedidoRepository.findAllWithUsuarioEntityOrderByDataCriacaoDesc();
+        return PedidoMapper.toPedidoRespostaAdminDTOList(pedidoEntities);
     }
 
     public PedidoRespostaDetalhadoDTO buscarPorIdAdmin(Integer id) {
-        Pedido pedidoEncontrado = pedidoRepository.findWithUsuarioById(id).orElseThrow(() -> RecursoNaoEncontradoException.pedidoNaoEncontrado(id));
-        var usuarioEncontrado = usuarioService.buscarPorId(pedidoEncontrado.getUsuario().getId());
+        PedidoEntity pedidoEntityEncontrado = pedidoRepository.findWithUsuarioEntityById(id).orElseThrow(() -> RecursoNaoEncontradoException.pedidoNaoEncontrado(id));
+        var usuarioEncontrado = usuarioMapper.toUsuarioRespostaDTO(buscarUsuarioPorId.execute(pedidoEntityEncontrado.getUsuarioEntity().getId()));
         List<PedidoRespostaDetalhadoDTO.DocumentoPedidoDTO> urlDocumentos = new ArrayList<>();
-        pedidoEncontrado.getDocumentos().forEach(documento -> {
+        pedidoEntityEncontrado.getDocumentos().forEach(documento -> {
             String blobName = documento.getBlobName();
             String originalFilename = documento.getOriginalFilename();
             String mimeType = documento.getMimeType();
@@ -282,14 +286,14 @@ public class PedidoService {
                     )
             );
         });
-        return PedidoMapper.toPedidoRespostaDetalhadoAdminDTO(pedidoEncontrado, usuarioEncontrado, urlDocumentos);
+        return PedidoMapper.toPedidoRespostaDetalhadoAdminDTO(pedidoEntityEncontrado, usuarioEncontrado, urlDocumentos);
     }
 
     public PedidoRespostaDetalhadoDTO buscarPorId(Integer id, UUID idUsuario) {
-        Pedido pedidoEncontrado = pedidoRepository.findWithUsuarioByIdAndByUsuarioId(id, idUsuario).orElseThrow(() -> RecursoNaoEncontradoException.pedidoNaoEncontradoComUsuario(id, idUsuario));
-        var usuarioEncontrado = usuarioService.buscarPorId(idUsuario);
+        PedidoEntity pedidoEntityEncontrado = pedidoRepository.findWithUsuarioEntityByIdAndByUsuarioEntityId(id, idUsuario).orElseThrow(() -> RecursoNaoEncontradoException.pedidoNaoEncontradoComUsuario(id, idUsuario));
+        var usuarioEncontrado = usuarioMapper.toUsuarioRespostaDTO(buscarUsuarioPorId.execute(idUsuario));
         List<PedidoRespostaDetalhadoDTO.DocumentoPedidoDTO> urlDocumentos = new ArrayList<>();
-        pedidoEncontrado.getDocumentos().forEach(documento -> {
+        pedidoEntityEncontrado.getDocumentos().forEach(documento -> {
             String originalFilename = documento.getOriginalFilename();
             String blobName = documento.getBlobName();
             String mimeType = documento.getMimeType();
@@ -301,6 +305,6 @@ public class PedidoService {
                     )
             );
         });
-        return PedidoMapper.toPedidoRespostaDetalhadoAdminDTO(pedidoEncontrado, usuarioEncontrado, urlDocumentos);
+        return PedidoMapper.toPedidoRespostaDetalhadoAdminDTO(pedidoEntityEncontrado, usuarioEncontrado, urlDocumentos);
     }
 }

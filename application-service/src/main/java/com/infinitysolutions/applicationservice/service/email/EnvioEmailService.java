@@ -1,12 +1,12 @@
 package com.infinitysolutions.applicationservice.service.email;
 
 import com.infinitysolutions.applicationservice.infra.exception.ErroInesperadoException;
-import com.infinitysolutions.applicationservice.model.dto.email.EmailNotificacaoMudancaStatusDTO;
-import com.infinitysolutions.applicationservice.model.dto.email.EmailNotificacaoPedidoConcluidoAdminDTO;
-import com.infinitysolutions.applicationservice.model.dto.email.EmailNotificacaoPedidoConcluidoDTO;
-import com.infinitysolutions.applicationservice.model.dto.email.EmailResponseDTO;
-import com.infinitysolutions.applicationservice.model.dto.usuario.UsuarioAutenticacaoCadastroDTO;
-import com.infinitysolutions.applicationservice.model.enums.SituacaoPedido;
+import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.email.EmailNotificacaoMudancaStatusDTO;
+import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.email.EmailPedidoConcluidoAdminDTO;
+import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.email.EmailNotificacaoPedidoConcluidoDTO;
+import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.email.EmailResponseDTO;
+import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.usuario.UsuarioAutenticacaoCadastroDTO;
+import com.infinitysolutions.applicationservice.core.domain.valueobject.SituacaoPedido;
 import com.infinitysolutions.applicationservice.service.strategy.LocalJavaMailSenderStrategy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -86,7 +86,7 @@ public class EnvioEmailService {
             throw ErroInesperadoException.erroInesperado("Erro ao enviar notificação de sucesso de pedido: ", e.getMessage());
         }
     }
-    public EmailResponseDTO enviarNotificacaoNovoPedido(EmailNotificacaoPedidoConcluidoAdminDTO dto) {
+    public EmailResponseDTO enviarNotificacaoNovoPedido(EmailPedidoConcluidoAdminDTO dto) {
         try {
             // Formatando a data no padrão brasileiro: dd/MM/yyyy HH:mm
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern(PATTERN_DATA);

@@ -1,15 +1,11 @@
 package com.infinitysolutions.applicationservice.service;
 
-import com.infinitysolutions.applicationservice.infra.exception.AuthServiceCommunicationException;
+import com.infinitysolutions.applicationservice.core.exception.RecursoExistenteException;
 import com.infinitysolutions.applicationservice.infra.exception.ErroInesperadoException;
-import com.infinitysolutions.applicationservice.infra.exception.RecursoExistenteException;
-import com.infinitysolutions.applicationservice.model.dto.auth.AuthServiceCadastroRequestDTO;
-import com.infinitysolutions.applicationservice.model.dto.auth.DesativarCredenciaisRequestDTO;
-import com.infinitysolutions.applicationservice.model.dto.auth.RespostaEmail;
+import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.auth.AuthServiceCadastroRequestDTO;
+import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.auth.RespostaEmail;
 import com.infinitysolutions.applicationservice.service.auth.CredencialService;
 import com.infinitysolutions.applicationservice.service.strategy.AuthServiceConnection;
-import feign.FeignException;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;

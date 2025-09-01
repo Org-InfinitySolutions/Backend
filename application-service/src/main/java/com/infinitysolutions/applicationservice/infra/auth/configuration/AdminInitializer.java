@@ -1,10 +1,10 @@
 package com.infinitysolutions.applicationservice.infra.auth.configuration;
 
-import com.infinitysolutions.applicationservice.model.auth.Cargo;
-import com.infinitysolutions.applicationservice.model.auth.Credencial;
-import com.infinitysolutions.applicationservice.model.auth.enums.NomeCargo;
-import com.infinitysolutions.applicationservice.repository.auth.CargoRepository;
-import com.infinitysolutions.applicationservice.repository.auth.CredencialRepository;
+import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.entity.CargoEntity;
+import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.entity.CredencialEntity;
+import com.infinitysolutions.applicationservice.core.domain.valueobject.NomeCargo;
+import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.repository.auth.CargoRepository;
+import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.repository.auth.CredencialRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -39,34 +39,34 @@ public class AdminInitializer implements CommandLineRunner {
         log.info("Verificando se existe um usuário administrador...");
 
         // Garantir que o cargo ADMIN existe
-        Cargo cargoAdmin = garantirCargoAdmin();
+        CargoEntity cargoEntityAdmin = garantirCargoAdmin();
 
         // Verificar se já existe algum usuário com cargo ADMIN
         boolean adminExists = credencialRepository.findAll().stream()
                 .anyMatch(credencial ->
-                        credencial.getCargos().stream()
+                        credencial.getCargoEntities().stream()
                                 .anyMatch(cargo -> cargo.getNome() == NomeCargo.ADMIN));
 
         if (!adminExists) {
-            criarUsuarioAdmin(cargoAdmin);
+            criarUsuarioAdmin(cargoEntityAdmin);
         } else {
             log.info("Usuário administrador já existe no sistema.");
         }
     }
 
-    private void criarUsuarioAdmin(Cargo cargoAdmin) {
+    private void criarUsuarioAdmin(CargoEntity cargoEntityAdmin) {
         log.info("Criando usuário administrador padrão...");
 
         try {
             UUID usuarioId = UUID.fromString(adminUsuarioId);
 
-            Credencial admin = new Credencial(
+            CredencialEntity admin = new CredencialEntity(
                     usuarioId,
                     adminEmail,
                     passwordEncoder.encode(adminSenha)
             );
 
-            admin.getCargos().add(cargoAdmin);
+            admin.getCargoEntities().add(cargoEntityAdmin);
             credencialRepository.save(admin);
 
             log.info("Usuário administrador criado com sucesso: {}", adminEmail);
@@ -75,8 +75,8 @@ public class AdminInitializer implements CommandLineRunner {
         }
     }
 
-    private Cargo garantirCargoAdmin() {
-        Optional<Cargo> cargoOpt = cargoRepository.findByNome(NomeCargo.ADMIN);
+    private CargoEntity garantirCargoAdmin() {
+        Optional<CargoEntity> cargoOpt = cargoRepository.findByNome(NomeCargo.ADMIN);
 
         if (cargoOpt.isPresent()) {
             log.info("Cargo ADMIN já existe no sistema.");
@@ -84,9 +84,9 @@ public class AdminInitializer implements CommandLineRunner {
         }
 
         log.info("Criando cargo ADMIN...");
-        Cargo cargo = new Cargo();
-        cargo.setNome(NomeCargo.ADMIN);
-        cargo.setDescricao("Administrador do sistema");
-        return cargoRepository.save(cargo);
+        CargoEntity cargoEntity = new CargoEntity();
+        cargoEntity.setNome(NomeCargo.ADMIN);
+        cargoEntity.setDescricao("Administrador do sistema");
+        return cargoRepository.save(cargoEntity);
     }
 }

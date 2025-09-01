@@ -5,8 +5,8 @@ SET time_zone = "-03:00"; -- Timezone Brasil
 
 -- Criação do banco de dados
 CREATE DATABASE IF NOT EXISTS novalocacoes
-CHARACTER SET utf8mb4
-COLLATE utf8mb4_unicode_ci;
+    CHARACTER SET utf8mb4
+    COLLATE utf8mb4_unicode_ci;
 
 USE novalocacoes;
 
@@ -28,7 +28,7 @@ create table if not exists categorias
     nome     varchar(255) null
 );
 
-create table if not exists credencial
+create table if not exists credencialEntity
 (
     fk_usuario   binary(16)   not null
         primary key,
@@ -46,7 +46,7 @@ create table if not exists credencial_cargo
     cargo_id   int        not null,
     primary key (fk_usuario, cargo_id),
     constraint FKbgafdyldqm2ddluvtidbrkgij
-        foreign key (fk_usuario) references credencial (fk_usuario),
+        foreign key (fk_usuario) references credencialEntity (fk_usuario),
     constraint FKmpiqepm3rf73uo4o1v497hjif
         foreign key (cargo_id) references cargo (id)
 );
@@ -189,4 +189,3 @@ create table if not exists produto_pedido
 
 create index idx_usuario_celular
     on usuario (telefone_celular);
-

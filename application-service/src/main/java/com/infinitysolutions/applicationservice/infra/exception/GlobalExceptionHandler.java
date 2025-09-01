@@ -4,6 +4,9 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.exc.InvalidTypeIdException;
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
+import com.infinitysolutions.applicationservice.core.exception.CoreLayerException;
+import com.infinitysolutions.applicationservice.core.exception.RecursoExistenteException;
+import com.infinitysolutions.applicationservice.core.exception.RecursoNaoEncontradoException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +28,19 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ApplicationServiceException.class)
     public ResponseEntity<ErrorResponse> handleApplicationServiceException(ApplicationServiceException ex, HttpServletRequest request) {
         log.error("Exceção de serviço: {}", ex.getMessage());
+
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .status(getStatusForException(ex).value())
+                .error(ex.getMessage())
+                .path(request.getRequestURI())
+                .build();
+
+        return ResponseEntity.status(getStatusForException(ex)).body(errorResponse);
+    }
+
+    @ExceptionHandler(CoreLayerException.class)
+    public ResponseEntity<ErrorResponse> handleCoreLayerException(CoreLayerException ex, HttpServletRequest request) {
+        log.error("Exceção no core: {}", ex.getMessage());
 
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .status(getStatusForException(ex).value())
@@ -198,11 +214,20 @@ public class GlobalExceptionHandler {
             return HttpStatus.UNAUTHORIZED;
         } else if (ex instanceof DocumentoInvalidoException || ex instanceof RecursoIncompativelException) {
             return HttpStatus.UNPROCESSABLE_ENTITY;
-        } else if (ex instanceof DocumentoNaoEncontradoException || ex instanceof RecursoNaoEncontradoException) {
+        } else if (ex instanceof DocumentoNaoEncontradoException) {
             return HttpStatus.NOT_FOUND;
-        } else if (ex instanceof VinculoExistenteException || ex instanceof RecursoExistenteException) {
+        } else if (ex instanceof VinculoExistenteException) {
             return HttpStatus.CONFLICT;
         }
+        return HttpStatus.INTERNAL_SERVER_ERROR;
+    }
+
+    private HttpStatus getStatusForException(CoreLayerException ex) {
+    if (ex instanceof RecursoNaoEncontradoException) {
+        return HttpStatus.NOT_FOUND;
+    } else if ( ex instanceof RecursoExistenteException) {
+        return HttpStatus.CONFLICT;
+    }
         return HttpStatus.INTERNAL_SERVER_ERROR;
     }
 

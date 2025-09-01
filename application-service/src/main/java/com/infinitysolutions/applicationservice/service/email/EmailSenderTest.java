@@ -1,10 +1,5 @@
 package com.infinitysolutions.applicationservice.service.email;
 
-import com.infinitysolutions.applicationservice.model.dto.email.EmailNotificacaoMudancaStatusDTO;
-import com.infinitysolutions.applicationservice.model.dto.email.EmailNotificacaoPedidoConcluidoAdminDTO;
-import com.infinitysolutions.applicationservice.model.dto.email.EmailNotificacaoPedidoConcluidoDTO;
-import com.infinitysolutions.applicationservice.model.dto.usuario.UsuarioAutenticacaoCadastroDTO;
-import com.infinitysolutions.applicationservice.model.enums.SituacaoPedido;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;

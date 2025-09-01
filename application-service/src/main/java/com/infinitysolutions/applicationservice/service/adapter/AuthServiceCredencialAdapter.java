@@ -1,7 +1,7 @@
 package com.infinitysolutions.applicationservice.service.adapter;
 
-import com.infinitysolutions.applicationservice.model.dto.auth.AuthServiceCadastroRequestDTO;
-import com.infinitysolutions.applicationservice.model.dto.usuario.UsuarioCadastroDTO;
+import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.auth.AuthServiceCadastroRequestDTO;
+import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.usuario.UsuarioCadastroDTO;
 import org.springframework.stereotype.Component;
 
 import java.util.UUID;

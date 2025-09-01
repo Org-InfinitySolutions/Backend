@@ -1,6 +1,6 @@
 package com.infinitysolutions.applicationservice.infra.validation;
 
-import com.infinitysolutions.applicationservice.model.dto.pedido.PedidoCadastroDTO;
+import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.pedido.PedidoCadastroDTO;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 

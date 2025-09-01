@@ -1,9 +1,9 @@
 package com.infinitysolutions.applicationservice.service;
 
-import com.infinitysolutions.applicationservice.model.dto.dashboard.*;
+import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.dashboard.*;
 
-import com.infinitysolutions.applicationservice.model.enums.TipoPedido;
-import com.infinitysolutions.applicationservice.repository.PedidoRepository;
+import com.infinitysolutions.applicationservice.core.domain.valueobject.TipoPedido;
+import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.repository.PedidoRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 

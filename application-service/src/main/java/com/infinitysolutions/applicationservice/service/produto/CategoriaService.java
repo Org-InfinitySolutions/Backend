@@ -1,12 +1,12 @@
 package com.infinitysolutions.applicationservice.service.produto;
 
-import com.infinitysolutions.applicationservice.infra.exception.RecursoExistenteException;
-import com.infinitysolutions.applicationservice.infra.exception.RecursoNaoEncontradoException;
-import com.infinitysolutions.applicationservice.mapper.produto.CategoriaMapper;
-import com.infinitysolutions.applicationservice.model.dto.produto.CategoriaCriacaoDTO;
-import com.infinitysolutions.applicationservice.model.dto.produto.CategoriaRespostaDTO;
-import com.infinitysolutions.applicationservice.model.produto.Categoria;
-import com.infinitysolutions.applicationservice.repository.produto.CategoriaRepository;
+import com.infinitysolutions.applicationservice.core.exception.RecursoExistenteException;
+import com.infinitysolutions.applicationservice.core.exception.RecursoNaoEncontradoException;
+import com.infinitysolutions.applicationservice.infrastructure.mapper.produto.CategoriaMapper;
+import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.produto.CategoriaCriacaoDTO;
+import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.produto.CategoriaRespostaDTO;
+import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.entity.produto.Categoria;
+import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.repository.produto.CategoriaRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

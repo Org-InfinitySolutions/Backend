@@ -1,6 +1,6 @@
 package com.infinitysolutions.applicationservice.infra.exception;
 
-import com.infinitysolutions.applicationservice.model.enums.TipoAnexo;
+import com.infinitysolutions.applicationservice.core.domain.valueobject.TipoAnexo;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 

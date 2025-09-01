@@ -1,13 +1,13 @@
 package com.infinitysolutions.applicationservice.service.auth;
 
+import com.infinitysolutions.applicationservice.core.exception.RecursoExistenteException;
+import com.infinitysolutions.applicationservice.core.exception.RecursoNaoEncontradoException;
 import com.infinitysolutions.applicationservice.infra.exception.AutenticacaoException;
-import com.infinitysolutions.applicationservice.infra.exception.RecursoExistenteException;
-import com.infinitysolutions.applicationservice.infra.exception.RecursoNaoEncontradoException;
-import com.infinitysolutions.applicationservice.mapper.auth.CredencialMapper;
-import com.infinitysolutions.applicationservice.model.auth.Cargo;
-import com.infinitysolutions.applicationservice.model.auth.Credencial;
-import com.infinitysolutions.applicationservice.model.dto.auth.RespostaEmail;
-import com.infinitysolutions.applicationservice.repository.auth.CredencialRepository;
+import com.infinitysolutions.applicationservice.infrastructure.mapper.auth.CredencialMapper;
+import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.entity.CargoEntity;
+import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.entity.CredencialEntity;
+import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.auth.RespostaEmail;
+import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.repository.auth.CredencialRepository;
 import com.infinitysolutions.applicationservice.service.email.EnvioEmailService;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -33,12 +33,12 @@ public class CredencialService {
     public void criarCredencialUsuario(UUID idUsuario, String email, String senha, String tipoUsuario) {
         log.info("Iniciando criação de credencial para usuário: {}", idUsuario);
 
-        Cargo cargo = cargoSerivce.resgatarCargo(tipoUsuario);
-        Credencial credencial = CredencialMapper.toCredencial(idUsuario, email, encoder.encode(senha));
-        credencial.getCargos().add(cargo);
+        CargoEntity cargoEntity = cargoSerivce.resgatarCargo(tipoUsuario);
+        CredencialEntity credencialEntity = CredencialMapper.toCredencial(idUsuario, email, encoder.encode(senha));
+        credencialEntity.getCargoEntities().add(cargoEntity);
 
         try {
-            repository.save(credencial);
+            repository.save(credencialEntity);
             log.info("Credencial criada com sucesso para usuário: {}", idUsuario);
         } catch (DataIntegrityViolationException e){
             log.error("Falha ao criar credencias devido a violação de integridade: {}", e.getMessage());
@@ -49,15 +49,15 @@ public class CredencialService {
     @Transactional
     public void deletar(UUID usuarioId, String senha) {
         log.info("Deletando a credencial para o usuário: {}", usuarioId);
-        Credencial credencialEncontrada = procurarCredencial(usuarioId);
-        validarSenha(senha, credencialEncontrada);
-        credencialEncontrada.setAtivo(false);
-        repository.save(credencialEncontrada);
+        CredencialEntity credencialEntityEncontrada = procurarCredencial(usuarioId);
+        validarSenha(senha, credencialEntityEncontrada);
+        credencialEntityEncontrada.setAtivo(false);
+        repository.save(credencialEntityEncontrada);
     }
 
 
-    private Credencial procurarCredencial(UUID usuarioId) {
-        Optional<Credencial> credencial = repository.findByFkUsuarioAndAtivoTrue(usuarioId);
+    private CredencialEntity procurarCredencial(UUID usuarioId) {
+        Optional<CredencialEntity> credencial = repository.findByFkUsuarioAndAtivoTrue(usuarioId);
         if (credencial.isEmpty()) {
             log.warn("Credencial não encontrada para o usuário: {}", usuarioId);
             throw RecursoNaoEncontradoException.credencialNaoEncontrada(usuarioId);
@@ -65,8 +65,8 @@ public class CredencialService {
         return credencial.get();
     }
 
-    private Credencial procurarCredencial(String email) {
-        Optional<Credencial> credencial = repository.findByEmailAndAtivoTrue(email);
+    private CredencialEntity procurarCredencial(String email) {
+        Optional<CredencialEntity> credencial = repository.findByEmailAndAtivoTrue(email);
         if (credencial.isEmpty()) {
             log.warn("Credencial não encontrada para o email: {}", email);
             throw RecursoNaoEncontradoException.credencialNaoEncontrada(email);
@@ -74,7 +74,7 @@ public class CredencialService {
         return credencial.get();
     }
 
-    public Credencial procurarCredencialPorEmail(String email) {
+    public CredencialEntity procurarCredencialPorEmail(String email) {
         return procurarCredencial(email);
     }
     
@@ -82,34 +82,34 @@ public class CredencialService {
     public void resetarSenhaPorEmail(String email, String novaSenha) {
         log.info("Iniciando reset de senha para email: {}", email);
         
-        Credencial credencial = procurarCredencial(email);
+        CredencialEntity credencialEntity = procurarCredencial(email);
         
         String novaSenhaCriptografada = encoder.encode(novaSenha);
         
-        credencial.setHashSenha(novaSenhaCriptografada);
+        credencialEntity.setHashSenha(novaSenhaCriptografada);
         
-        repository.save(credencial);
+        repository.save(credencialEntity);
         
         log.info("Senha resetada com sucesso para email: {}", email);
         envioEmailService.enviarConfirmacaoResetSenha(email);
     }
 
-    public Credencial obterCredencial(String email, String senha) {
-        Credencial credencial = procurarCredencial(email);
-        validarSenha(senha, credencial);
-        return credencial;
+    public CredencialEntity obterCredencial(String email, String senha) {
+        CredencialEntity credencialEntity = procurarCredencial(email);
+        validarSenha(senha, credencialEntity);
+        return credencialEntity;
     }
 
-    private void validarSenha(String senha, Credencial credencial) {
-        if (!encoder.matches(senha, credencial.getHashSenha())) {
-            log.warn("Senha inválida para o email: {}", credencial.getEmail());
+    private void validarSenha(String senha, CredencialEntity credencialEntity) {
+        if (!encoder.matches(senha, credencialEntity.getHashSenha())) {
+            log.warn("Senha inválida para o email: {}", credencialEntity.getEmail());
             throw AutenticacaoException.credenciaisInvalidas();
         }
     }
 
     public RespostaEmail buscarEmail(UUID usuarioId) {
-        Credencial credencial = procurarCredencial(usuarioId);
-        return new RespostaEmail(credencial.getEmail());
+        CredencialEntity credencialEntity = procurarCredencial(usuarioId);
+        return new RespostaEmail(credencialEntity.getEmail());
     }
 
     public boolean verificarEmailExiste(String email) {
@@ -121,18 +121,18 @@ public class CredencialService {
     public void alterarSenha(UUID usuarioId, String senhaAtual, String novaSenha) {
         log.info("Iniciando alteração de senha para usuário: {}", usuarioId);
         
-        Credencial credencial = procurarCredencial(usuarioId);
+        CredencialEntity credencialEntity = procurarCredencial(usuarioId);
         
-        validarSenha(senhaAtual, credencial);
+        validarSenha(senhaAtual, credencialEntity);
         
         String novaSenhaCriptografada = encoder.encode(novaSenha);
         
-        credencial.setHashSenha(novaSenhaCriptografada);
+        credencialEntity.setHashSenha(novaSenhaCriptografada);
         
-        repository.save(credencial);
+        repository.save(credencialEntity);
         
         log.info("Senha alterada com sucesso para usuário: {}", usuarioId);
-        envioEmailService.enviarConfirmacaoResetSenha(credencial.getEmail());
+        envioEmailService.enviarConfirmacaoResetSenha(credencialEntity.getEmail());
     }
 
     @Transactional
@@ -144,12 +144,12 @@ public class CredencialService {
             throw RecursoExistenteException.emailJaEmUso(novoEmail);
         }
 
-        Credencial credencial = procurarCredencial(usuarioId);
-        validarSenha(senha, credencial);
-        credencial.setEmail(novoEmail);
+        CredencialEntity credencialEntity = procurarCredencial(usuarioId);
+        validarSenha(senha, credencialEntity);
+        credencialEntity.setEmail(novoEmail);
 
         try {
-            repository.save(credencial);
+            repository.save(credencialEntity);
             log.info("Email alterado com sucesso para usuário: {} - Novo email: {}", usuarioId, novoEmail);
             envioEmailService.enviarConfirmacaoResetEmail(novoEmail);
         } catch (DataIntegrityViolationException e) {

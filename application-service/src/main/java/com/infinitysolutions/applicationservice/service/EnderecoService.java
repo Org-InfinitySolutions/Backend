@@ -1,9 +1,9 @@
 package com.infinitysolutions.applicationservice.service;
 
-import com.infinitysolutions.applicationservice.mapper.EnderecoMapper;
-import com.infinitysolutions.applicationservice.model.Endereco;
-import com.infinitysolutions.applicationservice.model.dto.endereco.EnderecoDTO;
-import com.infinitysolutions.applicationservice.repository.EnderecoRepository;
+import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.entity.EnderecoEntity;
+import com.infinitysolutions.applicationservice.infrastructure.mapper.EnderecoMapper;
+import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.endereco.EnderecoDTO;
+import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.repository.EnderecoRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -19,7 +19,7 @@ public class EnderecoService {
     private final EnderecoRepository repository;
 
     @Transactional
-    public Endereco buscarEndereco(EnderecoDTO dto) {
+    public EnderecoEntity buscarEndereco(EnderecoDTO dto) {
         log.info("Buscando endereço: {}", dto);
 
         // Normalização de todos os campos para garantir consistência com o índice único
@@ -31,7 +31,7 @@ public class EnderecoService {
         String numeroNormalizado = dto.getNumero().trim();
         String complementoNormalizado = dto.getComplemento() != null ? dto.getComplemento().trim() : null;
 
-        Optional<Endereco> enderecoExistente;
+        Optional<EnderecoEntity> enderecoExistente;
 
         if (complementoNormalizado != null && !complementoNormalizado.isBlank()) {
             enderecoExistente = repository.findByLogradouroIgnoreCaseAndNumeroAndBairroIgnoreCaseAndCidadeIgnoreCaseAndEstadoIgnoreCaseAndCepAndComplementoIgnoreCase(
@@ -59,22 +59,22 @@ public class EnderecoService {
             return enderecoExistente.get();
         }
 
-        Endereco novoEndereco = EnderecoMapper.toEndereco(
+        EnderecoEntity novoEnderecoEntity = EnderecoMapper.toEndereco(
                 cepNormalizado, logradouroNormalizado, numeroNormalizado,
                 bairroNormalizado, cidadeNormalizada, estadoNormalizado, 
                 complementoNormalizado);
 
         try {
-            Endereco enderecoSalvo = repository.save(novoEndereco);
-            log.info("Novo Endereço criado com o ID: {}", enderecoSalvo.getId());
-            return enderecoSalvo;
+            EnderecoEntity enderecoEntitySalvo = repository.save(novoEnderecoEntity);
+            log.info("Novo Endereço criado com o ID: {}", enderecoEntitySalvo.getId());
+            return enderecoEntitySalvo;
         } catch (Exception e) {
             // Em caso de erro de constraint única (pode acontecer em ambiente concorrente)
             // Tentar buscar novamente o endereço
             log.warn("Erro ao salvar endereço, verificando se foi inserido concorrentemente: {}", e.getMessage());
             
             // Buscar novamente para caso o endereço tenha sido inserido por outro processo
-            Optional<Endereco> enderecoInseridoConcorrentemente = complementoNormalizado != null && !complementoNormalizado.isBlank() ?
+            Optional<EnderecoEntity> enderecoInseridoConcorrentemente = complementoNormalizado != null && !complementoNormalizado.isBlank() ?
                 repository.findByLogradouroIgnoreCaseAndNumeroAndBairroIgnoreCaseAndCidadeIgnoreCaseAndEstadoIgnoreCaseAndCepAndComplementoIgnoreCase(
                     logradouroNormalizado, numeroNormalizado, bairroNormalizado, cidadeNormalizada, 
                     estadoNormalizado, cepNormalizado, complementoNormalizado) :

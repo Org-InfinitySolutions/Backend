@@ -3,9 +3,8 @@ package com.infinitysolutions.applicationservice.service;
 import com.infinitysolutions.applicationservice.infra.client.AuthServiceClient;
 import com.infinitysolutions.applicationservice.infra.exception.AuthServiceCommunicationException;
 import com.infinitysolutions.applicationservice.infra.exception.ErroInesperadoException;
-import com.infinitysolutions.applicationservice.model.dto.auth.AuthServiceCadastroRequestDTO;
-import com.infinitysolutions.applicationservice.model.dto.auth.DesativarCredenciaisRequestDTO;
-import com.infinitysolutions.applicationservice.model.dto.auth.RespostaEmail;
+import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.auth.AuthServiceCadastroRequestDTO;
+import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.auth.RespostaEmail;
 import com.infinitysolutions.applicationservice.service.strategy.AuthServiceConnection;
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
@@ -41,7 +40,7 @@ public class HttpAuthServiceConnection implements AuthServiceConnection {
             if (e.status() == 409 || (e.contentUTF8() != null && e.contentUTF8().contains("Email já está em uso"))) {
                 String email = credenciaisDTO.email();
                 log.warn("Tentativa de cadastro com email já existente: {}", email);
-                throw com.infinitysolutions.applicationservice.infra.exception.RecursoExistenteException.emailJaEmUso(email);
+                throw com.infinitysolutions.applicationservice.core.exception.RecursoExistenteException.emailJaEmUso(email);
             }
             
             throw AuthServiceCommunicationException.falhaAoEnviarCredenciais();
@@ -72,7 +71,7 @@ public class HttpAuthServiceConnection implements AuthServiceConnection {
                     idUsuario, e.status(), e.getMessage());
                     
             if (e.status() == 404) {
-                throw new com.infinitysolutions.applicationservice.infra.exception.RecursoNaoEncontradoException(
+                throw new com.infinitysolutions.applicationservice.core.exception.RecursoNaoEncontradoException(
                     "Credencial para o usuário de ID " + idUsuario + " não encontrada");
             }
             

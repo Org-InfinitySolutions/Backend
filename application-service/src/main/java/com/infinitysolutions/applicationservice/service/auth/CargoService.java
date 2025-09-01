@@ -1,9 +1,9 @@
 package com.infinitysolutions.applicationservice.service.auth;
 
-import com.infinitysolutions.applicationservice.mapper.auth.CargoMapper;
-import com.infinitysolutions.applicationservice.model.auth.Cargo;
-import com.infinitysolutions.applicationservice.model.auth.enums.NomeCargo;
-import com.infinitysolutions.applicationservice.repository.auth.CargoRepository;
+import com.infinitysolutions.applicationservice.infrastructure.mapper.auth.CargoMapper;
+import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.entity.CargoEntity;
+import com.infinitysolutions.applicationservice.core.domain.valueobject.NomeCargo;
+import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.repository.auth.CargoRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 public class CargoService {
 
     private final CargoRepository cargoRepository;
-    public Cargo resgatarCargo(String tipoUsuario) {
+    public CargoEntity resgatarCargo(String tipoUsuario) {
         log.info("Buscando um cargo para o usuário do tipo: {}", tipoUsuario);
 
         NomeCargo nomeCargo = switch (tipoUsuario) {
