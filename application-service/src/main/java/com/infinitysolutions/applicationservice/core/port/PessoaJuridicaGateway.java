@@ -1,6 +1,6 @@
 package com.infinitysolutions.applicationservice.core.port;
 
-import com.infinitysolutions.applicationservice.core.domain.PessoaJuridica;
+import com.infinitysolutions.applicationservice.core.domain.usuario.PessoaJuridica;
 
 import java.util.List;
 import java.util.Optional;

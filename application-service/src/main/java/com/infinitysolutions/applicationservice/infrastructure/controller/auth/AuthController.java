@@ -1,7 +1,7 @@
 package com.infinitysolutions.applicationservice.infrastructure.controller.auth;
 
 
-import com.infinitysolutions.applicationservice.infra.validation.EmailValido;
+import com.infinitysolutions.applicationservice.old.infra.validation.EmailValido;
 
 import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.auth.*;
 import io.swagger.v3.oas.annotations.Hidden;
@@ -14,8 +14,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import com.infinitysolutions.applicationservice.service.auth.AuthService;
-import com.infinitysolutions.applicationservice.service.auth.CredencialService;
+import com.infinitysolutions.applicationservice.old.service.auth.AuthService;
+import com.infinitysolutions.applicationservice.old.service.auth.CredencialService;
 
 import java.util.UUID;
 

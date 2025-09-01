@@ -1,6 +1,7 @@
 package com.infinitysolutions.applicationservice.infrastructure.persistence.dto.pessoa.fisica;
 
-import com.infinitysolutions.applicationservice.infra.validation.CpfValido;
+import com.infinitysolutions.applicationservice.old.infra.validation.CpfValido;
+import com.infinitysolutions.applicationservice.old.infra.validation.RgValido;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.usuario.UsuarioCadastroDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
@@ -19,8 +20,7 @@ public class PessoaFisicaCadastroDTO extends UsuarioCadastroDTO {
     private String cpf;
     
     @NotBlank(message = "O RG é obrigatório")
-    @Pattern(regexp = "^[0-9]{1,2}(\\.[0-9]{3}){2}-[0-9xX]$|^[0-9]{8,9}$", 
-            message = "Formato de RG inválido. Use XX.XXX.XXX-X ou XXXXXXXX")
+    @RgValido
     @Schema(description = "RG do usuário", example = "12.345.678-9")
     private String rg;
 }

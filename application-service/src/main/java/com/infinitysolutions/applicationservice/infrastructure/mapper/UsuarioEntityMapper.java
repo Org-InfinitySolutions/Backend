@@ -1,9 +1,9 @@
 package com.infinitysolutions.applicationservice.infrastructure.mapper;
 
 import com.infinitysolutions.applicationservice.core.domain.ArquivoMetadado;
-import com.infinitysolutions.applicationservice.core.domain.PessoaFisica;
-import com.infinitysolutions.applicationservice.core.domain.PessoaJuridica;
-import com.infinitysolutions.applicationservice.core.domain.Usuario;
+import com.infinitysolutions.applicationservice.core.domain.usuario.PessoaFisica;
+import com.infinitysolutions.applicationservice.core.domain.usuario.PessoaJuridica;
+import com.infinitysolutions.applicationservice.core.domain.usuario.Usuario;
 import com.infinitysolutions.applicationservice.core.domain.valueobject.TipoUsuario;
 import com.infinitysolutions.applicationservice.core.exception.EstrategiaNaoEncontradaException;
 import com.infinitysolutions.applicationservice.core.usecases.endereco.EnderecoInput;
@@ -25,7 +25,7 @@ import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.p
 import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.pessoa.juridica.PJRespostaCadastroDTO;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.usuario.UsuarioRespostaCadastroDTO;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.usuario.UsuarioRespostaDTO;
-import com.infinitysolutions.applicationservice.service.FileUploadService;
+import com.infinitysolutions.applicationservice.old.service.FileUploadService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -38,13 +38,11 @@ public class UsuarioEntityMapper {
     private final FileUploadService fileUploadService;
 
     public PessoaFisicaEntity toPessoaFisica(String nome, String telefoneCelular, String rg, String cpf) {
-        String cpfLimpo = cpf.replaceAll("[.\\-\\s]", "");
-        return new PessoaFisicaEntity(nome, telefoneCelular, rg, cpfLimpo);
+        return new PessoaFisicaEntity(nome, telefoneCelular, rg, cpf);
     }
 
     public PessoaJuridicaEntity toPessoaJuridica(String nome, String telefoneCelular, String telefoneResidencial, String cnpj, String razaoSocial) {
-        String cnpjLimpo = cnpj.replaceAll("[.\\-/\\\\s]", "");
-        return new PessoaJuridicaEntity(nome, telefoneCelular, telefoneResidencial, cnpjLimpo, razaoSocial);
+        return new PessoaJuridicaEntity(nome, telefoneCelular, telefoneResidencial, cnpj, razaoSocial);
     }
 
     public Usuario toDomain(UsuarioEntity userEntity) {
@@ -137,7 +135,7 @@ public class UsuarioEntityMapper {
                         pessoaFisica.getEndereco().getNumero(),
                         pessoaFisica.getEndereco().getCidade(),
                         pessoaFisica.getEndereco().getEstado()),
-                pessoaFisica.getCpf());
+                pessoaFisica.getCpfValueObject().getValorFormatado());
     }
 
     public PJRespostaCadastroDTO toPessoaJuridicaRespostaCadastroDTO(PessoaJuridica pessoaJuridica) {
@@ -151,7 +149,7 @@ public class UsuarioEntityMapper {
                         pessoaJuridica.getEndereco().getNumero(),
                         pessoaJuridica.getEndereco().getCidade(),
                         pessoaJuridica.getEndereco().getEstado()),
-                pessoaJuridica.getCnpj(),
+                pessoaJuridica.getCnpjValueObject().getValorFormatado(),
                 pessoaJuridica.getRazaoSocial(),
                 pessoaJuridica.getTelefoneResidencial()
         );
@@ -181,8 +179,8 @@ public class UsuarioEntityMapper {
                 ),
                 pessoaFisica.getDataCriacao(),
                 pessoaFisica.getDataAtualizacao(),
-                pessoaFisica.getCpf(),
-                pessoaFisica.getRg(),
+                pessoaFisica.getCpfValueObject().getValorFormatado(),
+                pessoaFisica.getRgValueObject().getValorFormatado(),
                 pessoaFisica.PossuiCopiaRg(),
                 pessoaFisica.possuiComprovanteEndereco(),
                 pessoaFisica.getPossuiCadastroCompleto(),

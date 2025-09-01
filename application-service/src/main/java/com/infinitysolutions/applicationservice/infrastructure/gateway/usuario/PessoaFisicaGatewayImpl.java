@@ -1,7 +1,7 @@
 package com.infinitysolutions.applicationservice.infrastructure.gateway.usuario;
 
 import com.infinitysolutions.applicationservice.core.domain.Endereco;
-import com.infinitysolutions.applicationservice.core.domain.PessoaFisica;
+import com.infinitysolutions.applicationservice.core.domain.usuario.PessoaFisica;
 import com.infinitysolutions.applicationservice.core.exception.RecursoNaoEncontradoException;
 import com.infinitysolutions.applicationservice.core.port.PessoaFisicaGateway;
 import com.infinitysolutions.applicationservice.infrastructure.mapper.UsuarioEntityMapper;
@@ -45,7 +45,7 @@ public class PessoaFisicaGatewayImpl implements PessoaFisicaGateway {
 
     @Override
     public boolean existsByRg(String rg) {
-        return repository.existsByRgContaining(rg);
+        return repository.existsByRg(rg);
     }
 
     @Override

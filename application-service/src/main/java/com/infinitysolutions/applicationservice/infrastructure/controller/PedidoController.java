@@ -1,8 +1,8 @@
 package com.infinitysolutions.applicationservice.infrastructure.controller;
 
-import com.infinitysolutions.applicationservice.infra.utils.AuthenticationUtils;
+import com.infinitysolutions.applicationservice.old.infra.utils.AuthenticationUtils;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.pedido.*;
-import com.infinitysolutions.applicationservice.service.PedidoService;
+import com.infinitysolutions.applicationservice.old.service.PedidoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;

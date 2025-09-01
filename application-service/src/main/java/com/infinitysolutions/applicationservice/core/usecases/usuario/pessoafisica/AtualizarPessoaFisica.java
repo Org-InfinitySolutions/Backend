@@ -1,7 +1,7 @@
 package com.infinitysolutions.applicationservice.core.usecases.usuario.pessoafisica;
 
 import com.infinitysolutions.applicationservice.core.domain.Endereco;
-import com.infinitysolutions.applicationservice.core.domain.PessoaFisica;
+import com.infinitysolutions.applicationservice.core.domain.usuario.PessoaFisica;
 import com.infinitysolutions.applicationservice.core.exception.RecursoNaoEncontradoException;
 import com.infinitysolutions.applicationservice.core.port.PessoaFisicaGateway;
 import com.infinitysolutions.applicationservice.core.usecases.endereco.ObterEndereco;

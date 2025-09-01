@@ -1,8 +1,8 @@
 package com.infinitysolutions.applicationservice.infrastructure.persistence.dto.pedido;
 
 
-import com.infinitysolutions.applicationservice.infra.validation.PeriodoMinimoEntreEntregaERetirada;
-import com.infinitysolutions.applicationservice.infra.validation.ProdutosSemDuplicata;
+import com.infinitysolutions.applicationservice.old.infra.validation.PeriodoMinimoEntreEntregaERetirada;
+import com.infinitysolutions.applicationservice.old.infra.validation.ProdutosSemDuplicata;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.endereco.EnderecoDTO;
 import com.infinitysolutions.applicationservice.core.domain.valueobject.TipoPedido;
 import io.swagger.v3.oas.annotations.media.Schema;

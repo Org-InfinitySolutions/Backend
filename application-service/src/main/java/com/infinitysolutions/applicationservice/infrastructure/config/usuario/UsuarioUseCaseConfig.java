@@ -1,6 +1,5 @@
 package com.infinitysolutions.applicationservice.infrastructure.config.usuario;
 
-import com.infinitysolutions.applicationservice.core.usecases.endereco.ObterEndereco;
 import com.infinitysolutions.applicationservice.core.usecases.usuario.*;
 import com.infinitysolutions.applicationservice.core.usecases.usuario.pessoafisica.AtualizarPessoaFisica;
 import com.infinitysolutions.applicationservice.core.usecases.usuario.pessoafisica.CriarPessoaFisica;

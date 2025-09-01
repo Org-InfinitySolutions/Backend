@@ -1,7 +1,7 @@
 package com.infinitysolutions.applicationservice.core.usecases.usuario.pessoafisica;
 
 import com.infinitysolutions.applicationservice.core.domain.Endereco;
-import com.infinitysolutions.applicationservice.core.domain.PessoaFisica;
+import com.infinitysolutions.applicationservice.core.domain.usuario.PessoaFisica;
 import com.infinitysolutions.applicationservice.core.domain.mapper.UsuarioMapper;
 import com.infinitysolutions.applicationservice.core.port.PessoaFisicaGateway;
 import com.infinitysolutions.applicationservice.core.usecases.endereco.ObterEndereco;
@@ -19,12 +19,12 @@ public class CriarPessoaFisica {
 
     public PessoaFisica execute(CriarPFInput input) {
 
-        boolean existePorCpf = pessoaFisicaGateway.existsByCpf(input.cpf.replaceAll("[.\\-\\s]", ""));
-        boolean existePorRg = pessoaFisicaGateway.existsByRg(input.rg);
+        boolean existePorCpf = pessoaFisicaGateway.existsByCpf(input.cpf.getValor());
+        boolean existePorRg = pessoaFisicaGateway.existsByRg(input.rg.getValor());
 
-        if (existePorCpf) throw RecursoExistenteException.cpfJaEmUso(input.cpf);
+        if (existePorCpf) throw RecursoExistenteException.cpfJaEmUso(input.cpf.getValorFormatado());
 
-        if (existePorRg) throw RecursoExistenteException.rgJaEmUso(input.rg);
+        if (existePorRg) throw RecursoExistenteException.rgJaEmUso(input.rg.getValorFormatado());
 
         Endereco enderecoEncontrado = obterEndereco.execute(input.endereco);
         PessoaFisica novoUsuario = UsuarioMapper.toPessoaFisica(input, enderecoEncontrado);

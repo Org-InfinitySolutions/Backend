@@ -1,8 +1,8 @@
 package com.infinitysolutions.applicationservice.infrastructure.persistence.dto.auth;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.infinitysolutions.applicationservice.infra.validation.EmailValido;
-import com.infinitysolutions.applicationservice.infra.validation.SenhaValida;
+import com.infinitysolutions.applicationservice.old.infra.validation.EmailValido;
+import com.infinitysolutions.applicationservice.old.infra.validation.SenhaValida;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 

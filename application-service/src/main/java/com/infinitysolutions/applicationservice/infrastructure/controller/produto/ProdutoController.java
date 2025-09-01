@@ -3,8 +3,8 @@ package com.infinitysolutions.applicationservice.infrastructure.controller.produ
 import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.produto.ProdutoAtualizacaoDTO;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.produto.ProdutoCriacaoDTO;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.produto.ProdutoRespostaDTO;
-import com.infinitysolutions.applicationservice.service.produto.ProdutoService;
-import com.infinitysolutions.applicationservice.infra.utils.AuthenticationUtils;
+import com.infinitysolutions.applicationservice.old.service.produto.ProdutoService;
+import com.infinitysolutions.applicationservice.old.infra.utils.AuthenticationUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;

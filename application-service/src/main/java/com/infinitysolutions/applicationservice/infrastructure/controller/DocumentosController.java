@@ -2,7 +2,7 @@ package com.infinitysolutions.applicationservice.infrastructure.controller;
 
 
 import com.infinitysolutions.applicationservice.core.domain.valueobject.TipoAnexo;
-import com.infinitysolutions.applicationservice.service.DocumentoService;
+import com.infinitysolutions.applicationservice.old.service.DocumentoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;

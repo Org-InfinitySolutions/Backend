@@ -1,6 +1,8 @@
 package com.infinitysolutions.applicationservice.infrastructure.config.usuario;
 
 import com.infinitysolutions.applicationservice.core.usecases.endereco.ObterEndereco;
+import com.infinitysolutions.applicationservice.core.usecases.usuario.pessoafisica.VerificarCpf;
+import com.infinitysolutions.applicationservice.core.usecases.usuario.pessoafisica.VerificarRg;
 import com.infinitysolutions.applicationservice.core.usecases.usuario.pessoafisica.AtualizarPessoaFisica;
 import com.infinitysolutions.applicationservice.core.usecases.usuario.pessoafisica.CriarPessoaFisica;
 import com.infinitysolutions.applicationservice.core.usecases.usuario.pessoafisica.ListarPessoaFisica;
@@ -32,5 +34,15 @@ public class PessoaFisicaUseCaseConfig {
     @Bean
     public AtualizarPessoaFisica atualizarPessoaFisica() {
         return new AtualizarPessoaFisica(obterEndereco, pessoaFisicaGateway);
+    }
+
+    @Bean
+    public VerificarCpf verificarCpf() {
+        return new VerificarCpf(pessoaFisicaGateway);
+    }
+
+    @Bean
+    VerificarRg verificarRg() {
+        return new VerificarRg(pessoaFisicaGateway);
     }
 }

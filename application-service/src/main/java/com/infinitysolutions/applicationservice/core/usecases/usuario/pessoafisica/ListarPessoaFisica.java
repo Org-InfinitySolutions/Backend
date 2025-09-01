@@ -1,6 +1,6 @@
 package com.infinitysolutions.applicationservice.core.usecases.usuario.pessoafisica;
 
-import com.infinitysolutions.applicationservice.core.domain.PessoaFisica;
+import com.infinitysolutions.applicationservice.core.domain.usuario.PessoaFisica;
 import com.infinitysolutions.applicationservice.core.port.PessoaFisicaGateway;
 
 import java.util.List;

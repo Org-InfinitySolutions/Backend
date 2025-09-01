@@ -2,7 +2,7 @@ package com.infinitysolutions.applicationservice.infrastructure.controller.produ
 
 import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.produto.CategoriaCriacaoDTO;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.produto.CategoriaRespostaDTO;
-import com.infinitysolutions.applicationservice.service.produto.CategoriaService;
+import com.infinitysolutions.applicationservice.old.service.produto.CategoriaService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;

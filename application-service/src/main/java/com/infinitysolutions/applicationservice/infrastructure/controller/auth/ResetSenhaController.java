@@ -3,7 +3,7 @@ package com.infinitysolutions.applicationservice.infrastructure.controller.auth;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.auth.RequisicaoResetSenhaEmail;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.auth.RequisicaoResetSenhaCodigo;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.auth.RespostaResetSenha;
-import com.infinitysolutions.applicationservice.service.auth.ResetSenhaService;
+import com.infinitysolutions.applicationservice.old.service.auth.ResetSenhaService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;

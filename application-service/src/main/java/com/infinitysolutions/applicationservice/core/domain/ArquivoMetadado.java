@@ -1,5 +1,6 @@
 package com.infinitysolutions.applicationservice.core.domain;
 
+import com.infinitysolutions.applicationservice.core.domain.usuario.Usuario;
 import com.infinitysolutions.applicationservice.core.domain.valueobject.TipoAnexo;
 import com.infinitysolutions.applicationservice.core.exception.ArquivoMetadadoException;
 

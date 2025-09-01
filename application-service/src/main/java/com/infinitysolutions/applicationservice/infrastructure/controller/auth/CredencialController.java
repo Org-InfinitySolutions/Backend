@@ -2,7 +2,7 @@ package com.infinitysolutions.applicationservice.infrastructure.controller.auth;
 
 import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.auth.RequisicaoAlterarEmail;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.auth.RequisicaoAlterarSenha;
-import com.infinitysolutions.applicationservice.service.auth.CredencialService;
+import com.infinitysolutions.applicationservice.old.service.auth.CredencialService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;

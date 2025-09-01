@@ -1,7 +1,7 @@
 package com.infinitysolutions.applicationservice.infrastructure.gateway.usuario;
 
 import com.infinitysolutions.applicationservice.core.domain.Endereco;
-import com.infinitysolutions.applicationservice.core.domain.PessoaJuridica;
+import com.infinitysolutions.applicationservice.core.domain.usuario.PessoaJuridica;
 import com.infinitysolutions.applicationservice.core.exception.RecursoNaoEncontradoException;
 import com.infinitysolutions.applicationservice.core.port.PessoaJuridicaGateway;
 import com.infinitysolutions.applicationservice.infrastructure.mapper.UsuarioEntityMapper;

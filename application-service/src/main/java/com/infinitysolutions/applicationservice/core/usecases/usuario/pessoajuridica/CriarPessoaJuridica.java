@@ -1,7 +1,7 @@
 package com.infinitysolutions.applicationservice.core.usecases.usuario.pessoajuridica;
 
 import com.infinitysolutions.applicationservice.core.domain.Endereco;
-import com.infinitysolutions.applicationservice.core.domain.PessoaJuridica;
+import com.infinitysolutions.applicationservice.core.domain.usuario.PessoaJuridica;
 import com.infinitysolutions.applicationservice.core.domain.mapper.UsuarioMapper;
 import com.infinitysolutions.applicationservice.core.port.PessoaJuridicaGateway;
 import com.infinitysolutions.applicationservice.core.usecases.endereco.ObterEndereco;
@@ -18,8 +18,8 @@ public class CriarPessoaJuridica {
     }
 
     public PessoaJuridica execute(CriarPJInput input) {
-        boolean existePorCnpj = pessoaJuridicaGateway.existsByCnpj(input.cnpj.replaceAll("[.\\-/\\\\s]", ""));
-        if (existePorCnpj) throw RecursoExistenteException.cnpjJaEmUso(input.cnpj);
+        boolean existePorCnpj = pessoaJuridicaGateway.existsByCnpj(input.cnpj.getValor());
+        if (existePorCnpj) throw RecursoExistenteException.cnpjJaEmUso(input.cnpj.getValorFormatado());
 
         Endereco enderecoEncontrado = obterEndereco.execute(input.endereco);
         PessoaJuridica novoUsuario = UsuarioMapper.toPessoaJuridica(input, enderecoEncontrado);

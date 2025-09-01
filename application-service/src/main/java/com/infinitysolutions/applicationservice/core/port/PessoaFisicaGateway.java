@@ -1,7 +1,6 @@
 package com.infinitysolutions.applicationservice.core.port;
 
-import com.infinitysolutions.applicationservice.core.domain.PessoaFisica;
-import com.infinitysolutions.applicationservice.core.domain.Usuario;
+import com.infinitysolutions.applicationservice.core.domain.usuario.PessoaFisica;
 
 import java.util.List;
 import java.util.Optional;

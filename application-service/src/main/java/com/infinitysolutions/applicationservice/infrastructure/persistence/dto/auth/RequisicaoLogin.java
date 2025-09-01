@@ -1,7 +1,7 @@
 package com.infinitysolutions.applicationservice.infrastructure.persistence.dto.auth;
 
-import com.infinitysolutions.applicationservice.infra.validation.EmailValido;
-import com.infinitysolutions.applicationservice.infra.validation.SenhaValida;
+import com.infinitysolutions.applicationservice.old.infra.validation.EmailValido;
+import com.infinitysolutions.applicationservice.old.infra.validation.SenhaValida;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 public record RequisicaoLogin(

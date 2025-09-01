@@ -1,8 +1,8 @@
 package com.infinitysolutions.applicationservice.infrastructure.persistence.dto.pessoa.juridica;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.infinitysolutions.applicationservice.infra.validation.CnpjValido;
-import com.infinitysolutions.applicationservice.infra.validation.TelefoneValido;
+import com.infinitysolutions.applicationservice.old.infra.validation.CnpjValido;
+import com.infinitysolutions.applicationservice.old.infra.validation.TelefoneValido;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.usuario.UsuarioCadastroDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;

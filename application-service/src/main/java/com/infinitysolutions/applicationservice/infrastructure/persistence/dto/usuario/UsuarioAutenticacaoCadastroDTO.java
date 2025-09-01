@@ -1,6 +1,6 @@
 package com.infinitysolutions.applicationservice.infrastructure.persistence.dto.usuario;
 
-import com.infinitysolutions.applicationservice.infra.validation.EmailValido;
+import com.infinitysolutions.applicationservice.old.infra.validation.EmailValido;
 import jakarta.validation.constraints.NotBlank;
 
 public record UsuarioAutenticacaoCadastroDTO(

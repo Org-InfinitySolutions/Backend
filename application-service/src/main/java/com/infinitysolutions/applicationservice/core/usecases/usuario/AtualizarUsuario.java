@@ -1,6 +1,6 @@
 package com.infinitysolutions.applicationservice.core.usecases.usuario;
 
-import com.infinitysolutions.applicationservice.core.domain.Usuario;
+import com.infinitysolutions.applicationservice.core.domain.usuario.Usuario;
 import com.infinitysolutions.applicationservice.core.exception.EstrategiaNaoEncontradaException;
 import com.infinitysolutions.applicationservice.core.usecases.usuario.pessoafisica.AtualizarPessoaFisica;
 import com.infinitysolutions.applicationservice.core.usecases.usuario.pessoafisica.AtualizarPessoaFisicaInput;

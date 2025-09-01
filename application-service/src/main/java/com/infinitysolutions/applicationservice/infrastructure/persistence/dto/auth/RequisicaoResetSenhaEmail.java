@@ -1,6 +1,6 @@
 package com.infinitysolutions.applicationservice.infrastructure.persistence.dto.auth;
 
-import com.infinitysolutions.applicationservice.infra.validation.EmailValido;
+import com.infinitysolutions.applicationservice.old.infra.validation.EmailValido;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 

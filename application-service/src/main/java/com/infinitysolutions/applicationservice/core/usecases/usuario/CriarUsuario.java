@@ -5,7 +5,7 @@ import com.infinitysolutions.applicationservice.core.usecases.usuario.pessoafisi
 import com.infinitysolutions.applicationservice.core.usecases.usuario.pessoafisica.CriarPessoaFisica;
 import com.infinitysolutions.applicationservice.core.usecases.usuario.pessoajuridica.CriarPJInput;
 import com.infinitysolutions.applicationservice.core.usecases.usuario.pessoajuridica.CriarPessoaJuridica;
-import com.infinitysolutions.applicationservice.core.domain.Usuario;
+import com.infinitysolutions.applicationservice.core.domain.usuario.Usuario;
 
 public class CriarUsuario {
 

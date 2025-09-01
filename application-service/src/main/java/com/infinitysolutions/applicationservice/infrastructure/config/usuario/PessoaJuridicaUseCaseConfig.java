@@ -1,6 +1,7 @@
 package com.infinitysolutions.applicationservice.infrastructure.config.usuario;
 
 import com.infinitysolutions.applicationservice.core.usecases.endereco.ObterEndereco;
+import com.infinitysolutions.applicationservice.core.usecases.usuario.pessoajuridica.VerificarCnpj;
 import com.infinitysolutions.applicationservice.core.usecases.usuario.pessoajuridica.AtualizarPessoaJuridica;
 import com.infinitysolutions.applicationservice.core.usecases.usuario.pessoajuridica.CriarPessoaJuridica;
 import com.infinitysolutions.applicationservice.infrastructure.gateway.usuario.PessoaJuridicaGatewayImpl;
@@ -26,5 +27,10 @@ public class PessoaJuridicaUseCaseConfig {
     @Bean
     public AtualizarPessoaJuridica atualizarPessoaJuridica() {
         return new AtualizarPessoaJuridica(obterEndereco, pessoaJuridicaGateway);
+    }
+
+    @Bean
+    public VerificarCnpj verificarCnpj() {
+        return new VerificarCnpj(pessoaJuridicaGateway);
     }
 }
