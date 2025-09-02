@@ -1,7 +1,7 @@
 package com.infinitysolutions.applicationservice.core.usecases.endereco;
 
 import com.infinitysolutions.applicationservice.core.domain.Endereco;
-import com.infinitysolutions.applicationservice.core.port.EnderecoGateway;
+import com.infinitysolutions.applicationservice.core.gateway.EnderecoGateway;
 
 import java.util.Optional;
 

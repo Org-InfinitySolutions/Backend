@@ -1,7 +1,7 @@
 package com.infinitysolutions.applicationservice.core.usecases.usuario.pessoajuridica;
 
 import com.infinitysolutions.applicationservice.core.domain.valueobject.Cnpj;
-import com.infinitysolutions.applicationservice.core.port.PessoaJuridicaGateway;
+import com.infinitysolutions.applicationservice.core.gateway.PessoaJuridicaGateway;
 import com.infinitysolutions.applicationservice.core.usecases.usuario.RespostaVerificacao;
 
 public class VerificarCnpj {

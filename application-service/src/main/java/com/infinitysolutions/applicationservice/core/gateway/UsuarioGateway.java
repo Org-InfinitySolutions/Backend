@@ -1,4 +1,4 @@
-package com.infinitysolutions.applicationservice.core.port;
+package com.infinitysolutions.applicationservice.core.gateway;
 
 import com.infinitysolutions.applicationservice.core.domain.usuario.Usuario;
 

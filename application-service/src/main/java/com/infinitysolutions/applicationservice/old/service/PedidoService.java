@@ -146,14 +146,17 @@ public class PedidoService {
         }
         log.info("Documento auxiliar está pronto para ser enviado ao bucket!!!");
         arquivoMetadadosService.uploadAndPersistArquivo(arquivo, TipoAnexo.DOCUMENTO_AUXILIAR, pedidoEntity);
-    }    private static ProdutoPedido createProdutoPedido(ProdutoEntity produtoEntity, PedidoEntity pedidoEntitySalvo, PedidoCadastroDTO.ProdutoPedidoDTO dtoCorrespondente) {
+    }
+
+    private static ProdutoPedido createProdutoPedido(ProdutoEntity produtoEntity, PedidoEntity pedidoEntitySalvo, PedidoCadastroDTO.ProdutoPedidoDTO dtoCorrespondente) {
         ProdutoPedido produtoPedido = new ProdutoPedido();
         produtoPedido.setPedidoEntity(pedidoEntitySalvo);
         produtoPedido.setProdutoEntity(produtoEntity);
         produtoPedido.setQtd(dtoCorrespondente.quantidade());
         return produtoPedido;
     }
-      @Transactional
+
+    @Transactional
     public PedidoRespostaDTO atualizarSituacao(Integer pedidoId, PedidoAtualizacaoSituacaoDTO dto, boolean isCustomer) {
         PedidoEntity pedidoEntity = findById(pedidoId);
         var statusAntigo = pedidoEntity.getSituacao();
@@ -239,6 +242,7 @@ public class PedidoService {
                     produtoEntity.getModelo(), produtoEntity.getId(), estoqueAtual, novoEstoque);
         }
     }
+
     private void devolverEstoque(PedidoEntity pedidoEntity) {
         log.info("Devolvendo estoque dos produtos do pedido {}", pedidoEntity.getId());
         

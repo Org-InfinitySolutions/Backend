@@ -75,15 +75,4 @@ public class AuthController {
                     .body(new RespostaEmail(email, false));
         }
     }
-
-    @PostMapping("/cadastrar")
-    @ResponseStatus(HttpStatus.CREATED)
-    @Hidden
-    @Operation(
-            summary = "Cadastrar nova credencial",
-            description = "Cadastra uma nova credencial de um usuário com base no seu id e informações de login"
-    )
-    public void cadastrar(@Valid @RequestBody RequisicaoCadastro requisicaoCadastro) {
-        credencialService.criarCredencialUsuario(requisicaoCadastro.idUsuario(), requisicaoCadastro.email(), requisicaoCadastro.senha(), requisicaoCadastro.tipoUsuario());
-    }
 }

@@ -1,20 +1,24 @@
 package com.infinitysolutions.applicationservice.old.infra.validation;
 
+import com.infinitysolutions.applicationservice.core.domain.valueobject.Email;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
-import java.util.regex.Pattern;
-
+/**
+ * Validador de email que delega a validação para o value object Email.
+ * 
+ * Este validador foi refatorado para usar o value object Email do domínio,
+ * garantindo consistência e reutilização das regras de validação.
+ */
 public class ValidadorEmail implements ConstraintValidator<EmailValido, String> {
-
-    private static final String EMAIL_PATTERN = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
-    private static final Pattern pattern = Pattern.compile(EMAIL_PATTERN);
 
     @Override
     public boolean isValid(String email, ConstraintValidatorContext context) {
         if (email == null || email.isBlank()) {
             return false;
         }
-        return pattern.matcher(email).matches();
+        
+        // Delega a validação para o value object Email
+        return Email.isValid(email);
     }
 }

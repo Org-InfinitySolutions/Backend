@@ -23,24 +23,6 @@ public class LocalAuthServiceConnection implements AuthServiceConnection {
 
     private final CredencialService credencialService;
 
-    @Override
-    public void enviarCredenciais(AuthServiceCadastroRequestDTO credenciasDTO) {
-        try {
-            log.info("Enviando credenciais para criação de usuário ID: {}", credenciasDTO.idUsuario());
-            if (credencialService.verificarEmailExiste(credenciasDTO.email())) {
-                log.warn("Tentativa de cadastro com email já existente: {}", credenciasDTO.email());
-                throw RecursoExistenteException.emailJaEmUso(credenciasDTO.email());
-            }
-            
-            credencialService.criarCredencialUsuario(credenciasDTO.idUsuario(), credenciasDTO.email(), credenciasDTO.senha(), credenciasDTO.tipoUsuario());
-            log.info("Credenciais para o usuário ID: {} enviadas com sucesso.", credenciasDTO.idUsuario());
-        } catch (Exception e) {
-            log.error("Erro inesperado ao criar credenciais: {}", e.getMessage());
-            throw ErroInesperadoException.erroInesperado(
-                "Erro inesperado ao criar credenciais", e.getMessage());
-        }
-    }
-
 
     @Override
     public RespostaEmail buscarEmailUsuario(UUID idUsuario) {

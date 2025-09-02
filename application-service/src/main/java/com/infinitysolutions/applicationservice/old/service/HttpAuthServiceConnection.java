@@ -26,39 +26,6 @@ public class HttpAuthServiceConnection implements AuthServiceConnection {
     private String authApiKey;
 
     @Override
-    public void enviarCredenciais(AuthServiceCadastroRequestDTO credenciaisDTO) {
-        log.info("Enviando credenciais para o AuthService para o usuário ID: {}", credenciaisDTO.idUsuario());
-
-        try {
-
-            authServiceClient.registrarCredenciais(credenciaisDTO, authApiKey);
-            log.info("Credenciais para o usuário ID: {} enviadas com sucesso.", credenciaisDTO.idUsuario());
-        } catch (FeignException e) {
-            log.error("Erro ao enviar credenciais para AuthService para o usuário ID: {}. Status: {}, Response: {}", 
-                    credenciaisDTO.idUsuario(), e.status(), e.getMessage());
-
-            if (e.status() == 409 || (e.contentUTF8() != null && e.contentUTF8().contains("Email já está em uso"))) {
-                String email = credenciaisDTO.email();
-                log.warn("Tentativa de cadastro com email já existente: {}", email);
-                throw com.infinitysolutions.applicationservice.core.exception.RecursoExistenteException.emailJaEmUso(email);
-            }
-            
-            throw AuthServiceCommunicationException.falhaAoEnviarCredenciais();
-
-
-        } catch (Exception e) {
-
-            if (e.getCause() instanceof TimeoutException) {
-                log.error("Timeout ao comunicar com AuthService", e);
-                throw AuthServiceCommunicationException.timeout();
-            }
-
-            log.error("Erro inesperado ao enviar credenciais para AuthService para o usuário ID: {}", credenciaisDTO.idUsuario(), e);
-            throw ErroInesperadoException.erroInesperado("Erro inesperado na comunicação com AuthService.", e.getMessage());
-        }
-    }
-
-    @Override
     public RespostaEmail buscarEmailUsuario(UUID idUsuario) {
         log.info("Buscando email do usuário ID: {} no AuthService", idUsuario);
         

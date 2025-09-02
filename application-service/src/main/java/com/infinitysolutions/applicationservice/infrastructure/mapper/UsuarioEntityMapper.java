@@ -1,6 +1,7 @@
 package com.infinitysolutions.applicationservice.infrastructure.mapper;
 
 import com.infinitysolutions.applicationservice.core.domain.ArquivoMetadado;
+import com.infinitysolutions.applicationservice.core.domain.usuario.Credencial;
 import com.infinitysolutions.applicationservice.core.domain.usuario.PessoaFisica;
 import com.infinitysolutions.applicationservice.core.domain.usuario.PessoaJuridica;
 import com.infinitysolutions.applicationservice.core.domain.usuario.Usuario;
@@ -155,18 +156,25 @@ public class UsuarioEntityMapper {
         );
     }
 
-    public UsuarioRespostaDTO toUsuarioRespostaDTO(Usuario usuario) {
+    public UsuarioRespostaDTO toUsuarioRespostaDTO(Usuario usuario, Credencial credencial) {
         if (usuario.getTipoUsuario().equals(TipoUsuario.PF)) {
-            return toPessoaFisicaDTO((PessoaFisica) usuario);
+            return toPessoaFisicaDTO((PessoaFisica) usuario, credencial);
         }
-        return toPessoaJuridicaDTO((PessoaJuridica) usuario);
+        return toPessoaJuridicaDTO((PessoaJuridica) usuario, credencial);
     }
 
-    public PessoaFisicaDTO toPessoaFisicaDTO(PessoaFisica pessoaFisica) {
+    public UsuarioRespostaDTO toUsuarioRespostaDTO(Usuario usuario) {
+        if (usuario.getTipoUsuario().equals(TipoUsuario.PF)) {
+            return toPessoaFisicaDTO((PessoaFisica) usuario, null);
+        }
+        return toPessoaJuridicaDTO((PessoaJuridica) usuario, null);
+    }
+
+    public PessoaFisicaDTO toPessoaFisicaDTO(PessoaFisica pessoaFisica, Credencial credencial) {
         return new PessoaFisicaDTO(
                 pessoaFisica.getId(),
                 pessoaFisica.getNome(),
-                null,
+                credencial != null ? credencial.getEmailValor() : null,
                 pessoaFisica.getTelefoneCelular(),
                 new EnderecoDTO(
                 pessoaFisica.getEndereco().getCep(),
@@ -194,12 +202,12 @@ public class UsuarioEntityMapper {
         );
     }
 
-    public PessoaJuridicaDTO toPessoaJuridicaDTO(PessoaJuridica pessoaJuridica) {
+    public PessoaJuridicaDTO toPessoaJuridicaDTO(PessoaJuridica pessoaJuridica, Credencial credencial) {
 
         return new PessoaJuridicaDTO(
                 pessoaJuridica.getId(),
                 pessoaJuridica.getNome(),
-                null,
+                credencial != null ? credencial.getEmailValor() : null,
                 pessoaJuridica.getTelefoneCelular(),
                 pessoaJuridica.getTelefoneResidencial(),
                 new EnderecoDTO(

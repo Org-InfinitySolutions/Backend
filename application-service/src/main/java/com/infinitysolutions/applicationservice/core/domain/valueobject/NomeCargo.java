@@ -4,16 +4,19 @@ import lombok.Getter;
 
 @Getter
 public enum NomeCargo {
-    FUNCIONARIO(1),
-    ADMIN(2),
-    USUARIO_PF(3),
-    USUARIO_PJ(4);
+    FUNCIONARIO(1, "Usuário Funcionário"),
+    ADMIN(2, "Usuário Admin"),
+    USUARIO_PF(3, "Usuário Pessoa Física"),
+    USUARIO_PJ(4, "Usuário Pessoa Jurídica");
 
     private final int id;
+    private final String descricao;
 
-    NomeCargo(int id) {
+    NomeCargo(int id, String descricao) {
         this.id = id;
+        this.descricao = descricao;
     }
+
     public static NomeCargo fromId(int id) {
         for (NomeCargo cargo : NomeCargo.values()) {
             if (cargo.getId() == id) {

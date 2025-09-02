@@ -1,11 +1,11 @@
 package com.infinitysolutions.applicationservice.infrastructure.config.usuario;
 
+import com.infinitysolutions.applicationservice.core.usecases.credencial.CriarCredenciais;
 import com.infinitysolutions.applicationservice.core.usecases.usuario.*;
 import com.infinitysolutions.applicationservice.core.usecases.usuario.pessoafisica.AtualizarPessoaFisica;
 import com.infinitysolutions.applicationservice.core.usecases.usuario.pessoafisica.CriarPessoaFisica;
 import com.infinitysolutions.applicationservice.core.usecases.usuario.pessoajuridica.AtualizarPessoaJuridica;
 import com.infinitysolutions.applicationservice.core.usecases.usuario.pessoajuridica.CriarPessoaJuridica;
-import com.infinitysolutions.applicationservice.infrastructure.gateway.ArquivoMetadadoGatewayImpl;
 import com.infinitysolutions.applicationservice.infrastructure.gateway.usuario.UsuarioGatewayImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,11 +14,12 @@ import org.springframework.context.annotation.Configuration;
 public class UsuarioUseCaseConfig {
 
     private final UsuarioGatewayImpl usuarioGatewayImpl;
-    private final ArquivoMetadadoGatewayImpl arquivoMetadadoGatewayImpl;
 
     private final CriarPessoaFisica criarPessoaFisica;
 
     private final CriarPessoaJuridica criarPessoaJuridica;
+
+    private final CriarCredenciais criarCredenciais;
 
     private final AtualizarPessoaFisica atualizarPessoaFisica;
     private final AtualizarPessoaJuridica atualizarPessoaJuridica;
@@ -27,23 +28,23 @@ public class UsuarioUseCaseConfig {
 
     public UsuarioUseCaseConfig(
             UsuarioGatewayImpl usuarioGatewayImpl,
-            ArquivoMetadadoGatewayImpl arquivoMetadadoGatewayImpl,
             CriarPessoaFisica criarPessoaFisica,
             CriarPessoaJuridica criarPessoaJuridica,
+            CriarCredenciais criarCredenciais,
             AtualizarPessoaFisica atualizarPessoaFisica,
             AtualizarPessoaJuridica atualizarPessoaJuridica
     ) {
         this.usuarioGatewayImpl = usuarioGatewayImpl;
-        this.arquivoMetadadoGatewayImpl = arquivoMetadadoGatewayImpl;
         this.criarPessoaFisica = criarPessoaFisica;
         this.criarPessoaJuridica = criarPessoaJuridica;
+        this.criarCredenciais = criarCredenciais;
         this.atualizarPessoaFisica = atualizarPessoaFisica;
         this.atualizarPessoaJuridica = atualizarPessoaJuridica;
     }
 
     @Bean
     public CriarUsuario criarUsuario() {
-        return new CriarUsuario(criarPessoaJuridica, criarPessoaFisica);
+        return new CriarUsuario(criarPessoaJuridica, criarPessoaFisica, criarCredenciais);
     }
 
     @Bean
@@ -53,7 +54,7 @@ public class UsuarioUseCaseConfig {
 
     @Bean
     public BuscarUsuarioPorId buscarUsuarioPorId() {
-        return new BuscarUsuarioPorId(usuarioGatewayImpl, arquivoMetadadoGatewayImpl);
+        return new BuscarUsuarioPorId(usuarioGatewayImpl);
     }
 
     @Bean

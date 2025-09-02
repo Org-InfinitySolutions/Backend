@@ -44,6 +44,7 @@ public class PessoaFisica extends Usuario {
         this.cpf = Cpf.of(cpf);
         this.rg = Rg.of(rg);
         setDocumentos(documentos);
+        setCadastroCompleto(documentos);
     }
 
     @Override

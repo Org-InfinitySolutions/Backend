@@ -1,10 +1,15 @@
 package com.infinitysolutions.applicationservice.old.infra.validation;
 
+import com.infinitysolutions.applicationservice.core.domain.valueobject.Senha;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
-import java.util.regex.Pattern;
-
+/**
+ * Validador de senha que delega a validação para o value object Senha.
+ * 
+ * Este validador foi refatorado para usar o value object Senha do domínio,
+ * garantindo consistência e reutilização das regras de validação.
+ */
 public class ValidadorSenha implements ConstraintValidator<SenhaValida, String> {
 
     private int minLength;
@@ -20,28 +25,11 @@ public class ValidadorSenha implements ConstraintValidator<SenhaValida, String> 
 
     @Override
     public boolean isValid(String password, ConstraintValidatorContext context) {
-        if ( password == null || password.isBlank()) {
+        if (password == null || password.isBlank()) {
             return false;
         }
 
-        boolean isValid = password.length() >= minLength;
-        boolean hasLetter = Pattern.compile("[a-zA-Z]").matcher(password).find();
-        boolean hasDigit = Pattern.compile("\\d").matcher(password).find();
-
-        // Validar requisitos básicos (comprimento, letras e números)
-        if (!isValid || !hasLetter || !hasDigit) {
-            return false;
-        }
-
-        // Validar requisitos adicionais se configurados
-        if (requireUppercase && !Pattern.compile("[A-Z]").matcher(password).find()) {
-            return false;
-        }
-
-        if (requireSpecialChar && !Pattern.compile("[!@#$%^&*(),.?\":{}|<>]").matcher(password).find()) {
-            return false;
-        }
-
-        return true;
+        // Delega a validação para o value object Senha
+        return Senha.isValid(password, minLength, requireUppercase, requireSpecialChar);
     }
 }

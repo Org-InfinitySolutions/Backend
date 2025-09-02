@@ -1,7 +1,7 @@
 package com.infinitysolutions.applicationservice.infrastructure.gateway;
 
 import com.infinitysolutions.applicationservice.core.domain.ArquivoMetadado;
-import com.infinitysolutions.applicationservice.core.port.ArquivoMetadadoGateway;
+import com.infinitysolutions.applicationservice.core.gateway.ArquivoMetadadoGateway;
 import org.springframework.stereotype.Component;
 
 import java.util.List;

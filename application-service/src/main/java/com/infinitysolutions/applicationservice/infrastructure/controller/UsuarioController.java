@@ -1,7 +1,9 @@
 package com.infinitysolutions.applicationservice.infrastructure.controller;
 
+import com.infinitysolutions.applicationservice.core.domain.usuario.Credencial;
 import com.infinitysolutions.applicationservice.core.domain.usuario.Usuario;
 import com.infinitysolutions.applicationservice.core.exception.RecursoNaoEncontradoException;
+import com.infinitysolutions.applicationservice.core.usecases.credencial.BuscarCredenciaisPorId;
 import com.infinitysolutions.applicationservice.core.usecases.usuario.*;
 import com.infinitysolutions.applicationservice.core.usecases.endereco.EnderecoInput;
 import com.infinitysolutions.applicationservice.core.usecases.usuario.pessoafisica.AtualizarPessoaFisicaInput;
@@ -22,6 +24,7 @@ import com.infinitysolutions.applicationservice.infrastructure.mapper.UsuarioEnt
 import com.infinitysolutions.applicationservice.core.usecases.usuario.RespostaVerificacao;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -43,6 +46,8 @@ public class UsuarioController {
     private final CriarUsuario criarUsuarioCase;
     private final ListarTodosUsuarios listarTodosUsuariosCase;
     private final BuscarUsuarioPorId buscarUsuarioPorIdCase;
+    private final BuscarCredenciaisPorId buscarCredenciaisPorIdCase;
+
     private final ExcluirUsuario excluirUsuarioCase;
     private final AtualizarUsuario atualizarUsuarioCase;
     private final VerificarCpf verificarCpfCase;
@@ -52,6 +57,7 @@ public class UsuarioController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @Transactional
     @Operation(
         summary = "Cadastrar um novo usuário",
         description = "Cadastra um novo usuário no sistema, podendo ser pessoa física (PF) ou pessoa jurídica (PJ)"
@@ -114,7 +120,9 @@ public class UsuarioController {
         description = "Retorna os detalhes de um usuário específico com base no ID fornecido"
     )
     public UsuarioRespostaDTO buscarPorId(@PathVariable UUID usuarioId) {
-        return usuarioEntityMapper.toUsuarioRespostaDTO(buscarUsuarioPorIdCase.execute(usuarioId));
+        Usuario usuarioEncontrado = buscarUsuarioPorIdCase.execute(usuarioId);
+        Credencial credencialEncontrada = buscarCredenciaisPorIdCase.execute(usuarioId);
+        return usuarioEntityMapper.toUsuarioRespostaDTO(usuarioEncontrado, credencialEncontrada);
     }
 //
 //    @DeleteMapping("/{usuarioId}")

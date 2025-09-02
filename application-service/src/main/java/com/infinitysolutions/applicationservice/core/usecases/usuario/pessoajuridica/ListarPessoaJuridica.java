@@ -2,7 +2,7 @@ package com.infinitysolutions.applicationservice.core.usecases.usuario.pessoajur
 
 
 import com.infinitysolutions.applicationservice.core.domain.usuario.PessoaJuridica;
-import com.infinitysolutions.applicationservice.core.port.PessoaJuridicaGateway;
+import com.infinitysolutions.applicationservice.core.gateway.PessoaJuridicaGateway;
 
 import java.util.List;
 

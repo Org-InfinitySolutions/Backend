@@ -3,7 +3,7 @@ package com.infinitysolutions.applicationservice.infrastructure.gateway.usuario;
 import com.infinitysolutions.applicationservice.core.domain.Endereco;
 import com.infinitysolutions.applicationservice.core.domain.usuario.PessoaJuridica;
 import com.infinitysolutions.applicationservice.core.exception.RecursoNaoEncontradoException;
-import com.infinitysolutions.applicationservice.core.port.PessoaJuridicaGateway;
+import com.infinitysolutions.applicationservice.core.gateway.PessoaJuridicaGateway;
 import com.infinitysolutions.applicationservice.infrastructure.mapper.UsuarioEntityMapper;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.entity.EnderecoEntity;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.entity.PessoaJuridicaEntity;

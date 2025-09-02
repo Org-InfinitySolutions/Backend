@@ -1,7 +1,7 @@
 package com.infinitysolutions.applicationservice.infrastructure.gateway;
 
 import com.infinitysolutions.applicationservice.core.domain.Endereco;
-import com.infinitysolutions.applicationservice.core.port.EnderecoGateway;
+import com.infinitysolutions.applicationservice.core.gateway.EnderecoGateway;
 import com.infinitysolutions.applicationservice.infrastructure.mapper.EnderecoMapper;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.entity.EnderecoEntity;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.repository.EnderecoRepository;

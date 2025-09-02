@@ -6,6 +6,5 @@ import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.a
 import java.util.UUID;
 
 public interface AuthServiceConnection {
-    void enviarCredenciais(AuthServiceCadastroRequestDTO credenciasDTO);
     RespostaEmail buscarEmailUsuario(UUID idUsuario);
 }

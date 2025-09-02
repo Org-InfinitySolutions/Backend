@@ -1,7 +1,7 @@
 package com.infinitysolutions.applicationservice.infrastructure.gateway.usuario;
 
 import com.infinitysolutions.applicationservice.core.domain.usuario.Usuario;
-import com.infinitysolutions.applicationservice.core.port.UsuarioGateway;
+import com.infinitysolutions.applicationservice.core.gateway.UsuarioGateway;
 import com.infinitysolutions.applicationservice.infrastructure.mapper.UsuarioEntityMapper;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;

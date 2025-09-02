@@ -49,6 +49,7 @@ public class PessoaJuridica extends Usuario {
         this.razaoSocial = razaoSocial;
         this.telefoneResidencial = telefoneResidencial;
         this.setDocumentos(documentos);
+        setCadastroCompleto(documentos);
 
     }
 

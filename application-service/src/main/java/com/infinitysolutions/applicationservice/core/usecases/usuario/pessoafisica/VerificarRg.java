@@ -1,7 +1,7 @@
 package com.infinitysolutions.applicationservice.core.usecases.usuario.pessoafisica;
 
 import com.infinitysolutions.applicationservice.core.domain.valueobject.Rg;
-import com.infinitysolutions.applicationservice.core.port.PessoaFisicaGateway;
+import com.infinitysolutions.applicationservice.core.gateway.PessoaFisicaGateway;
 import com.infinitysolutions.applicationservice.core.usecases.usuario.RespostaVerificacao;
 
 public class VerificarRg {

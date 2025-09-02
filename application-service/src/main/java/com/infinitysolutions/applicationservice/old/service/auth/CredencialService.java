@@ -26,25 +26,8 @@ public class CredencialService {
 
     private final CredencialRepository repository;
     private final BCryptPasswordEncoder encoder;
-    private final CargoService cargoSerivce;
     private final EnvioEmailService envioEmailService;
 
-    @Transactional
-    public void criarCredencialUsuario(UUID idUsuario, String email, String senha, String tipoUsuario) {
-        log.info("Iniciando criação de credencial para usuário: {}", idUsuario);
-
-        CargoEntity cargoEntity = cargoSerivce.resgatarCargo(tipoUsuario);
-        CredencialEntity credencialEntity = CredencialMapper.toCredencial(idUsuario, email, encoder.encode(senha));
-        credencialEntity.getCargoEntities().add(cargoEntity);
-
-        try {
-            repository.save(credencialEntity);
-            log.info("Credencial criada com sucesso para usuário: {}", idUsuario);
-        } catch (DataIntegrityViolationException e){
-            log.error("Falha ao criar credencias devido a violação de integridade: {}", e.getMessage());
-            throw RecursoExistenteException.credencialJaExiste(idUsuario);
-        }
-    }
 
     @Transactional
     public void deletar(UUID usuarioId, String senha) {

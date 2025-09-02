@@ -4,9 +4,8 @@ package com.infinitysolutions.applicationservice.old.infra.exception;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.exc.InvalidTypeIdException;
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
-import com.infinitysolutions.applicationservice.core.exception.CoreLayerException;
-import com.infinitysolutions.applicationservice.core.exception.RecursoExistenteException;
-import com.infinitysolutions.applicationservice.core.exception.RecursoNaoEncontradoException;
+import com.infinitysolutions.applicationservice.core.exception.*;
+import com.infinitysolutions.applicationservice.core.exception.DocumentoInvalidoException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +18,6 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import com.infinitysolutions.applicationservice.core.exception.DocumentoInvalidoException;
 
 
 import java.util.List;
@@ -215,7 +213,7 @@ public class GlobalExceptionHandler {
             return HttpStatus.SERVICE_UNAVAILABLE;
         } else if (ex instanceof TokenExpiradoException || ex instanceof AutenticacaoException) {
             return HttpStatus.UNAUTHORIZED;
-        } else if (ex instanceof RecursoIncompativelException) {
+        } else if (ex instanceof RecursoIncompativelException || ex instanceof com.infinitysolutions.applicationservice.old.infra.exception.DocumentoInvalidoException) {
             return HttpStatus.UNPROCESSABLE_ENTITY;
         } else if (ex instanceof DocumentoNaoEncontradoException) {
             return HttpStatus.NOT_FOUND;
@@ -230,7 +228,7 @@ public class GlobalExceptionHandler {
         return HttpStatus.NOT_FOUND;
     } else if ( ex instanceof RecursoExistenteException) {
         return HttpStatus.CONFLICT;
-    } else if (ex instanceof DocumentoInvalidoException) {
+    } else if (ex instanceof DocumentoInvalidoException || ex instanceof CredencialException) {
         return HttpStatus.BAD_REQUEST;
     }
         return HttpStatus.INTERNAL_SERVER_ERROR;
