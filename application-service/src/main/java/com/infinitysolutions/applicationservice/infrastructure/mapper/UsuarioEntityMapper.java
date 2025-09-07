@@ -1,6 +1,7 @@
 package com.infinitysolutions.applicationservice.infrastructure.mapper;
 
 import com.infinitysolutions.applicationservice.core.domain.ArquivoMetadado;
+import com.infinitysolutions.applicationservice.core.domain.Endereco;
 import com.infinitysolutions.applicationservice.core.domain.usuario.Credencial;
 import com.infinitysolutions.applicationservice.core.domain.usuario.PessoaFisica;
 import com.infinitysolutions.applicationservice.core.domain.usuario.PessoaJuridica;
@@ -14,10 +15,7 @@ import com.infinitysolutions.applicationservice.core.usecases.usuario.pessoajuri
 import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.pessoa.fisica.PessoaFisicaAtualizacaoDTO;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.pessoa.juridica.PJAtualizacaoDTO;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.usuario.UsuarioAtualizacaoDTO;
-import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.entity.ArquivoMetadadosEntity;
-import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.entity.PessoaFisicaEntity;
-import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.entity.PessoaJuridicaEntity;
-import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.entity.UsuarioEntity;
+import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.entity.*;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.endereco.EnderecoDTO;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.endereco.EnderecoResumidoDTO;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.pessoa.fisica.PessoaFisicaDTO;
@@ -90,8 +88,8 @@ public class UsuarioEntityMapper {
         );
     }
     
-    private com.infinitysolutions.applicationservice.core.domain.Endereco toEnderecoDomain(com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.entity.EnderecoEntity enderecoEntity) {
-        return new com.infinitysolutions.applicationservice.core.domain.Endereco(
+    private Endereco toEnderecoDomain(EnderecoEntity enderecoEntity) {
+        return new Endereco(
                 enderecoEntity.getId(),
                 enderecoEntity.getCep(),
                 enderecoEntity.getLogradouro(),

@@ -6,17 +6,17 @@ import com.infinitysolutions.applicationservice.core.exception.CredencialExcepti
 import com.infinitysolutions.applicationservice.core.gateway.CredenciaisGateway;
 import com.infinitysolutions.applicationservice.core.usecases.cargo.ObterCargo;
 
-public class CriarCredenciais {
+public class CriarCredencial {
 
     private final CredenciaisGateway credenciaisGateway;
     private final ObterCargo obterCargo;
 
-    public CriarCredenciais(CredenciaisGateway credenciaisGateway, ObterCargo obterCargo) {
+    public CriarCredencial(CredenciaisGateway credenciaisGateway, ObterCargo obterCargo) {
         this.credenciaisGateway = credenciaisGateway;
         this.obterCargo = obterCargo;
     }
 
-    public Credencial execute(CriarCredenciaisInput input) {
+    public Credencial execute(CriarCredencialInput input) {
 
         if (credenciaisGateway.existsByEmail(input.email().getValor())) throw CredencialException.emailExistente(input.email().getValor());
         if (credenciaisGateway.existsByUserId(input.idUsuario())) throw CredencialException.usuarioIdExistente(input.idUsuario().toString());

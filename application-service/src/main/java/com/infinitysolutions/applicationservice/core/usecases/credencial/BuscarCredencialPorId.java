@@ -7,11 +7,11 @@ import com.infinitysolutions.applicationservice.core.gateway.CredenciaisGateway;
 import java.util.Optional;
 import java.util.UUID;
 
-public class BuscarCredenciaisPorId {
+public class BuscarCredencialPorId {
 
     private final CredenciaisGateway credenciaisGateway;
 
-    public BuscarCredenciaisPorId(CredenciaisGateway credenciaisGateway) {
+    public BuscarCredencialPorId(CredenciaisGateway credenciaisGateway) {
         this.credenciaisGateway = credenciaisGateway;
     }
 

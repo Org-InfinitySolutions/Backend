@@ -9,8 +9,5 @@ import java.util.UUID;
 public interface UsuarioGateway {
     Optional<Usuario> findUserById(UUID id);
 
-    void deleteById(UUID id);
-
     List<Usuario> findAll();
-
 }

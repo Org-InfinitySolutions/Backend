@@ -6,15 +6,15 @@ import com.infinitysolutions.applicationservice.core.domain.valueobject.TipoUsua
 
 import java.util.UUID;
 
-public record CriarCredenciaisInput (
+public record CriarCredencialInput(
     Email email,
     Senha senha,
     UUID idUsuario,
     TipoUsuario tipoUsuario
 ) {
-    public static CriarCredenciaisInput of(String emailString, String senhaString, UUID idUsuario, TipoUsuario tipoUsuario) {
+    public static CriarCredencialInput of(String emailString, String senhaString, UUID idUsuario, TipoUsuario tipoUsuario) {
         Email email = Email.of(emailString);
         Senha senha = Senha.ofSistema(senhaString);
-        return new CriarCredenciaisInput(email, senha, idUsuario, tipoUsuario);
+        return new CriarCredencialInput(email, senha, idUsuario, tipoUsuario);
     }
 }

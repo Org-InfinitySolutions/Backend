@@ -3,7 +3,7 @@ package com.infinitysolutions.applicationservice.infrastructure.controller;
 import com.infinitysolutions.applicationservice.core.domain.usuario.Credencial;
 import com.infinitysolutions.applicationservice.core.domain.usuario.Usuario;
 import com.infinitysolutions.applicationservice.core.exception.RecursoNaoEncontradoException;
-import com.infinitysolutions.applicationservice.core.usecases.credencial.BuscarCredenciaisPorId;
+import com.infinitysolutions.applicationservice.core.usecases.credencial.BuscarCredencialPorId;
 import com.infinitysolutions.applicationservice.core.usecases.usuario.*;
 import com.infinitysolutions.applicationservice.core.usecases.endereco.EnderecoInput;
 import com.infinitysolutions.applicationservice.core.usecases.usuario.pessoafisica.AtualizarPessoaFisicaInput;
@@ -46,9 +46,8 @@ public class UsuarioController {
     private final CriarUsuario criarUsuarioCase;
     private final ListarTodosUsuarios listarTodosUsuariosCase;
     private final BuscarUsuarioPorId buscarUsuarioPorIdCase;
-    private final BuscarCredenciaisPorId buscarCredenciaisPorIdCase;
+    private final BuscarCredencialPorId buscarCredencialPorIdCase;
 
-    private final ExcluirUsuario excluirUsuarioCase;
     private final AtualizarUsuario atualizarUsuarioCase;
     private final VerificarCpf verificarCpfCase;
     private final VerificarRg verificarRgCase;
@@ -121,19 +120,9 @@ public class UsuarioController {
     )
     public UsuarioRespostaDTO buscarPorId(@PathVariable UUID usuarioId) {
         Usuario usuarioEncontrado = buscarUsuarioPorIdCase.execute(usuarioId);
-        Credencial credencialEncontrada = buscarCredenciaisPorIdCase.execute(usuarioId);
+        Credencial credencialEncontrada = buscarCredencialPorIdCase.execute(usuarioId);
         return usuarioEntityMapper.toUsuarioRespostaDTO(usuarioEncontrado, credencialEncontrada);
     }
-//
-//    @DeleteMapping("/{usuarioId}")
-//    @ResponseStatus(HttpStatus.NO_CONTENT)
-//    @Operation(
-//        summary = "Excluir usuário por ID",
-//        description = "Remove um usuário específico do sistema com base no ID fornecido"
-//    )
-//    public void excluir(@PathVariable UUID usuarioId) {
-//        excluirUsuarioCase.execute(usuarioId);
-//    }
 
     @PutMapping("/{usuarioId}")
     @ResponseStatus(HttpStatus.OK)

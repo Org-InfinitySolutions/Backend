@@ -26,7 +26,7 @@ public class Credencial {
     private Set<Cargo> cargos = new HashSet<>();
     private final static BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
-    private Credencial(UUID usuarioId, Email email, String hashSenha) {
+    private Credencial(UUID usuarioId, Email email, String hashSenha, Set<Cargo> cargosEncontrados, LocalDateTime ultimoLogin) {
         if (usuarioId == null) {
             throw new IllegalArgumentException("ID do usuário não pode ser nulo");
         }
@@ -36,22 +36,27 @@ public class Credencial {
         if (hashSenha == null || hashSenha.isBlank()) {
             throw new IllegalArgumentException("Hash da senha não pode ser nulo ou vazio");
         }
+        if (ultimoLogin != null) {
+            this.ultimoLogin = ultimoLogin;
+        }
+
         this.usuarioId = usuarioId;
         this.email = email;
         this.hashSenha = hashSenha;
         this.ativo = true;
+        this.cargos.addAll(cargosEncontrados);
     }
 
     public static Credencial of(UUID usuarioId, String emailString, String senhaString) {
         Email email = Email.of(emailString);
         Senha senha = Senha.ofSistema(senhaString);
         String hashSenha = encoder.encode(senha.getValor());
-        return new Credencial(usuarioId, email, hashSenha);
+        return new Credencial(usuarioId, email, hashSenha, new HashSet<>(), null);
     }
 
-    public static Credencial ofEntity(UUID usuarioId, String emailString, String hashSenha) {
+    public static Credencial ofEntity(UUID usuarioId, String emailString, String hashSenha, Set<Cargo> cargos, LocalDateTime ultimoLogin) {
         Email email = Email.of(emailString);
-        return new Credencial(usuarioId, email, hashSenha);
+        return new Credencial(usuarioId, email, hashSenha, cargos, ultimoLogin);
     }
 
     public Set<Cargo> getCargos() {
@@ -104,6 +109,10 @@ public class Credencial {
     
     public boolean isAtivo() {
         return ativo;
+    }
+
+    public boolean validarSenha(String senha) {
+        return encoder.matches(senha, getHashSenha());
     }
     
     @Override

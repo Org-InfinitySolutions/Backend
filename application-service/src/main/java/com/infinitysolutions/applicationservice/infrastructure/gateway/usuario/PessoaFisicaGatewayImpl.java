@@ -64,6 +64,7 @@ public class PessoaFisicaGatewayImpl implements PessoaFisicaGateway {
         PessoaFisicaEntity pFEntity = repository.findByIdAndIsAtivoTrue(usuario.getId()).orElseThrow(() -> RecursoNaoEncontradoException.usuarioNaoEncontrado(usuario.getId()));
         pFEntity.setNome(usuario.getNome());
         pFEntity.setTelefoneCelular(usuario.getTelefoneCelular());
+        pFEntity.setAtivo(usuario.isAtivo());
 
         EnderecoEntity enderecoEntity = enderecoRepository.findById(usuario.getEndereco().getId()).orElseThrow(() -> new RecursoNaoEncontradoException("Falha ao buscar o endereço"));
         pFEntity.setEnderecoEntity(enderecoEntity);

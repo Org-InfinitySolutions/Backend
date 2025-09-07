@@ -40,11 +40,12 @@ public class CredencialEntity {
     @Column(nullable = false)
     private boolean ativo = true;
 
-    public CredencialEntity(UUID fkUsuario, String email, String hashSenha){
+    public CredencialEntity(UUID fkUsuario, String email, String hashSenha, boolean isAtivo){
         this.fkUsuario = fkUsuario;
         this.email = email;
         this.hashSenha = hashSenha;
         this.cargoEntities = new HashSet<>();
+        this.ativo = isAtivo;
     }
 
     public void atualizarUltimoLogin() {

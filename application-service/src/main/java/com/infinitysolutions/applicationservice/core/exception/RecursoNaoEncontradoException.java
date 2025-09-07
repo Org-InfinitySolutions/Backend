@@ -19,6 +19,10 @@ public class RecursoNaoEncontradoException extends CoreLayerException {
         return new com.infinitysolutions.applicationservice.core.exception.RecursoNaoEncontradoException("Usuário não encontrado com o ID: " + uuid);
     }
 
+    public static com.infinitysolutions.applicationservice.core.exception.RecursoNaoEncontradoException usuarioNaoEncontrado(String email){
+        return new com.infinitysolutions.applicationservice.core.exception.RecursoNaoEncontradoException("Usuário não encontrado com o email: " + email);
+    }
+
     public static com.infinitysolutions.applicationservice.core.exception.RecursoNaoEncontradoException produtoNaoEncontrado(Integer id){
         return new com.infinitysolutions.applicationservice.core.exception.RecursoNaoEncontradoException("Produto não encontrado com o ID: " + id);
     }

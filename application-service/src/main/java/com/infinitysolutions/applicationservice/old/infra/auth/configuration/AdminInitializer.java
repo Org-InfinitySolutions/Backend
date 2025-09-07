@@ -63,7 +63,8 @@ public class AdminInitializer implements CommandLineRunner {
             CredencialEntity admin = new CredencialEntity(
                     usuarioId,
                     adminEmail,
-                    passwordEncoder.encode(adminSenha)
+                    passwordEncoder.encode(adminSenha),
+                    true
             );
 
             admin.getCargoEntities().add(cargoEntityAdmin);

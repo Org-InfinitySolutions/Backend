@@ -2,8 +2,8 @@ package com.infinitysolutions.applicationservice.core.usecases.usuario;
 
 import com.infinitysolutions.applicationservice.core.domain.valueobject.Email;
 import com.infinitysolutions.applicationservice.core.exception.EstrategiaNaoEncontradaException;
-import com.infinitysolutions.applicationservice.core.usecases.credencial.CriarCredenciais;
-import com.infinitysolutions.applicationservice.core.usecases.credencial.CriarCredenciaisInput;
+import com.infinitysolutions.applicationservice.core.usecases.credencial.CriarCredencial;
+import com.infinitysolutions.applicationservice.core.usecases.credencial.CriarCredencialInput;
 import com.infinitysolutions.applicationservice.core.usecases.email.EnviarEmailCadastro;
 import com.infinitysolutions.applicationservice.core.usecases.email.dto.EnviarEmailInput;
 import com.infinitysolutions.applicationservice.core.usecases.email.EnviarEmailNotificacaoCadastro;
@@ -17,14 +17,14 @@ public class CriarUsuario {
 
     private final CriarPessoaJuridica criarPessoaJuridica;
     private final CriarPessoaFisica criarPessoaFisica;
-    private final CriarCredenciais criarCredenciais;
+    private final CriarCredencial criarCredencial;
     private final EnviarEmailCadastro enviarEmailCadastro;
     private final EnviarEmailNotificacaoCadastro enviarEmailNotificacaoCadastro;
 
-    public CriarUsuario(CriarPessoaJuridica criarPessoaJuridica, CriarPessoaFisica criarPessoaFisica, CriarCredenciais criarCredenciais, EnviarEmailCadastro enviarEmailCadastro, EnviarEmailNotificacaoCadastro enviarEmailNotificacaoCadastro) {
+    public CriarUsuario(CriarPessoaJuridica criarPessoaJuridica, CriarPessoaFisica criarPessoaFisica, CriarCredencial criarCredencial, EnviarEmailCadastro enviarEmailCadastro, EnviarEmailNotificacaoCadastro enviarEmailNotificacaoCadastro) {
         this.criarPessoaJuridica = criarPessoaJuridica;
         this.criarPessoaFisica = criarPessoaFisica;
-        this.criarCredenciais = criarCredenciais;
+        this.criarCredencial = criarCredencial;
         this.enviarEmailCadastro = enviarEmailCadastro;
         this.enviarEmailNotificacaoCadastro = enviarEmailNotificacaoCadastro;
     }
@@ -37,7 +37,7 @@ public class CriarUsuario {
             default -> throw new EstrategiaNaoEncontradaException(input.getClass().toString());
         };
 
-        criarCredenciais.execute(CriarCredenciaisInput.of(input.email, input.senha, usuarioCadastrado.getId(), usuarioCadastrado.getTipoUsuario()));
+        criarCredencial.execute(CriarCredencialInput.of(input.email, input.senha, usuarioCadastrado.getId(), usuarioCadastrado.getTipoUsuario()));
 
         EnviarEmailInput emailInput = new EnviarEmailInput(usuarioCadastrado.getNome(), Email.of(input.email));
 

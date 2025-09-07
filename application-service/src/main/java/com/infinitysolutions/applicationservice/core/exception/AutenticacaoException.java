@@ -1,5 +1,6 @@
-package com.infinitysolutions.applicationservice.old.infra.exception;
+package com.infinitysolutions.applicationservice.core.exception;
 
+import com.infinitysolutions.applicationservice.old.infra.exception.ApplicationServiceException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 

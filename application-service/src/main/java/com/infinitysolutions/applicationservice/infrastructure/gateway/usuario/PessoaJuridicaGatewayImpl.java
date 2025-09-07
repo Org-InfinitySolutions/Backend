@@ -61,6 +61,7 @@ public class PessoaJuridicaGatewayImpl implements PessoaJuridicaGateway {
         pJEntity.setTelefoneCelular(usuario.getTelefoneCelular());
         pJEntity.setTelefoneResidencial(usuario.getTelefoneResidencial());
         pJEntity.setRazaoSocial(usuario.getRazaoSocial());
+        pJEntity.setAtivo(usuario.isAtivo());
 
         EnderecoEntity enderecoEntity = enderecoRepository.findById(usuario.getEndereco().getId()).orElseThrow(() -> new RecursoNaoEncontradoException("Falha ao buscar o endereço"));
         pJEntity.setEnderecoEntity(enderecoEntity);

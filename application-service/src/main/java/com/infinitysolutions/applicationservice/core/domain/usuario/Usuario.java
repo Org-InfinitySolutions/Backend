@@ -74,6 +74,11 @@ public abstract class Usuario {
         isAtivo = ativo;
     }
 
+    public void desativar() {
+        isAtivo = false;
+    }
+
+
     public void setDataCriacao(LocalDateTime dataCriacao) {
         this.dataCriacao = dataCriacao;
     }

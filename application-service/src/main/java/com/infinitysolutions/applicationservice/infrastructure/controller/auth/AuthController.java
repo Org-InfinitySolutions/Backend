@@ -1,12 +1,18 @@
 package com.infinitysolutions.applicationservice.infrastructure.controller.auth;
 
 
+import com.infinitysolutions.applicationservice.core.gateway.CredenciaisGateway;
+import com.infinitysolutions.applicationservice.core.usecases.credencial.BuscarCredencialPorId;
+import com.infinitysolutions.applicationservice.core.usecases.credencial.DeletarCredencial;
+import com.infinitysolutions.applicationservice.core.usecases.credencial.RealizarLogin;
+import com.infinitysolutions.applicationservice.core.usecases.credencial.RespostaLogin;
 import com.infinitysolutions.applicationservice.old.infra.validation.EmailValido;
 
 import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.auth.*;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,8 +20,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import com.infinitysolutions.applicationservice.old.service.auth.AuthService;
-import com.infinitysolutions.applicationservice.old.service.auth.CredencialService;
 
 import java.util.UUID;
 
@@ -27,8 +31,11 @@ import java.util.UUID;
 @RequestMapping("/auth")
 public class AuthController {
 
-    private final CredencialService credencialService;
-    private final AuthService authService;
+    private final RealizarLogin realizarLogin;
+    private final DeletarCredencial deletarCredencial;
+    private final BuscarCredencialPorId buscarCredencialPorId;
+    private final CredenciaisGateway credenciaisGateway;
+
 
     @PostMapping("/login")
     @ResponseStatus(HttpStatus.OK)
@@ -37,7 +44,7 @@ public class AuthController {
             description = "Autentica um usuário com base no email e senha fornecidos e retorna um token de acesso"
     )
     public RespostaLogin login(@RequestBody RequisicaoLogin requisicaoLogin){
-        return authService.realizarLogin(requisicaoLogin.email(), requisicaoLogin.senha());
+        return realizarLogin.execute(requisicaoLogin.email(), requisicaoLogin.senha());
     }
     @DeleteMapping("/credenciais/{usuarioId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -45,8 +52,9 @@ public class AuthController {
             summary = "Desativar uma credencial.",
             description = "Desativa a credencial do usuário com base no seu ID."
     )
+    @Transactional
     public void deletarCredencial(@Valid @RequestBody RequisicaoDeletarCredencial request, @PathVariable UUID usuarioId) {
-        credencialService.deletar(usuarioId, request.senha());
+        deletarCredencial.execute(usuarioId, request.senha());
     }
 
     @GetMapping("/credenciais/{usuarioId}/email")
@@ -57,7 +65,7 @@ public class AuthController {
             description = "Busca o email de uma credencial de usuário com base no ID do usuário"
     )
     public RespostaEmail buscarEmail(@PathVariable UUID usuarioId) {
-        return credencialService.buscarEmail(usuarioId);
+        return new RespostaEmail(buscarCredencialPorId.execute(usuarioId).getEmail().getValor());
     }
 
     @Operation(
@@ -66,7 +74,7 @@ public class AuthController {
     )
     @GetMapping("/email/verificar")
     public ResponseEntity<?> verificarEmail(@RequestParam @EmailValido String email) {
-        boolean disponivel = !credencialService.verificarEmailExiste(email);
+        boolean disponivel = !credenciaisGateway.existsByEmail(email);
 
         if (disponivel) {
             return ResponseEntity.ok(new RespostaEmail(email, true));

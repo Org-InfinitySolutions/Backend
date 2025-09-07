@@ -4,7 +4,7 @@ import com.infinitysolutions.applicationservice.core.domain.email.EmailTemplateB
 import com.infinitysolutions.applicationservice.core.gateway.EmailGateway;
 import com.infinitysolutions.applicationservice.core.usecases.email.*;
 import com.infinitysolutions.applicationservice.infrastructure.gateway.CodigoAutenticacaoGatewayImpl;
-import com.infinitysolutions.applicationservice.infrastructure.gateway.email.EmailConfigProviderImpl;
+import com.infinitysolutions.applicationservice.infrastructure.gateway.ProjectConfigProviderImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -13,9 +13,9 @@ public class EmailUseCaseConfig {
 
     private final EmailGateway emailGateway;
     private final CodigoAutenticacaoGatewayImpl codigoAutenticacaoGateway;
-    private final EmailConfigProviderImpl emailConfigProvider;
+    private final ProjectConfigProviderImpl emailConfigProvider;
 
-    public EmailUseCaseConfig(EmailGateway emailGateway, CodigoAutenticacaoGatewayImpl codigoAutenticacaoGateway, EmailConfigProviderImpl emailConfigProvider) {
+    public EmailUseCaseConfig(EmailGateway emailGateway, CodigoAutenticacaoGatewayImpl codigoAutenticacaoGateway, ProjectConfigProviderImpl emailConfigProvider) {
         this.emailGateway = emailGateway;
         this.codigoAutenticacaoGateway = codigoAutenticacaoGateway;
         this.emailConfigProvider = emailConfigProvider;

@@ -1,6 +1,7 @@
 package com.infinitysolutions.applicationservice.infrastructure.gateway.credencial;
 
 import com.infinitysolutions.applicationservice.core.domain.usuario.Credencial;
+import com.infinitysolutions.applicationservice.core.domain.valueobject.Email;
 import com.infinitysolutions.applicationservice.core.gateway.CredenciaisGateway;
 import com.infinitysolutions.applicationservice.infrastructure.mapper.auth.CredencialMapper;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.entity.CredencialEntity;
@@ -29,12 +30,17 @@ public class CredenciaisGatewayImpl implements CredenciaisGateway {
 
     @Override
     public Credencial save(Credencial novaCredencial) {
-        CredencialEntity entity = CredencialMapper.toEntity(novaCredencial.getUsuarioId(), novaCredencial.getEmailValor(), novaCredencial.getHashSenha());
+        CredencialEntity entity = CredencialMapper.toEntity(novaCredencial.getUsuarioId(), novaCredencial.getEmailValor(), novaCredencial.getHashSenha(), novaCredencial.getCargos(), novaCredencial.getUltimoLogin(), novaCredencial.isAtivo());
         return CredencialMapper.toCredencial(credencialRepository.save(entity));
     }
 
     @Override
     public Optional<Credencial> findByUserId(UUID id) {
         return credencialRepository.findByFkUsuarioAndAtivoTrue(id).map(CredencialMapper::toCredencial);
+    }
+
+    @Override
+    public Optional<Credencial> findByUserEmail(Email email) {
+        return credencialRepository.findByEmailAndAtivoTrue(email.getValor()).map(CredencialMapper::toCredencial);
     }
 }
