@@ -1,9 +1,10 @@
 package com.infinitysolutions.applicationservice.old.service.auth;
 
+import com.infinitysolutions.applicationservice.core.domain.valueobject.Email;
 import com.infinitysolutions.applicationservice.core.exception.RecursoNaoEncontradoException;
+import com.infinitysolutions.applicationservice.core.gateway.CodigoAutenticacaoGateway;
+import com.infinitysolutions.applicationservice.core.usecases.email.EnviarEmailCodigoResetSenha;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.auth.RespostaResetSenha;
-import com.infinitysolutions.applicationservice.old.service.email.CodigoAutenticacaoService;
-import com.infinitysolutions.applicationservice.old.service.email.EnvioEmailService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -17,9 +18,9 @@ import java.util.Map;
 public class ResetSenhaService {
     
     private final CredencialService credencialService;
-    private final CodigoAutenticacaoService codigoAutenticacaoService;
-    private final EnvioEmailService envioEmailService;
-    
+    private final EnviarEmailCodigoResetSenha enviarEmailCodigoResetSenha;
+    private final CodigoAutenticacaoGateway codigoAutenticacaoGateway;
+
     public RespostaResetSenha enviarCodigoResetSenha(String email) {
         log.info("Iniciando processo de reset de senha para email: {}", email);
         
@@ -29,10 +30,10 @@ public class ResetSenhaService {
                 return new RespostaResetSenha(true, "Se o email estiver cadastrado, você receberá um código para reset de senha");
             }
             
-            String codigo = codigoAutenticacaoService.gerarCodigo(email);            
+            String codigo = codigoAutenticacaoGateway.gerarCodigo(Email.of(email));
             String nomeUsuario = "Usuário"; // Mudar depois se precisar.
             
-            envioEmailService.enviarCodigoResetSenha(email, nomeUsuario, codigo);
+            enviarEmailCodigoResetSenha.execute(Email.of(email), nomeUsuario, codigo);
             
             log.info("Código de reset de senha enviado com sucesso para: {}", email);
             return new RespostaResetSenha(true, "Código de reset de senha enviado com sucesso para o email fornecido");
@@ -48,7 +49,7 @@ public class ResetSenhaService {
         log.info("Validando código e alterando senha para email: {}", email);
         
         try {
-            Map.Entry<Boolean, String> validacao = codigoAutenticacaoService.validarCodigoAutenticacao(email, codigo);
+            Map.Entry<Boolean, String> validacao = codigoAutenticacaoGateway.validarCodigoAutenticacao(Email.of(email), codigo);
             
             if (!validacao.getKey()) {
                 log.warn("Código inválido ou expirado para email: {}", email);

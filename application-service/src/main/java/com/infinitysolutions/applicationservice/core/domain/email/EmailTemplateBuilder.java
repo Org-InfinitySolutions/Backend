@@ -1,9 +1,11 @@
-package com.infinitysolutions.applicationservice.old.service.email;
+package com.infinitysolutions.applicationservice.core.domain.email;
 
-import org.springframework.stereotype.Service;
+public class EmailTemplateBuilder {
 
-@Service
-public class EmailTemplateService {
+    public String gerarPatternData() {
+        return "dd/MM/yyyy - HH:mm";
+    }
+
     public String gerarTemplateVerificacaoEmail(String nome, String codigo){
         return """
                 <!DOCTYPE html>

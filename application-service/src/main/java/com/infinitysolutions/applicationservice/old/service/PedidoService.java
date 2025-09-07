@@ -1,6 +1,10 @@
 package com.infinitysolutions.applicationservice.old.service;
 
+import com.infinitysolutions.applicationservice.core.domain.valueobject.Email;
 import com.infinitysolutions.applicationservice.core.exception.RecursoNaoEncontradoException;
+import com.infinitysolutions.applicationservice.core.usecases.email.EnviarEmailNotificacaoMudancaStatusPedido;
+import com.infinitysolutions.applicationservice.core.usecases.email.EnviarEmailNotificacaoNovoPedido;
+import com.infinitysolutions.applicationservice.core.usecases.email.EnviarEmailPedidoConcluidoUsuario;
 import com.infinitysolutions.applicationservice.core.usecases.usuario.BuscarUsuarioPorId;
 import com.infinitysolutions.applicationservice.old.infra.exception.OperacaoNaoPermitidaException;
 import com.infinitysolutions.applicationservice.infrastructure.mapper.UsuarioEntityMapper;
@@ -9,9 +13,9 @@ import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.e
 import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.entity.UsuarioEntity;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.pedido.*;
 import com.infinitysolutions.applicationservice.infrastructure.mapper.PedidoMapper;
-import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.email.EmailNotificacaoMudancaStatusDTO;
-import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.email.EmailPedidoConcluidoAdminDTO;
-import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.email.EmailNotificacaoPedidoConcluidoDTO;
+import com.infinitysolutions.applicationservice.core.usecases.email.dto.EmailNotificacaoMudancaStatus;
+import com.infinitysolutions.applicationservice.core.usecases.email.dto.EmailPedidoConcluidoAdmin;
+import com.infinitysolutions.applicationservice.core.usecases.email.dto.EmailNotificacaoPedidoConcluido;
 import com.infinitysolutions.applicationservice.core.domain.valueobject.SituacaoPedido;
 import com.infinitysolutions.applicationservice.core.domain.valueobject.TipoAnexo;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.entity.produto.ProdutoEntity;
@@ -19,7 +23,6 @@ import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.e
 import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.repository.PedidoRepository;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.repository.produto.ProdutoRepository;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.repository.UsuarioRepository;
-import com.infinitysolutions.applicationservice.old.service.email.EnvioEmailService;
 import com.infinitysolutions.applicationservice.old.service.strategy.AuthServiceConnection;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -42,12 +45,15 @@ public class PedidoService {
     private final EnderecoService enderecoService;
     private final ArquivoMetadadosService arquivoMetadadosService;
     private final FileUploadService fileUploadService;
-    private final EnvioEmailService envioEmailService;
     private final AuthServiceConnection authServiceConnection;
 
     private final BuscarUsuarioPorId buscarUsuarioPorId;
     private final UsuarioEntityMapper usuarioMapper;
-    
+
+    private final EnviarEmailPedidoConcluidoUsuario enviarEmailPedidoConcluidoUsuario;
+    private final EnviarEmailNotificacaoNovoPedido enviarEmailNotificacaoNovoPedido;
+    private final EnviarEmailNotificacaoMudancaStatusPedido enviarEmailNotificacaoMudancaStatusPedido;
+
     @Transactional
     public PedidoRespostaCadastroDTO cadastrar(PedidoCadastroDTO dto, MultipartFile documentoAuxiliar, UUID usuarioId) {
             UsuarioEntity usuarioEntity = usuarioRepository.findByIdAndIsAtivoTrue(usuarioId).orElseThrow(() -> RecursoNaoEncontradoException.usuarioNaoEncontrado(usuarioId));
@@ -78,7 +84,7 @@ public class PedidoService {
                     .map(produto -> {
                         PedidoCadastroDTO.ProdutoPedidoDTO dtoCorrespondente = mapaDtos.get(produto.getId());
                         return createProdutoPedido(produto, pedidoEntitySalvo, dtoCorrespondente);
-                    }).collect(Collectors.toList());
+                    }).toList();
 
             pedidoEntitySalvo.setProdutosPedido(produtosPedido);
             if (documentoAuxiliar != null && !documentoAuxiliar.isEmpty()) {
@@ -102,10 +108,10 @@ public class PedidoService {
             if (!usuarioEmail.isEmpty()) {
                 try {
                     int qtdItens = produtosPedido.size();
-                    envioEmailService.enviarPedidoConcluidoUsuario(new EmailNotificacaoPedidoConcluidoDTO(
+                    enviarEmailPedidoConcluidoUsuario.execute(new EmailNotificacaoPedidoConcluido(
                             usuarioEntity.getNome(),
                             pedidoEntitySalvo.getId().toString(),
-                            usuarioEmail,
+                            Email.of(usuarioEmail),
                             String.valueOf(qtdItens)
                     ));
                     log.info("Email de confirmação de pedido enviado para o usuário: {}", usuarioEmail);
@@ -121,10 +127,10 @@ public class PedidoService {
                             ? pedidoEntitySalvo.getDescricao()
                             : "Sem descrição";
                     
-                    envioEmailService.enviarNotificacaoNovoPedido(new EmailPedidoConcluidoAdminDTO(
+                    enviarEmailNotificacaoNovoPedido.execute(new EmailPedidoConcluidoAdmin(
                             usuarioEntity.getNome(),
                             pedidoEntitySalvo.getId().toString(),
-                            usuarioEmail,
+                            Email.of(usuarioEmail),
                             String.valueOf(qtdItens),
                             usuarioEntity.getTelefoneCelular(),
                             descricaoPedido
@@ -185,13 +191,13 @@ public class PedidoService {
 
         String usuarioEmail = authServiceConnection.buscarEmailUsuario(pedidoEntity.getUsuarioEntity().getId()).email();
         
-        envioEmailService.enviarNotificacaoMudancaStatusPedido(
-            new EmailNotificacaoMudancaStatusDTO(
+        enviarEmailNotificacaoMudancaStatusPedido.execute(
+            new EmailNotificacaoMudancaStatus(
                 pedidoEntity.getUsuarioEntity().getNome(),
                 pedidoEntity.getId().toString(),
                 statusAntigo.getNome(),
                 dto.situacao().getNome(),
-                usuarioEmail
+                Email.of(usuarioEmail)
             )
         );
         

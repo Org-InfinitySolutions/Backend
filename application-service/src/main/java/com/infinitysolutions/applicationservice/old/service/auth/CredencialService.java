@@ -1,14 +1,14 @@
 package com.infinitysolutions.applicationservice.old.service.auth;
 
+import com.infinitysolutions.applicationservice.core.domain.valueobject.Email;
 import com.infinitysolutions.applicationservice.core.exception.RecursoExistenteException;
 import com.infinitysolutions.applicationservice.core.exception.RecursoNaoEncontradoException;
+import com.infinitysolutions.applicationservice.core.usecases.email.EnviarEmailConfirmacaoResetEmail;
+import com.infinitysolutions.applicationservice.core.usecases.email.EnviarEmailConfirmacaoResetSenha;
 import com.infinitysolutions.applicationservice.old.infra.exception.AutenticacaoException;
-import com.infinitysolutions.applicationservice.infrastructure.mapper.auth.CredencialMapper;
-import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.entity.CargoEntity;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.entity.CredencialEntity;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.auth.RespostaEmail;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.repository.auth.CredencialRepository;
-import com.infinitysolutions.applicationservice.old.service.email.EnvioEmailService;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,8 +26,8 @@ public class CredencialService {
 
     private final CredencialRepository repository;
     private final BCryptPasswordEncoder encoder;
-    private final EnvioEmailService envioEmailService;
-
+    private final EnviarEmailConfirmacaoResetSenha enviarEmailConfirmacaoResetSenha;
+    private final EnviarEmailConfirmacaoResetEmail enviarEmailConfirmacaoResetEmail;
 
     @Transactional
     public void deletar(UUID usuarioId, String senha) {
@@ -74,7 +74,7 @@ public class CredencialService {
         repository.save(credencialEntity);
         
         log.info("Senha resetada com sucesso para email: {}", email);
-        envioEmailService.enviarConfirmacaoResetSenha(email);
+        enviarEmailConfirmacaoResetSenha.execute(Email.of(email));
     }
 
     public CredencialEntity obterCredencial(String email, String senha) {
@@ -115,7 +115,7 @@ public class CredencialService {
         repository.save(credencialEntity);
         
         log.info("Senha alterada com sucesso para usuário: {}", usuarioId);
-        envioEmailService.enviarConfirmacaoResetSenha(credencialEntity.getEmail());
+        enviarEmailConfirmacaoResetSenha.execute(Email.of(credencialEntity.getEmail()));
     }
 
     @Transactional
@@ -134,7 +134,7 @@ public class CredencialService {
         try {
             repository.save(credencialEntity);
             log.info("Email alterado com sucesso para usuário: {} - Novo email: {}", usuarioId, novoEmail);
-            envioEmailService.enviarConfirmacaoResetEmail(novoEmail);
+            enviarEmailConfirmacaoResetEmail.execute(Email.of(novoEmail));
         } catch (DataIntegrityViolationException e) {
             log.error("Falha ao alterar email devido a violação de integridade: {}", e.getMessage());
             throw RecursoExistenteException.emailJaEmUso(novoEmail);

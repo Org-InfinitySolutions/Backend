@@ -1,10 +1,11 @@
 package com.infinitysolutions.applicationservice.infrastructure.controller;
 
+import com.infinitysolutions.applicationservice.core.domain.valueobject.Email;
+import com.infinitysolutions.applicationservice.core.gateway.CodigoAutenticacaoGateway;
+import com.infinitysolutions.applicationservice.core.usecases.email.EnviarEmailAutenticacao;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.auth.UsuarioAutenticacaoValidarCodigoDTO;
-import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.usuario.UsuarioAutenticacaoCadastroDTO;
-import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.email.EmailResponseDTO;
-import com.infinitysolutions.applicationservice.old.service.email.CodigoAutenticacaoService;
-import com.infinitysolutions.applicationservice.old.service.email.EnvioEmailService;
+import com.infinitysolutions.applicationservice.core.usecases.email.dto.EnviarEmailInput;
+import com.infinitysolutions.applicationservice.core.usecases.email.dto.EnviarEmailResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -23,8 +24,8 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "Emails", description = "Endpoints para verificação de email e envio de códigos de autenticação")
 public class MailSenderController {
 
-    private final EnvioEmailService emailAutenticacaoService;
-    private final CodigoAutenticacaoService codigoAutenticacaoService;
+    private final EnviarEmailAutenticacao enviarCodigoAutenticacaoCase;
+    private final CodigoAutenticacaoGateway codigoAutenticacaoGateway;
 
     @PostMapping("/enviar-codigo")
     @Operation(
@@ -37,8 +38,8 @@ public class MailSenderController {
         @ApiResponse(responseCode = "500", description = "Erro interno ao enviar email")
     })
     @ResponseStatus(HttpStatus.OK)
-    public EmailResponseDTO enviarCodigoVerificacao(@RequestBody @Valid UsuarioAutenticacaoCadastroDTO dto) {
-            return emailAutenticacaoService.enviarCodigoAutenticacao(dto);
+    public EnviarEmailResponse enviarCodigoVerificacao(@RequestBody @Valid EnviarEmailInput dto) {
+            return enviarCodigoAutenticacaoCase.execute(dto);
     }
     @PostMapping("/validar-codigo")
     @Operation(
@@ -52,26 +53,26 @@ public class MailSenderController {
         @ApiResponse(responseCode = "410", description = "Código expirado"),
         @ApiResponse(responseCode = "429", description = "Número máximo de tentativas excedido")
     })
-    public ResponseEntity<EmailResponseDTO> validarCodigo(@RequestBody @Valid UsuarioAutenticacaoValidarCodigoDTO dto) {
-            var response = codigoAutenticacaoService.validarCodigoAutenticacao(dto.email(), dto.codigo());
+    public ResponseEntity<EnviarEmailResponse> validarCodigo(@RequestBody @Valid UsuarioAutenticacaoValidarCodigoDTO dto) {
+            var response = codigoAutenticacaoGateway.validarCodigoAutenticacao(Email.of(dto.email()), dto.codigo());
             if (response.getKey()) {
                 return ResponseEntity.ok(
-                    new EmailResponseDTO(true, "Código validado com sucesso", response.getValue())
+                    new EnviarEmailResponse(true, "Código validado com sucesso", response.getValue())
                 );
             } else {
                 String mensagem = response.getValue();
                 if (mensagem.contains("sem código ativo")) {
                     return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(new EmailResponseDTO(false, "Código não encontrado para o email informado", mensagem));
+                        .body(new EnviarEmailResponse(false, "Código não encontrado para o email informado", mensagem));
                 } else if (mensagem.contains("Código expirado")) {
                     return ResponseEntity.status(HttpStatus.GONE)
-                        .body(new EmailResponseDTO(false, "Código expirado", mensagem));
+                        .body(new EnviarEmailResponse(false, "Código expirado", mensagem));
                 } else if (mensagem.contains("Máximo de tentativas excedido")) {
                     return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
-                        .body(new EmailResponseDTO(false, "Número máximo de tentativas excedido", mensagem));
+                        .body(new EnviarEmailResponse(false, "Número máximo de tentativas excedido", mensagem));
                 } else {
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body(new EmailResponseDTO(false, "Código inválido", mensagem));
+                        .body(new EnviarEmailResponse(false, "Código inválido", mensagem));
                 }
             }
     }

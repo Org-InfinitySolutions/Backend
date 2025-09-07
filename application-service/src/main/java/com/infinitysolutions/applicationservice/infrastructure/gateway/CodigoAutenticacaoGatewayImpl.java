@@ -1,11 +1,14 @@
-package com.infinitysolutions.applicationservice.old.service.email;
+package com.infinitysolutions.applicationservice.infrastructure.gateway;
 
+import com.infinitysolutions.applicationservice.core.domain.valueobject.Email;
+import com.infinitysolutions.applicationservice.core.gateway.CodigoAutenticacaoGateway;
 import com.infinitysolutions.applicationservice.old.infra.exception.ErroInesperadoException;
 import com.infinitysolutions.applicationservice.old.infra.validation.EmailValido;
 import jakarta.validation.constraints.NotNull;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
@@ -13,27 +16,83 @@ import java.util.AbstractMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-@Service
 @Slf4j
-public class CodigoAutenticacaoService {
+@Component
+@RequiredArgsConstructor
+public class CodigoAutenticacaoGatewayImpl implements CodigoAutenticacaoGateway {
 
     private static final int CODIGO_TAMANHO = 6;
     private static final long CODIGO_VALIDADE_MINUTOS = 10;
     private static final int MAX_TENTATIVAS = 3;
-    
+
     private final Map<String, CodigoAutenticacao> codigosAtivos = new ConcurrentHashMap<>();
     private final Map<String, Integer> tentativasFalhas = new ConcurrentHashMap<>();
     private final SecureRandom random = new SecureRandom();
 
-    public String gerarCodigo(@EmailValido String email) {
-        String emailNormalizado = email.toLowerCase().trim();
+    @Override
+    public String gerarCodigo(Email email) {
+        String emailNormalizado = email.getValor();
         String codigo = gerarCodigoAleatorio();
         LocalDateTime expiracao = LocalDateTime.now().plusMinutes(CODIGO_VALIDADE_MINUTOS);
         tentativasFalhas.remove(emailNormalizado);
-        
+
         codigosAtivos.put(emailNormalizado, new CodigoAutenticacao(codigo, expiracao, 0));
         log.debug("Código de verificação gerado para: {}, expira em: {}", emailNormalizado, expiracao);
         return codigo;
+    }
+
+    @Override
+    public Map.Entry<Boolean, String> validarCodigoAutenticacao(Email email, String codigo) {
+        log.info("Validando código de autenticação para: {}", email);
+        try {
+            var response = validarCodigo(email.getValor(), codigo);
+            if (response.valido()) {
+                log.info("Código validado com sucesso para: {}", email);
+            } else {
+                log.warn("Tentativa de validação com código inválido para: {}", email);
+            }
+            return new AbstractMap.SimpleEntry<>(response.valido(), response.mensagem());
+        } catch (Exception e) {
+            log.error("Erro ao validar código de autenticação para: {}", email, e);
+            throw ErroInesperadoException.erroInesperado("Erro ao validar código de verificação: ", e.getMessage());
+        }
+    }
+
+
+    private String gerarCodigoAleatorio() {
+        String caracteres = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+        StringBuilder codigo = new StringBuilder(CODIGO_TAMANHO);
+        for (int i = 0; i < CODIGO_TAMANHO; i++) {
+            int indice = random.nextInt(caracteres.length());
+            codigo.append(caracteres.charAt(indice));
+        }
+        return codigo.toString();
+    }
+
+    private void removerCodigo(String email) {
+        String emailNormalizado = email.toLowerCase().trim();
+        codigosAtivos.remove(emailNormalizado);
+        tentativasFalhas.remove(emailNormalizado);
+    }
+
+    @Scheduled(fixedDelay = 300000) // Executa a cada 5 minutos
+    public void limparCodigosExpirados() {
+        log.debug("Iniciando limpeza de códigos expirados");
+        LocalDateTime agora = LocalDateTime.now();
+        int removidos = 0;
+        for (Map.Entry<String, CodigoAutenticacao> entry : codigosAtivos.entrySet()) {
+            if (agora.isAfter(entry.getValue().expiracao())) {
+                codigosAtivos.remove(entry.getKey());
+                tentativasFalhas.remove(entry.getKey());
+                removidos++;
+            }
+        }
+
+        if (removidos > 0) {
+            log.info("Removidos {} códigos expirados", removidos);
+        } else {
+            log.debug("Nenhum código expirado encontrado");
+        }
     }
 
     private AutenticacaoResposta validarCodigo(@EmailValido String email, @NotNull String codigo) {
@@ -58,7 +117,7 @@ public class CodigoAutenticacaoService {
             removerCodigo(emailNormalizado);
             return new AutenticacaoResposta(false, mensagem);
         }
-        
+
         boolean valido = codigo.equals(codigoArmazenado.codigo());
         String mensagem = "";
         if (valido) {
@@ -73,57 +132,7 @@ public class CodigoAutenticacaoService {
         return new AutenticacaoResposta(valido, mensagem);
     }
 
-    public void removerCodigo(String email) {
-        String emailNormalizado = email.toLowerCase().trim();
-        codigosAtivos.remove(emailNormalizado);
-        tentativasFalhas.remove(emailNormalizado);
-    }
-    
-    private String gerarCodigoAleatorio() {
-        String caracteres = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-        StringBuilder codigo = new StringBuilder(CODIGO_TAMANHO);
-        for (int i = 0; i < CODIGO_TAMANHO; i++) {
-            int indice = random.nextInt(caracteres.length());
-            codigo.append(caracteres.charAt(indice));
-        }
-        return codigo.toString();
-    }
-    @Scheduled(fixedDelay = 300000) // Executa a cada 5 minutos
-    public void limparCodigosExpirados() {
-        log.debug("Iniciando limpeza de códigos expirados");
-        LocalDateTime agora = LocalDateTime.now();
-        int removidos = 0;
-        for (Map.Entry<String, CodigoAutenticacao> entry : codigosAtivos.entrySet()) {
-            if (agora.isAfter(entry.getValue().expiracao())) {
-                codigosAtivos.remove(entry.getKey());
-                tentativasFalhas.remove(entry.getKey());
-                removidos++;
-            }
-        }
-        
-        if (removidos > 0) {
-            log.info("Removidos {} códigos expirados", removidos);
-        } else {
-            log.debug("Nenhum código expirado encontrado");
-        }
-    }
 
-
-    public Map.Entry<Boolean, String> validarCodigoAutenticacao(String email, String codigo) {
-        log.info("Validando código de autenticação para: {}", email);
-        try {
-            var response = validarCodigo(email, codigo);
-            if (response.valido()) {
-                log.info("Código validado com sucesso para: {}", email);
-            } else {
-                log.warn("Tentativa de validação com código inválido para: {}", email);
-            }
-            return new AbstractMap.SimpleEntry<>(response.valido(), response.mensagem());
-        } catch (Exception e) {
-            log.error("Erro ao validar código de autenticação para: {}", email, e);
-            throw ErroInesperadoException.erroInesperado("Erro ao validar código de verificação: ", e.getMessage());
-        }
-    }
 
     private record CodigoAutenticacao(String codigo, LocalDateTime expiracao, int tentativas) {}
 

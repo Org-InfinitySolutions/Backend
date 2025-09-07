@@ -1,6 +1,8 @@
 package com.infinitysolutions.applicationservice.infrastructure.config.usuario;
 
 import com.infinitysolutions.applicationservice.core.usecases.credencial.CriarCredenciais;
+import com.infinitysolutions.applicationservice.core.usecases.email.EnviarEmailCadastro;
+import com.infinitysolutions.applicationservice.core.usecases.email.EnviarEmailNotificacaoCadastro;
 import com.infinitysolutions.applicationservice.core.usecases.usuario.*;
 import com.infinitysolutions.applicationservice.core.usecases.usuario.pessoafisica.AtualizarPessoaFisica;
 import com.infinitysolutions.applicationservice.core.usecases.usuario.pessoafisica.CriarPessoaFisica;
@@ -24,6 +26,9 @@ public class UsuarioUseCaseConfig {
     private final AtualizarPessoaFisica atualizarPessoaFisica;
     private final AtualizarPessoaJuridica atualizarPessoaJuridica;
 
+    private final EnviarEmailCadastro enviarEmailCadastro;
+    private final EnviarEmailNotificacaoCadastro enviarEmailNotificacaoCadastro;
+
 
 
     public UsuarioUseCaseConfig(
@@ -32,7 +37,9 @@ public class UsuarioUseCaseConfig {
             CriarPessoaJuridica criarPessoaJuridica,
             CriarCredenciais criarCredenciais,
             AtualizarPessoaFisica atualizarPessoaFisica,
-            AtualizarPessoaJuridica atualizarPessoaJuridica
+            AtualizarPessoaJuridica atualizarPessoaJuridica,
+            EnviarEmailCadastro enviarEmailCadastro,
+            EnviarEmailNotificacaoCadastro enviarEmailNotificacaoCadastro
     ) {
         this.usuarioGatewayImpl = usuarioGatewayImpl;
         this.criarPessoaFisica = criarPessoaFisica;
@@ -40,11 +47,13 @@ public class UsuarioUseCaseConfig {
         this.criarCredenciais = criarCredenciais;
         this.atualizarPessoaFisica = atualizarPessoaFisica;
         this.atualizarPessoaJuridica = atualizarPessoaJuridica;
+        this.enviarEmailCadastro = enviarEmailCadastro;
+        this.enviarEmailNotificacaoCadastro = enviarEmailNotificacaoCadastro;
     }
 
     @Bean
     public CriarUsuario criarUsuario() {
-        return new CriarUsuario(criarPessoaJuridica, criarPessoaFisica, criarCredenciais);
+        return new CriarUsuario(criarPessoaJuridica, criarPessoaFisica, criarCredenciais, enviarEmailCadastro, enviarEmailNotificacaoCadastro);
     }
 
     @Bean
