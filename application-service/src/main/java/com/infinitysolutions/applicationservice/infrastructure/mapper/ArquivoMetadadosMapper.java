@@ -1,5 +1,6 @@
 package com.infinitysolutions.applicationservice.infrastructure.mapper;
 
+import com.infinitysolutions.applicationservice.core.domain.ArquivoMetadado;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.entity.ArquivoMetadadosEntity;
 import com.infinitysolutions.applicationservice.core.domain.valueobject.TipoAnexo;
 
@@ -14,6 +15,18 @@ public class ArquivoMetadadosMapper {
         attachment.setFileSize(fileSize);
         attachment.setTipoAnexo(tipoAnexo);
         return attachment;
+    }
+
+    public static ArquivoMetadado toDomain(ArquivoMetadadosEntity entity) {
+        return new ArquivoMetadado(
+                entity.getId(),
+                entity.getBlobName(),
+                entity.getBlobUrl(),
+                entity.getOriginalFilename(),
+                entity.getMimeType(),
+                entity.getFileSize(),
+                entity.getTipoAnexo()
+        );
     }
 
 }

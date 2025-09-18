@@ -2,7 +2,7 @@ package com.infinitysolutions.applicationservice.infrastructure.controller;
 
 
 import com.infinitysolutions.applicationservice.core.domain.valueobject.TipoAnexo;
-import com.infinitysolutions.applicationservice.old.service.DocumentoService;
+import com.infinitysolutions.applicationservice.core.usecases.usuario.AdicionarDocumentoUsuario;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -27,7 +27,7 @@ import java.util.UUID;
 @Tag(name = "Documentos", description = "Endpoints para gerenciamento dos documentos dos usuários")
 public class DocumentosController {
 
-    private final DocumentoService service;
+    private final AdicionarDocumentoUsuario adicionarDocumentoUsuario;
 
     @PostMapping(path = "/{idUsuario}" ,consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
@@ -48,10 +48,10 @@ public class DocumentosController {
             @Parameter(description = "Dados do documento em JSON", required = true)
             @RequestPart("dados") @Valid DadosDocumentoCriacaoDTO dto,
             @Parameter(description = "Documento do usuário")
-            @RequestPart(value = "documento", required = true) MultipartFile documento,
+            @RequestPart(value = "documento") MultipartFile documento,
             @PathVariable UUID idUsuario
             ) {
-        service.adicionarDocumentoUsuario(documento, dto, idUsuario);
+        adicionarDocumentoUsuario.execute(documento, dto.tipoAnexo, idUsuario);
     }
 
 

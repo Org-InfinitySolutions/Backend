@@ -2,7 +2,6 @@ package com.infinitysolutions.applicationservice.core.usecases.usuario;
 
 import com.infinitysolutions.applicationservice.core.domain.usuario.Usuario;
 import com.infinitysolutions.applicationservice.core.exception.RecursoNaoEncontradoException;
-import com.infinitysolutions.applicationservice.core.gateway.ArquivoMetadadoGateway;
 import com.infinitysolutions.applicationservice.core.gateway.UsuarioGateway;
 
 import java.util.Optional;

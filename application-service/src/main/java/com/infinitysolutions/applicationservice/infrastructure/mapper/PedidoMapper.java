@@ -4,7 +4,7 @@ import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.e
 import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.entity.PedidoEntity;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.entity.UsuarioEntity;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.pedido.*;
-import com.infinitysolutions.applicationservice.infrastructure.mapper.produto.ProdutoMapper;
+import com.infinitysolutions.applicationservice.infrastructure.mapper.produto.ProdutoEntityMapper;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.endereco.EnderecoResumidoDTO;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.usuario.UsuarioRespostaDTO;
 
@@ -62,7 +62,7 @@ public class PedidoMapper {
         PedidoRespostaDetalhadoDTO dto = new PedidoRespostaDetalhadoDTO();
         dto.setId(pedidoEntity.getId());
         dto.setUsuario(usuarioRespostaDTO);
-        dto.setProdutos(pedidoEntity.getProdutosPedido().stream().map(ProdutoMapper::toProdutoPedidoRespostaDTO).toList());
+        dto.setProdutos(pedidoEntity.getProdutosPedido().stream().map(ProdutoEntityMapper::toProdutoPedidoRespostaDTO).toList());
         dto.setEndereco(new EnderecoResumidoDTO(pedidoEntity.getEnderecoEntity().getCep(), pedidoEntity.getEnderecoEntity().getLogradouro(), pedidoEntity.getEnderecoEntity().getNumero(), pedidoEntity.getEnderecoEntity().getCidade(), pedidoEntity.getEnderecoEntity().getEstado()));
         dto.setQtdItens(pedidoEntity.getQtdItens());
         dto.setDataCriacao(pedidoEntity.getDataCriacao());

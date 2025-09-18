@@ -1,7 +1,6 @@
 package com.infinitysolutions.applicationservice.infrastructure.gateway.usuario;
 
 import com.infinitysolutions.applicationservice.core.domain.usuario.Usuario;
-import com.infinitysolutions.applicationservice.core.gateway.CredenciaisGateway;
 import com.infinitysolutions.applicationservice.core.gateway.UsuarioGateway;
 import com.infinitysolutions.applicationservice.infrastructure.mapper.UsuarioEntityMapper;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.repository.UsuarioRepository;
@@ -18,7 +17,6 @@ public class UsuarioGatewayImpl implements UsuarioGateway {
 
     private final UsuarioRepository repository;
     private final UsuarioEntityMapper usuarioMapper;
-    private final CredenciaisGateway credenciaisGateway;
 
     @Override
     public Optional<Usuario> findUserById(UUID id) {

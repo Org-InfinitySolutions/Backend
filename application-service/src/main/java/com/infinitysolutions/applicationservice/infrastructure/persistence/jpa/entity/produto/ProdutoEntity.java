@@ -45,7 +45,7 @@ public class ProdutoEntity {
 
     @ManyToOne
     @JoinColumn(name ="categoria_id")
-    private Categoria categoria;
+    private CategoriaEntity categoriaEntity;
 
     @PrePersist
     public void prePersist() {

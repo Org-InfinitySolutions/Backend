@@ -1,9 +1,11 @@
 package com.infinitysolutions.applicationservice.infrastructure.controller.produto;
 
+import com.infinitysolutions.applicationservice.core.domain.produto.Produto;
+import com.infinitysolutions.applicationservice.core.usecases.produto.*;
+import com.infinitysolutions.applicationservice.infrastructure.mapper.produto.ProdutoEntityMapper;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.produto.ProdutoAtualizacaoDTO;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.produto.ProdutoCriacaoDTO;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.produto.ProdutoRespostaDTO;
-import com.infinitysolutions.applicationservice.old.service.produto.ProdutoService;
 import com.infinitysolutions.applicationservice.old.infra.utils.AuthenticationUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -16,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -28,8 +31,16 @@ import java.util.List;
 @RequiredArgsConstructor
 @Tag(name = "Produtos", description = "Endpoints com funções que envolvem os produtos do sistema em geral")
 public class ProdutoController {
-    private final ProdutoService produtoService;
-    private final AuthenticationUtils authenticationUtils;    @GetMapping
+
+    private final AuthenticationUtils authenticationUtils;
+    private final AtualizarImagemProduto atualizarImagemProdutoCase;
+    private final CriarProduto criarProdutoCase;
+    private final ListarTodosProdutos listarTodosProdutos;
+    private final BuscarProdutoPorId buscarProdutoPorId;
+    private final AtualizarProduto atualizarProduto;
+    private final ExcluirProduto excluirProduto;
+
+    @GetMapping
     @ResponseStatus(HttpStatus.OK)
     @Operation(
             summary = "Listar todos os produtos",
@@ -40,16 +51,7 @@ public class ProdutoController {
     public List<ProdutoRespostaDTO> listarTodosProdutos(
             @Parameter(description = "Informações de autenticação do usuário", hidden = true)
             Authentication authentication) {
-        if (!authenticationUtils.isAuthenticated(authentication) || 
-            authenticationUtils.isCustomer(authentication)) {
-            return produtoService.listarTodosProdutos();
-        }
-        
-        if (authenticationUtils.isAdminOrEmployee(authentication)) {
-            return produtoService.listarTodosProdutosAdmin();
-        }
-        
-        return produtoService.listarTodosProdutos();
+        return listarTodosProdutos.execute(authenticationUtils.isAdminOrEmployee(authentication)).stream().map(ProdutoEntityMapper::toProdutoGenericoRespostaDTO).toList();
     }
       @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
@@ -64,13 +66,10 @@ public class ProdutoController {
             @PathVariable @Positive Integer id,
             @Parameter(description = "Informações de autenticação do usuário", hidden = true)
             Authentication authentication) {
-        
-        if (authenticationUtils.isAdminOrEmployee(authentication)) {
-            return produtoService.buscarPorIdAdmin(id);
-        }
-        
-        return produtoService.buscarPorId(id);
-    }
+
+          Produto produto = buscarProdutoPorId.execute(authenticationUtils.isAdminOrEmployee(authentication), id);
+          return ProdutoEntityMapper.toProdutoGenericoRespostaDTO(produto);
+      }
       @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(
@@ -101,9 +100,14 @@ public class ProdutoController {
                 "Acesso negado. Apenas administradores e funcionários podem criar produtos."
             );
         }
+
+          Produto produtoCriado = criarProdutoCase.execute(
+                  new CriarProdutoInput(dto.getModelo(), dto.getMarca(), dto.getUrlFrabricante(), dto.getDescricao(), dto.getQtdEstoque(), dto.getCategoriaId()),
+                  imagemProduto
+          );
         
-        return produtoService.criar(dto, imagemProduto);
-    }
+        return ProdutoEntityMapper.toProdutoGenericoRespostaDTO(ProdutoEntityMapper.toProdutoEntity(produtoCriado));
+      }
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     @Operation(
@@ -123,10 +127,21 @@ public class ProdutoController {
                 "Acesso negado. Apenas administradores e funcionários podem editar produtos."
             );
         }
-        
-        return produtoService.atualizar(id, dto);
+
+        Produto produtoAtualizado = atualizarProduto.execute(id, new AtualizarProdutoInput(
+                dto.getModelo(),
+                dto.getMarca(),
+                dto.getUrlFrabricante(),
+                dto.getDescricao(),
+                dto.getQtdEstoque(),
+                dto.getCategoriaId(),
+                dto.isAtivo()
+        ));
+
+        return ProdutoEntityMapper.toProdutoGenericoRespostaDTO(produtoAtualizado);
     }
-      @PutMapping(value = "/{id}/imagem", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+
+    @PutMapping(value = "/{id}/imagem", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(
             summary = "Atualizar imagem do produto",
@@ -139,6 +154,7 @@ public class ProdutoController {
                     encoding = @Encoding(name = "imagem", contentType = MediaType.APPLICATION_OCTET_STREAM_VALUE)
             )
     )
+    @Transactional
     public void atualizarImagemProduto(
             @Parameter(description = "ID do produto cuja imagem será atualizada", required = true)
             @PathVariable @Positive Integer id,
@@ -153,9 +169,11 @@ public class ProdutoController {
             );
         }
         
-         produtoService.atualizarImagem(id, novaImagem);
+         atualizarImagemProdutoCase.execute(novaImagem, id);
     }
-      @DeleteMapping("/{id}")
+
+    @Transactional
+    @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(
             summary = "Remover um produto",
@@ -174,6 +192,6 @@ public class ProdutoController {
             );
         }
         
-        produtoService.remover(id);
+        excluirProduto.execute(id);
     }
 }

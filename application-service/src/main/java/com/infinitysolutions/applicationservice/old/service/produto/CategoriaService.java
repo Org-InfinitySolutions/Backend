@@ -2,10 +2,10 @@ package com.infinitysolutions.applicationservice.old.service.produto;
 
 import com.infinitysolutions.applicationservice.core.exception.RecursoExistenteException;
 import com.infinitysolutions.applicationservice.core.exception.RecursoNaoEncontradoException;
-import com.infinitysolutions.applicationservice.infrastructure.mapper.produto.CategoriaMapper;
+import com.infinitysolutions.applicationservice.infrastructure.mapper.produto.CategoriaEntityMapper;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.produto.CategoriaCriacaoDTO;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.produto.CategoriaRespostaDTO;
-import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.entity.produto.Categoria;
+import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.entity.produto.CategoriaEntity;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.repository.produto.CategoriaRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,13 +24,13 @@ public class CategoriaService {
     public List<CategoriaRespostaDTO> listarTodasCategorias() {
         return repository.findAllByIsAtivoTrue()
                 .stream()
-                .map(CategoriaMapper::toCategoriaRespostaDTO)
+                .map(CategoriaEntityMapper::toCategoriaRespostaDTO)
                 .toList();
     }
 
-    public Categoria findById(Integer id) {
+    public CategoriaEntity findById(Integer id) {
         log.info("Buscando categoria com ID: {}", id);
-        Optional<Categoria> categoria = repository.findByIdAndIsAtivoTrue(id);
+        Optional<CategoriaEntity> categoria = repository.findByIdAndIsAtivoTrue(id);
         if (categoria.isEmpty()) {
             log.warn("Categoria com o ID: {} não encontrada", id);
             throw new RecursoNaoEncontradoException("Categoria não encontrada com o id: " + id);
@@ -39,7 +39,7 @@ public class CategoriaService {
     }
 
     public CategoriaRespostaDTO buscarPorId(Integer id) {
-        return CategoriaMapper.toCategoriaRespostaDTO(findById(id));
+        return CategoriaEntityMapper.toCategoriaRespostaDTO(findById(id));
     }
 
     @Transactional
@@ -48,30 +48,30 @@ public class CategoriaService {
             throw new RecursoExistenteException("Já existe uma categoria com este nome: " + dto.nome());
         }
 
-        Categoria categoria = CategoriaMapper.toCategoria(dto);
-        Categoria categoriaSalva = repository.save(categoria);
+        CategoriaEntity categoriaEntity = CategoriaEntityMapper.toCategoria(dto.nome());
+        CategoriaEntity categoriaEntitySalva = repository.save(categoriaEntity);
 
-        return CategoriaMapper.toCategoriaRespostaDTO(categoriaSalva);
+        return CategoriaEntityMapper.toCategoriaRespostaDTO(categoriaEntitySalva);
     }
 
     @Transactional
     public CategoriaRespostaDTO atualizar(Integer id, CategoriaCriacaoDTO dto) {
-        Categoria categoria = findById(id);
+        CategoriaEntity categoriaEntity = findById(id);
 
-        if (!categoria.getNome().equalsIgnoreCase(dto.nome()) &&
+        if (!categoriaEntity.getNome().equalsIgnoreCase(dto.nome()) &&
                 repository.existsByNomeIgnoreCase(dto.nome())) {
             throw new RecursoExistenteException("Já existe outra categoria com este nome: " + dto.nome());
         }
 
-        CategoriaMapper.atualizarCategoria(categoria, dto);
-        Categoria categoriaAtualizada = repository.save(categoria);
-        return CategoriaMapper.toCategoriaRespostaDTO(categoriaAtualizada);
+        CategoriaEntityMapper.atualizarCategoria(categoriaEntity, dto);
+        CategoriaEntity categoriaEntityAtualizada = repository.save(categoriaEntity);
+        return CategoriaEntityMapper.toCategoriaRespostaDTO(categoriaEntityAtualizada);
     }
 
     @Transactional
     public void remover(Integer id) {
-        Categoria categoria = findById(id);
-        categoria.setAtivo(false);
-        repository.save(categoria);
+        CategoriaEntity categoriaEntity = findById(id);
+        categoriaEntity.setAtivo(false);
+        repository.save(categoriaEntity);
     }
 }
