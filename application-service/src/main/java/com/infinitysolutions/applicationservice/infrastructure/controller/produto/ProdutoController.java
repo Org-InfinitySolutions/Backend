@@ -70,7 +70,9 @@ public class ProdutoController {
           Produto produto = buscarProdutoPorId.execute(authenticationUtils.isAdminOrEmployee(authentication), id);
           return ProdutoEntityMapper.toProdutoGenericoRespostaDTO(produto);
       }
-      @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+
+    @Transactional
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(
             summary = "Criar um novo produto",

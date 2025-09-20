@@ -21,7 +21,7 @@ public class CategoriaEntity {
     @Column(name = "is_ativo", nullable = false)
     private boolean isAtivo;
 
-    @OneToMany(mappedBy = "categoria")
+    @OneToMany(mappedBy = "categoriaEntity")
     private List<ProdutoEntity> produtoEntities;
 
     @PrePersist

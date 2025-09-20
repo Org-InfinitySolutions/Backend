@@ -33,7 +33,6 @@ public class ArquivoMetadadosService {
         return UUID.randomUUID().toString() + "-" + StringUtils.cleanPath(originalFileName);
     }
 
-    @Transactional
     public ArquivoMetadadosEntity uploadAndPersistArquivo(MultipartFile file, TipoAnexo tipoAnexo, ProdutoEntity produtoEntity) {
         if (file.isEmpty()) {
             throw new IllegalArgumentException("O arquivo não pode estar vazio.");

@@ -8,6 +8,11 @@ public class CoreLayerException extends RuntimeException {
         this.codigo = codigo;
     }
 
+    protected CoreLayerException(String message) {
+        super(message);
+        this.codigo = "400";
+    }
+
     protected CoreLayerException(String codigo, String message, Throwable cause) {
         super(message, cause);
         this.codigo = codigo;

@@ -228,7 +228,7 @@ public class GlobalExceptionHandler {
         return HttpStatus.NOT_FOUND;
     } else if ( ex instanceof RecursoExistenteException) {
         return HttpStatus.CONFLICT;
-    } else if (ex instanceof DocumentoInvalidoException || ex instanceof CredencialException) {
+    } else if (ex instanceof DocumentoInvalidoException || ex instanceof CredencialException || ex instanceof CategoriaException) {
         return HttpStatus.BAD_REQUEST;
     }
         return HttpStatus.INTERNAL_SERVER_ERROR;

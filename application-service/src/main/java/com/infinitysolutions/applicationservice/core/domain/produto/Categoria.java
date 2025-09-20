@@ -58,10 +58,10 @@ public class Categoria {
         this.isAtivo = true;
     }
 
-    public void inativar() {
-        if (hasActiveProdutos()) {
-            throw new CategoriaException("Não é possível inativar categoria com produtos ativos");
-        }
+    public void desativar() {
+//        if (hasActiveProdutos()) {
+//            throw new CategoriaException("Não é possível desativar categoria com produtos ativos");
+//        }
         this.isAtivo = false;
     }
 

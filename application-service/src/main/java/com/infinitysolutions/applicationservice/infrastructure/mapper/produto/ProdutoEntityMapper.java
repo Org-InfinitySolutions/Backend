@@ -5,7 +5,6 @@ import com.infinitysolutions.applicationservice.core.domain.mapper.CategoriaMapp
 import com.infinitysolutions.applicationservice.core.domain.produto.Produto;
 import com.infinitysolutions.applicationservice.infrastructure.mapper.ArquivoMetadadosMapper;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.entity.ArquivoMetadadosEntity;
-import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.produto.ProdutoAtualizacaoDTO;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.produto.ProdutoPedidoRespostaDTO;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.produto.ProdutoRespostaDTO;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.entity.produto.CategoriaEntity;
@@ -13,7 +12,7 @@ import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.e
 import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.entity.produto.ProdutoPedido;
 
 public class ProdutoEntityMapper {
-    
+
     public static ProdutoRespostaDTO toProdutoGenericoRespostaDTO(ProdutoEntity produtoEntity) {
         return new ProdutoRespostaDTO(
                 produtoEntity.getId(),
@@ -46,12 +45,19 @@ public class ProdutoEntityMapper {
 
     public static ProdutoEntity toProdutoEntity(Produto produtoDomain) {
         ProdutoEntity produtoEntity = new ProdutoEntity();
+        if (produtoDomain.getId() != null) produtoEntity.setId(produtoDomain.getId());
         produtoEntity.setModelo(produtoDomain.getModelo());
         produtoEntity.setMarca(produtoDomain.getMarca());
         produtoEntity.setUrlFrabricante(produtoDomain.getUrlFabricante());
         produtoEntity.setDescricao(produtoDomain.getDescricao());
         produtoEntity.setQtdEstoque(produtoDomain.getQtdEstoque());
-        CategoriaEntity categoriaEntity = CategoriaEntityMapper.toCategoria(produtoDomain.getCategoria().getNome());
+        produtoEntity.setAtivo(produtoDomain.isAtivo());
+
+        // Create a reference to an existing CategoriaEntity instead of creating a new one
+        CategoriaEntity categoriaEntity = new CategoriaEntity();
+        categoriaEntity.setId(produtoDomain.getCategoria().getId());
+        categoriaEntity.setNome(produtoDomain.getCategoria().getNome());
+
         produtoEntity.setCategoriaEntity(categoriaEntity);
         return produtoEntity;
     }

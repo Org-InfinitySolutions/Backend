@@ -89,7 +89,9 @@ public class ArquivoMetadadoGatewayImpl implements ArquivoMetadadoGateway {
 
     @Override
     public ArquivoMetadado enviarArquivoProduto(MultipartFile documento, TipoAnexo tipoAnexo, Integer produtoId) {
-        return null;
+        ProdutoEntity produtoEntity = produtoRepository.findByIdAndIsAtivoTrue(produtoId).orElseThrow(() -> RecursoNaoEncontradoException.produtoNaoEncontrado(produtoId));
+        ArquivoMetadadosEntity arquivoMetadadosEntity = arquivoMetadadosService.uploadAndPersistArquivo(documento, tipoAnexo, produtoEntity);
+        return ArquivoMetadadosMapper.toDomain(arquivoMetadadosEntity);
     }
 
 

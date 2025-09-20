@@ -7,7 +7,7 @@ public class ProdutoException extends CoreLayerException {
     }
     
     public ProdutoException(String message, Throwable cause) {
-        super(message, cause);
+        super(message, cause.getMessage());
     }
     
     public static ProdutoException modeloObrigatorio() {

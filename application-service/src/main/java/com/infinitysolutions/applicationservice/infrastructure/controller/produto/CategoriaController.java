@@ -1,8 +1,9 @@
 package com.infinitysolutions.applicationservice.infrastructure.controller.produto;
 
+import com.infinitysolutions.applicationservice.core.usecases.produto.categoria.*;
+import com.infinitysolutions.applicationservice.infrastructure.mapper.produto.CategoriaEntityMapper;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.produto.CategoriaCriacaoDTO;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.produto.CategoriaRespostaDTO;
-import com.infinitysolutions.applicationservice.old.service.produto.CategoriaService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -22,7 +23,11 @@ import java.util.List;
 @Tag(name = "Categorias", description = "Endpoints para gerenciamento de categorias de produtos")
 public class CategoriaController {
 
-    private final CategoriaService categoriaService;
+    private final ListarTodasCategorias listarTodasCategorias;
+    private final BuscarCategoriaPorId buscarCategoriaPorId;
+    private final CriarCategoria criarCategoria;
+    private final AtualizarCategoria atualizarCategoria;
+    private final ExcluirCategoria excluirCategoria;
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
@@ -31,7 +36,7 @@ public class CategoriaController {
             description = "Retorna uma lista com todas as categorias cadastradas no sistema."
     )
     public List<CategoriaRespostaDTO> listarTodasCategorias() {
-        return categoriaService.listarTodasCategorias();
+        return listarTodasCategorias.execute().stream().map(CategoriaEntityMapper::toCategoriaRespostaDTO).toList();
     }
 
     @GetMapping("/{id}")
@@ -43,7 +48,7 @@ public class CategoriaController {
     public CategoriaRespostaDTO buscarCategoriaPorId(
             @Parameter(description = "ID da categoria a ser buscada", required = true)
             @PathVariable @Positive Integer id) {
-        return categoriaService.buscarPorId(id);
+        return CategoriaEntityMapper.toCategoriaRespostaDTO(buscarCategoriaPorId.execute(id));
     }
 
     @PostMapping
@@ -54,7 +59,7 @@ public class CategoriaController {
     )
     public CategoriaRespostaDTO criarCategoria(
             @Valid @RequestBody CategoriaCriacaoDTO dto) {
-        return categoriaService.criar(dto);
+        return CategoriaEntityMapper.toCategoriaRespostaDTO(criarCategoria.execute(dto.nome()));
     }
 
     @PutMapping("/{id}")
@@ -67,7 +72,7 @@ public class CategoriaController {
             @Parameter(description = "ID da categoria a ser atualizada", required = true)
             @PathVariable @Positive Integer id,
             @Valid @RequestBody CategoriaCriacaoDTO dto) {
-        return categoriaService.atualizar(id, dto);
+        return CategoriaEntityMapper.toCategoriaRespostaDTO(atualizarCategoria.execute(id, dto.nome()));
     }
 
     @DeleteMapping("/{id}")
@@ -79,6 +84,6 @@ public class CategoriaController {
     public void removerCategoria(
             @Parameter(description = "ID da categoria a ser removida", required = true)
             @PathVariable @Positive Integer id) {
-        categoriaService.remover(id);
+        excluirCategoria.execute(id);
     }
 }

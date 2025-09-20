@@ -7,7 +7,7 @@ public class CategoriaException extends CoreLayerException {
     }
     
     public CategoriaException(String message, Throwable cause) {
-        super(message, cause);
+        super(message, cause.getMessage());
     }
     
     public static CategoriaException nomeInvalido(String nome) {

@@ -46,7 +46,7 @@ public interface PedidoRepository extends JpaRepository<PedidoEntity, Integer> {
            "FROM PedidoEntity p " +
            "JOIN p.produtosPedido pp " +
            "JOIN pp.produtoEntity prod " +
-           "JOIN prod.categoria c " +
+           "JOIN prod.categoriaEntity c " +
            "WHERE p.dataCriacao >= :dataInicio " +
            "GROUP BY c.nome " +
            "ORDER BY quantidade DESC")
