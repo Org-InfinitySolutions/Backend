@@ -3,7 +3,7 @@ package com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.
 import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.pedido.PedidoCadastroDTO;
 import com.infinitysolutions.applicationservice.core.domain.valueobject.SituacaoPedido;
 import com.infinitysolutions.applicationservice.core.domain.valueobject.TipoPedido;
-import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.entity.produto.ProdutoPedido;
+import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.entity.produto.ProdutoPedidoEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -30,9 +30,8 @@ public class PedidoEntity {
 
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "pedido_id")
-    @Column(name = "produtos_pedido")
     @ToString.Exclude
-    private List<ProdutoPedido> produtosPedido;
+    private List<ProdutoPedidoEntity> produtosPedido;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "fk_endereco_entrega")
@@ -69,7 +68,7 @@ public class PedidoEntity {
 
     @Column(name = "data_retirada")
     private LocalDateTime dataRetirada;
-    
+
     @Column(name = "descricao")
     private String descricao;
 
@@ -83,23 +82,13 @@ public class PedidoEntity {
     @EqualsAndHashCode.Exclude
     private List<ArquivoMetadadosEntity> documentos = new ArrayList<>();
 
-    public PedidoEntity(PedidoCadastroDTO dto, UsuarioEntity usuarioEntity, EnderecoEntity enderecoEntity) {
-        this.tipo = dto.tipo();
-        this.dataEntrega = dto.dataEntrega();
-        this.dataRetirada = dto.dataRetirada();
-        this.descricao = dto.descricao();
-        this.usuarioEntity = usuarioEntity;
-        this.enderecoEntity = enderecoEntity;
-    }
 
     public Integer getQtdItens(){
         if (this.produtosPedido == null || this.produtosPedido.isEmpty()) return 0;
 
-        return this.produtosPedido.stream().mapToInt(ProdutoPedido::getQtd).sum();
+        return this.produtosPedido.stream().mapToInt(ProdutoPedidoEntity::getQtd).sum();
     }
 
-    @PrePersist
-    public void PrePersist(){
-        this.produtosPedido = new ArrayList<>();
-    }
+    // Removed @PrePersist method that was resetting produtosPedido list
+    // This was causing issues with product associations being lost during persistence
 }

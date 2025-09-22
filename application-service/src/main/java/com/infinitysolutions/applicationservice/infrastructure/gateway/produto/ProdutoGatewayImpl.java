@@ -17,6 +17,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Component
@@ -79,5 +81,10 @@ public class ProdutoGatewayImpl implements ProdutoGateway {
         log.info("Produto com ID {} não possui vínculos, procedendo com a exclusão", produtoId);
         produtoRepository.deleteById(produtoId);
         log.info("Produto com ID {} removido com sucesso", produtoId);
+    }
+
+    @Override
+    public Set<Produto> findAllByIds(Set<Integer> ids) {
+        return produtoRepository.findByIdInAndIsAtivoTrue(ids).stream().map(ProdutoEntityMapper::toDomain).collect(Collectors.toSet());
     }
 }

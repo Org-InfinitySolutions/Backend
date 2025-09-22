@@ -104,39 +104,8 @@ public class ArquivoMetadadosService {
     }
 
 
-
-    @Transactional
-    public ArquivoMetadadosEntity atualizarImagemProduto(MultipartFile novaImagem, ProdutoEntity produtoEntity) {
-        if (novaImagem.isEmpty()) {
-            throw new IllegalArgumentException("O arquivo de imagem não pode estar vazio.");
-        }
-        
-        log.info("Iniciando atualização de imagem para produto ID: {}", produtoEntity.getId());
-        
-        // Buscar as imagens existentes do produto para excluir do blob storage
-        List<ArquivoMetadadosEntity> imagensExistentes = repository.findByProduto(produtoEntity);
-        
-        // Excluir as imagens antigas do blob storage
-        for (ArquivoMetadadosEntity imagemAntiga : imagensExistentes) {
-            try {
-                fileUploadService.deletarArquivo(imagemAntiga.getBlobUrl());
-                repository.delete(imagemAntiga);
-                log.info("Arquivo excluído do blob storage: {}", imagemAntiga.getBlobName());
-            } catch (Exception e) {
-                log.warn("Erro ao excluir arquivo do blob storage: {}, erro: {}", imagemAntiga.getBlobName(), e.getMessage());
-            }
-        }
-        
-        // Fazer upload da nova imagem
-        log.info("Fazendo upload da nova imagem: {}", novaImagem.getOriginalFilename());
-        return uploadAndPersistArquivo(novaImagem, TipoAnexo.IMAGEM_PRODUTO, produtoEntity);
-    }
-
     private ArquivoMetadadosEntity findById(Long arquivoId) {
         return repository.findById(arquivoId).orElseThrow(() -> DocumentoNaoEncontradoException.naoEncontradoPorId(arquivoId));
     }
-
-
-
 
 }

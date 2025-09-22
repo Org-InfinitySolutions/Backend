@@ -3,6 +3,7 @@ package com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.
 import com.infinitysolutions.applicationservice.core.domain.valueobject.TipoAnexo;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.entity.produto.ProdutoEntity;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
@@ -12,6 +13,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "arquivo_metadados")
 @NoArgsConstructor
+@AllArgsConstructor
 @Data
 public class ArquivoMetadadosEntity {
 

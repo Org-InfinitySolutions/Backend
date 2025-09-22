@@ -7,6 +7,10 @@ public class RecursoNaoEncontradoException extends CoreLayerException {
         super("recurso_nao_encontrado", message);
     }
 
+    public static com.infinitysolutions.applicationservice.core.exception.RecursoNaoEncontradoException enderecoNaoEncontrado(Integer id){
+        return new com.infinitysolutions.applicationservice.core.exception.RecursoNaoEncontradoException("Endereco não encontrado com o ID: " + id);
+    }
+
     public static com.infinitysolutions.applicationservice.core.exception.RecursoNaoEncontradoException pedidoNaoEncontrado(Integer id){
         return new com.infinitysolutions.applicationservice.core.exception.RecursoNaoEncontradoException("Pedido não encontrado com o ID: " + id);
     }

@@ -46,4 +46,9 @@ public class ProdutoUseCaseConfig {
     public ExcluirProduto excluirProduto() {
         return new ExcluirProduto(produtoGateway);
     }
+
+    @Bean
+    public BuscarProdutosPorIds buscarProdutosPorIds() {
+        return new BuscarProdutosPorIds(produtoGateway);
+    }
 }

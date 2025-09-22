@@ -1,5 +1,14 @@
 package com.infinitysolutions.applicationservice.infrastructure.mapper;
 
+import com.infinitysolutions.applicationservice.core.domain.ArquivoMetadado;
+import com.infinitysolutions.applicationservice.core.domain.Endereco;
+import com.infinitysolutions.applicationservice.core.domain.pedido.Pedido;
+import com.infinitysolutions.applicationservice.core.domain.pedido.ProdutoPedido;
+import com.infinitysolutions.applicationservice.core.domain.usuario.Usuario;
+import com.infinitysolutions.applicationservice.core.domain.valueobject.SituacaoPedido;
+import com.infinitysolutions.applicationservice.core.domain.valueobject.TipoPedido;
+import com.infinitysolutions.applicationservice.core.usecases.pedido.CadastrarPedidoInput;
+import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.entity.ArquivoMetadadosEntity;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.entity.EnderecoEntity;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.entity.PedidoEntity;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.entity.UsuarioEntity;
@@ -7,7 +16,17 @@ import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.p
 import com.infinitysolutions.applicationservice.infrastructure.mapper.produto.ProdutoEntityMapper;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.endereco.EnderecoResumidoDTO;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.usuario.UsuarioRespostaDTO;
+import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.entity.produto.ProdutoPedidoEntity;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.OneToMany;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+import org.hibernate.annotations.UpdateTimestamp;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,8 +38,41 @@ public class PedidoMapper {
         throw new IllegalStateException("Utility class");
     }
 
-    public static PedidoEntity toPedido(PedidoCadastroDTO dto, UsuarioEntity usuarioEntity, EnderecoEntity enderecoEntity) {
-        return new PedidoEntity(dto, usuarioEntity, enderecoEntity);
+    public static PedidoEntity toEntity(
+            UsuarioEntity usuarioEntity, List<ProdutoPedidoEntity> produtoPedidoEntityList,
+            EnderecoEntity enderecoEntity, SituacaoPedido situacaoPedido,
+            TipoPedido tipoPedido, LocalDateTime dataCriacao,
+            LocalDateTime dataAtualizacao, LocalDateTime dataAprovacao,
+            LocalDateTime dataInicioEvento, LocalDateTime dataFinalizacao,
+            LocalDateTime dataCancelamento, LocalDateTime dataEntrega,
+            LocalDateTime dataRetirada, String descricao,
+            List<ArquivoMetadadosEntity> documentos
+    ) {
+        PedidoEntity novoPedidoEntity = new PedidoEntity();
+        novoPedidoEntity.setUsuarioEntity(usuarioEntity);
+        novoPedidoEntity.setProdutosPedido(produtoPedidoEntityList);
+        novoPedidoEntity.setEnderecoEntity(enderecoEntity);
+        novoPedidoEntity.setSituacao(situacaoPedido);
+        novoPedidoEntity.setTipo(tipoPedido);
+        novoPedidoEntity.setDataCriacao(dataCriacao);
+        novoPedidoEntity.setDataAtualizacao(dataAtualizacao);
+        novoPedidoEntity.setDataAprovacao(dataAprovacao);
+        novoPedidoEntity.setDataInicioEvento(dataInicioEvento);
+        novoPedidoEntity.setDataFinalizacao(dataFinalizacao);
+        novoPedidoEntity.setDataCancelamento(dataCancelamento);
+        novoPedidoEntity.setDataEntrega(dataEntrega);
+        novoPedidoEntity.setDataRetirada(dataRetirada);
+        novoPedidoEntity.setDescricao(descricao);
+        novoPedidoEntity.setDocumentos(documentos);
+        return novoPedidoEntity;
+    }
+
+    public static Pedido toPedido(CadastrarPedidoInput input, Usuario usuario, Endereco endereco) {
+        return new Pedido(input, usuario, endereco);
+    }
+
+    public static Pedido toPedido(PedidoEntity pedidoEntity, Usuario usuario, List<ProdutoPedido> produtosPedido, Endereco endereco, List<ArquivoMetadado> documentos) {
+        return new Pedido(pedidoEntity.getId(), usuario, produtosPedido, endereco, pedidoEntity.getSituacao(), pedidoEntity.getTipo(), pedidoEntity.getDataCriacao(), pedidoEntity.getDataAtualizacao(), pedidoEntity.getDataAprovacao(), pedidoEntity.getDataInicioEvento(), pedidoEntity.getDataFinalizacao(), pedidoEntity.getDataCancelamento(), pedidoEntity.getDataEntrega(), pedidoEntity.getDataRetirada(), pedidoEntity.getDescricao(), documentos);
     }
 
 
@@ -37,6 +89,18 @@ public class PedidoMapper {
         );
     }
 
+    public static PedidoRespostaCadastroDTO toPedidoRespostaCadastroDTO(Pedido pedido) {
+        return new PedidoRespostaCadastroDTO(
+                pedido.getId(),
+                pedido.getUsuario().getId(),
+                pedido.getUsuario().getNome(),
+                pedido.getQtdItens(),
+                pedido.getSituacao(),
+                pedido.getTipo(),
+                pedido.getDataCriacao(),
+                pedido.getDescricao()
+        );
+    }
     public static PedidoRespostaDTO toPedidoRespostaDTO(PedidoEntity pedidoEntity) {
         PedidoRespostaDTO dto = new PedidoRespostaDTO();
         dto.setId(pedidoEntity.getId());

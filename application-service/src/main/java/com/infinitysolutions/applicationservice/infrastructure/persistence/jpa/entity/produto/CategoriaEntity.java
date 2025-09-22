@@ -29,4 +29,3 @@ public class CategoriaEntity {
         this.isAtivo = true;
     }
 }
-

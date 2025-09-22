@@ -1,5 +1,6 @@
 package com.infinitysolutions.applicationservice.core.domain;
 
+import com.infinitysolutions.applicationservice.core.domain.pedido.Pedido;
 import com.infinitysolutions.applicationservice.core.domain.produto.Produto;
 import com.infinitysolutions.applicationservice.core.domain.usuario.Usuario;
 import com.infinitysolutions.applicationservice.core.domain.valueobject.TipoAnexo;
@@ -64,8 +65,8 @@ public class ArquivoMetadado {
     }
 
     public void setProduto(Produto produto) {
-        if (this.pedido != null) throw ArquivoMetadadoException.ErroAoSetarAtributo("Erro ao setar o produto, arquivometadado já possui um pedido vinculado.");
-        if (this.usuario != null) throw ArquivoMetadadoException.ErroAoSetarAtributo("Erro ao setar o produto, arquivometadado já possui um usuario vinculado.");
+        if (hasPedido()) throw ArquivoMetadadoException.ErroAoSetarAtributo("Erro ao setar o produto, arquivometadado já possui um pedido vinculado.");
+        if (hasUsuario()) throw ArquivoMetadadoException.ErroAoSetarAtributo("Erro ao setar o produto, arquivometadado já possui um usuario vinculado.");
         this.produto = produto;
     }
 
@@ -74,8 +75,8 @@ public class ArquivoMetadado {
     }
 
     public void setUsuario(Usuario usuario) {
-        if (this.pedido != null) throw ArquivoMetadadoException.ErroAoSetarAtributo("Erro ao setar o usuario, arquivometadado já possui um pedido vinculado.");
-        if (this.produto != null) throw ArquivoMetadadoException.ErroAoSetarAtributo("Erro ao setar o usuario, arquivometadado já possui um produto vinculado.");
+        if (hasPedido()) throw ArquivoMetadadoException.ErroAoSetarAtributo("Erro ao setar o usuario, arquivometadado já possui um pedido vinculado.");
+        if (hasProduto()) throw ArquivoMetadadoException.ErroAoSetarAtributo("Erro ao setar o usuario, arquivometadado já possui um produto vinculado.");
         this.usuario = usuario;
     }
 
@@ -84,8 +85,8 @@ public class ArquivoMetadado {
     }
 
     public void setPedido(Pedido pedido) {
-        if (this.produto != null) throw ArquivoMetadadoException.ErroAoSetarAtributo("Erro ao setar o pedido, arquivometadado já possui um produto vinculado.");
-        if (this.usuario != null) throw ArquivoMetadadoException.ErroAoSetarAtributo("Erro ao setar o pedido, arquivometadado já possui um usuario vinculado.");
+        if (hasProduto()) throw ArquivoMetadadoException.ErroAoSetarAtributo("Erro ao setar o pedido, arquivometadado já possui um produto vinculado.");
+        if (hasUsuario()) throw ArquivoMetadadoException.ErroAoSetarAtributo("Erro ao setar o pedido, arquivometadado já possui um usuario vinculado.");
         this.pedido = pedido;
     }
 
@@ -95,5 +96,17 @@ public class ArquivoMetadado {
 
     public TipoAnexo getTipoAnexo() {
         return tipoAnexo;
+    }
+
+    public boolean hasPedido() {
+        return this.pedido != null;
+    }
+
+    public boolean hasUsuario() {
+        return this.usuario != null;
+    }
+
+    public boolean hasProduto() {
+        return this.produto != null;
     }
 }

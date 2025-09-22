@@ -9,7 +9,7 @@ import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.p
 import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.produto.ProdutoRespostaDTO;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.entity.produto.CategoriaEntity;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.entity.produto.ProdutoEntity;
-import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.entity.produto.ProdutoPedido;
+import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.entity.produto.ProdutoPedidoEntity;
 
 public class ProdutoEntityMapper {
 
@@ -80,18 +80,18 @@ public class ProdutoEntityMapper {
         );
     }
 
-    public static ProdutoPedidoRespostaDTO toProdutoPedidoRespostaDTO(ProdutoPedido produtoPedido){
+    public static ProdutoPedidoRespostaDTO toProdutoPedidoRespostaDTO(ProdutoPedidoEntity produtoPedidoEntity){
         ProdutoPedidoRespostaDTO.ProdutoResumidoDTO produtoResumidoDTO = ProdutoPedidoRespostaDTO.ProdutoResumidoDTO.builder()
-                .id(produtoPedido.getProdutoEntity().getId())
-                .marca(produtoPedido.getProdutoEntity().getMarca())
-                .urlFrabricante(produtoPedido.getProdutoEntity().getUrlFrabricante())
-                .qtdDisponivel(produtoPedido.getProdutoEntity().getQtdEstoque())
-                .modelo(produtoPedido.getProdutoEntity().getModelo())
-                .imagens(produtoPedido.getProdutoEntity().getImagens().stream().map(ArquivoMetadadosEntity::getBlobUrl).toList())
+                .id(produtoPedidoEntity.getProdutoEntity().getId())
+                .marca(produtoPedidoEntity.getProdutoEntity().getMarca())
+                .urlFrabricante(produtoPedidoEntity.getProdutoEntity().getUrlFrabricante())
+                .qtdDisponivel(produtoPedidoEntity.getProdutoEntity().getQtdEstoque())
+                .modelo(produtoPedidoEntity.getProdutoEntity().getModelo())
+                .imagens(produtoPedidoEntity.getProdutoEntity().getImagens().stream().map(ArquivoMetadadosEntity::getBlobUrl).toList())
                 .build();
         ProdutoPedidoRespostaDTO produtoPedidoRespostaDTO = new ProdutoPedidoRespostaDTO();
         produtoPedidoRespostaDTO.setProduto(produtoResumidoDTO);
-        produtoPedidoRespostaDTO.setQtdAlugada(produtoPedido.getQtd());
+        produtoPedidoRespostaDTO.setQtdAlugada(produtoPedidoEntity.getQtd());
         return produtoPedidoRespostaDTO;
 
     }

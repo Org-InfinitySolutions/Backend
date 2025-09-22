@@ -1,5 +1,8 @@
 package com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.entity;
 
+import com.infinitysolutions.applicationservice.core.domain.usuario.Usuario;
+import com.infinitysolutions.applicationservice.infrastructure.mapper.ArquivoMetadadosMapper;
+import com.infinitysolutions.applicationservice.infrastructure.mapper.EnderecoMapper;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

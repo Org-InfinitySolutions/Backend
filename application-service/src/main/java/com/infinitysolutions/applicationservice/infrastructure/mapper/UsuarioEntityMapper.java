@@ -54,7 +54,7 @@ public class UsuarioEntityMapper {
         throw new EstrategiaNaoEncontradaException("Tipo de usuário não encontrado");
     }
 
-    
+
     private PessoaFisica toPessoaFisicaDomain(PessoaFisicaEntity pessoaFisica) {
         return new PessoaFisica(
                 pessoaFisica.getId(),

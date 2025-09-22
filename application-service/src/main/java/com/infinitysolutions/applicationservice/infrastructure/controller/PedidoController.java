@@ -1,5 +1,10 @@
 package com.infinitysolutions.applicationservice.infrastructure.controller;
 
+import com.infinitysolutions.applicationservice.core.domain.pedido.Pedido;
+import com.infinitysolutions.applicationservice.core.usecases.endereco.EnderecoInput;
+import com.infinitysolutions.applicationservice.core.usecases.pedido.CadastrarPedido;
+import com.infinitysolutions.applicationservice.core.usecases.pedido.CadastrarPedidoInput;
+import com.infinitysolutions.applicationservice.infrastructure.mapper.PedidoMapper;
 import com.infinitysolutions.applicationservice.old.infra.utils.AuthenticationUtils;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.pedido.*;
 import com.infinitysolutions.applicationservice.old.service.PedidoService;
@@ -14,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -32,9 +38,13 @@ import java.util.UUID;
 )
 public class PedidoController {
 
-    private final PedidoService service;
     private final AuthenticationUtils authUtil;
+    private final CadastrarPedido cadastrarPedido;
+//    private final AtualizarSituacaoPedido atualizarSituacao;
+//    private final ListarTodosPedidos listarTodosPedidos;
+//    private final BuscarPedidoPorId buscarPedidoPorId;
 
+    @Transactional
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(
@@ -57,7 +67,13 @@ public class PedidoController {
         @RequestPart(value = "documento_auxiliar", required = false) MultipartFile documentoAuxiliar,
         Authentication auth
     ) {
-        return service.cadastrar(dto, documentoAuxiliar, UUID.fromString(auth.getName()));
+        List<CadastrarPedidoInput.ProdutoPedidoInput> produtoPedidoInputList = dto.produtos().stream().
+                map(produtoPedidoDTO -> new CadastrarPedidoInput.ProdutoPedidoInput(produtoPedidoDTO.produtoId(), produtoPedidoDTO.quantidade()))
+                .toList();
+        EnderecoInput enderecoInput = new EnderecoInput(dto.endereco().getCep(), dto.endereco().getLogradouro(), dto.endereco().getBairro(), dto.endereco().getCidade(), dto.endereco().getEstado(), dto.endereco().getNumero(), dto.endereco().getComplemento());
+        CadastrarPedidoInput cadastrarPedidoInput = new CadastrarPedidoInput(produtoPedidoInputList, enderecoInput, dto.tipo(), dto.dataEntrega(), dto.dataRetirada(), dto.descricao());
+        Pedido pedidoCadastrado = cadastrarPedido.execute(cadastrarPedidoInput, documentoAuxiliar, UUID.fromString(auth.getName()));
+        return PedidoMapper.toPedidoRespostaCadastroDTO(pedidoCadastrado);
     }
 
 
@@ -75,7 +91,8 @@ public class PedidoController {
             @Valid @RequestBody PedidoAtualizacaoSituacaoDTO dto,
             Authentication auth
             ) {
-        return service.atualizarSituacao(id, dto, authUtil.isCustomer(auth));
+//        return atualizarSituacao.execute(id, dto, authUtil.isCustomer(auth));
+        return null;
     }
 
     @GetMapping
@@ -87,7 +104,9 @@ public class PedidoController {
                      "(usuário comum ou administrador).")
 
     public List<PedidoRespostaDTO> listar(Authentication auth) {
-        return authUtil.isAdmin(auth) ? service.listarAdmin() : service.listar(UUID.fromString(auth.getName()));
+//        return listarTodosPedidos.execute(authUtil.isAdmin(auth), UUID.fromString(auth.getName()));
+        return null;
+
     }
 
     @GetMapping("/{id}")
@@ -101,6 +120,8 @@ public class PedidoController {
                                          @Parameter(description = "ID do pedido", required = true)
                                          @PathVariable @Positive Integer id
                                          ) {
-        return authUtil.isAdmin(auth) ? service.buscarPorIdAdmin(id) : service.buscarPorId(id, UUID.fromString(auth.getName()));
+//        return buscarPedidoPorId.execute(authUtil.isAdmin(auth), id, UUID.fromString(auth.getName()));
+        return null;
+
     }
 }

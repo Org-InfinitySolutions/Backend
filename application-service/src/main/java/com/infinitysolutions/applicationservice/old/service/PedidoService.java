@@ -19,11 +19,10 @@ import com.infinitysolutions.applicationservice.core.usecases.email.dto.EmailNot
 import com.infinitysolutions.applicationservice.core.domain.valueobject.SituacaoPedido;
 import com.infinitysolutions.applicationservice.core.domain.valueobject.TipoAnexo;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.entity.produto.ProdutoEntity;
-import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.entity.produto.ProdutoPedido;
+import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.entity.produto.ProdutoPedidoEntity;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.repository.PedidoRepository;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.repository.produto.ProdutoRepository;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.repository.UsuarioRepository;
-import com.infinitysolutions.applicationservice.old.service.strategy.AuthServiceConnection;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,10 +41,8 @@ public class PedidoService {
     private final PedidoRepository pedidoRepository;
     private final UsuarioRepository usuarioRepository;
     private final ProdutoRepository produtoRepository;
-    private final EnderecoService enderecoService;
     private final ArquivoMetadadosService arquivoMetadadosService;
     private final FileUploadService fileUploadService;
-    private final AuthServiceConnection authServiceConnection;
 
     private final BuscarUsuarioPorId buscarUsuarioPorId;
     private final UsuarioEntityMapper usuarioMapper;
@@ -75,12 +72,15 @@ public class PedidoService {
                 throw new RecursoNaoEncontradoException("Produtos não encontrados: " + idsNaoEncontrados);
             }
 
-            EnderecoEntity enderecoEntityEncontrado = enderecoService.buscarEndereco(dto.endereco());
+            EnderecoEntity enderecoEntityEncontrado = null;
+//                    enderecoService.buscarEndereco(dto.endereco());
 
-            PedidoEntity pedidoEntityCriado = PedidoMapper.toPedido(dto, usuarioEntity, enderecoEntityEncontrado);
+            PedidoEntity pedidoEntityCriado = null;
+//                    PedidoMapper.toPedido(dto, usuarioEntity, enderecoEntityEncontrado);
 
             PedidoEntity pedidoEntitySalvo = pedidoRepository.save(pedidoEntityCriado);
-            List<ProdutoPedido> produtosPedido = produtoEntities.stream()
+
+            List<ProdutoPedidoEntity> produtosPedido = produtoEntities.stream()
                     .map(produto -> {
                         PedidoCadastroDTO.ProdutoPedidoDTO dtoCorrespondente = mapaDtos.get(produto.getId());
                         return createProdutoPedido(produto, pedidoEntitySalvo, dtoCorrespondente);
@@ -97,7 +97,7 @@ public class PedidoService {
             // Buscar o email do usuário
             String usuarioEmail = "";
             try {
-                usuarioEmail = authServiceConnection.buscarEmailUsuario(usuarioId).email();
+//                usuarioEmail = authServiceConnection.buscarEmailUsuario(usuarioId).email();
                 log.info("Email do usuário recuperado com sucesso: {}", usuarioEmail);
             } catch (Exception e) {
                 log.error("Erro ao recuperar o email do usuário: {}", e.getMessage());
@@ -154,12 +154,12 @@ public class PedidoService {
         arquivoMetadadosService.uploadAndPersistArquivo(arquivo, TipoAnexo.DOCUMENTO_AUXILIAR, pedidoEntity);
     }
 
-    private static ProdutoPedido createProdutoPedido(ProdutoEntity produtoEntity, PedidoEntity pedidoEntitySalvo, PedidoCadastroDTO.ProdutoPedidoDTO dtoCorrespondente) {
-        ProdutoPedido produtoPedido = new ProdutoPedido();
-        produtoPedido.setPedidoEntity(pedidoEntitySalvo);
-        produtoPedido.setProdutoEntity(produtoEntity);
-        produtoPedido.setQtd(dtoCorrespondente.quantidade());
-        return produtoPedido;
+    private static ProdutoPedidoEntity createProdutoPedido(ProdutoEntity produtoEntity, PedidoEntity pedidoEntitySalvo, PedidoCadastroDTO.ProdutoPedidoDTO dtoCorrespondente) {
+        ProdutoPedidoEntity produtoPedidoEntity = new ProdutoPedidoEntity();
+        produtoPedidoEntity.setPedidoEntity(pedidoEntitySalvo);
+        produtoPedidoEntity.setProdutoEntity(produtoEntity);
+        produtoPedidoEntity.setQtd(dtoCorrespondente.quantidade());
+        return produtoPedidoEntity;
     }
 
     @Transactional
@@ -189,7 +189,8 @@ public class PedidoService {
         pedidoEntity.setSituacao(dto.situacao());
         PedidoRespostaDTO pedidoRespostaDTO = PedidoMapper.toPedidoRespostaDTO(pedidoRepository.save(pedidoEntity));
 
-        String usuarioEmail = authServiceConnection.buscarEmailUsuario(pedidoEntity.getUsuarioEntity().getId()).email();
+        String usuarioEmail = null;
+//                authServiceConnection.buscarEmailUsuario(pedidoEntity.getUsuarioEntity().getId()).email();
         
         enviarEmailNotificacaoMudancaStatusPedido.execute(
             new EmailNotificacaoMudancaStatus(
@@ -227,9 +228,9 @@ public class PedidoService {
     private void reduzirEstoque(PedidoEntity pedidoEntity) {
         log.info("Reduzindo estoque dos produtos do pedido {}", pedidoEntity.getId());
         
-        for (ProdutoPedido produtoPedido : pedidoEntity.getProdutosPedido()) {
-            ProdutoEntity produtoEntity = produtoPedido.getProdutoEntity();
-            int quantidadePedida = produtoPedido.getQtd();
+        for (ProdutoPedidoEntity produtoPedidoEntity : pedidoEntity.getProdutosPedido()) {
+            ProdutoEntity produtoEntity = produtoPedidoEntity.getProdutoEntity();
+            int quantidadePedida = produtoPedidoEntity.getQtd();
             int estoqueAtual = produtoEntity.getQtdEstoque();
             
             if (estoqueAtual < quantidadePedida) {
@@ -252,9 +253,9 @@ public class PedidoService {
     private void devolverEstoque(PedidoEntity pedidoEntity) {
         log.info("Devolvendo estoque dos produtos do pedido {}", pedidoEntity.getId());
         
-        for (ProdutoPedido produtoPedido : pedidoEntity.getProdutosPedido()) {
-            ProdutoEntity produtoEntity = produtoPedido.getProdutoEntity();
-            int quantidadePedida = produtoPedido.getQtd();
+        for (ProdutoPedidoEntity produtoPedidoEntity : pedidoEntity.getProdutosPedido()) {
+            ProdutoEntity produtoEntity = produtoPedidoEntity.getProdutoEntity();
+            int quantidadePedida = produtoPedidoEntity.getQtd();
             int estoqueAtual = produtoEntity.getQtdEstoque();
             int novoEstoque = estoqueAtual + quantidadePedida;
             

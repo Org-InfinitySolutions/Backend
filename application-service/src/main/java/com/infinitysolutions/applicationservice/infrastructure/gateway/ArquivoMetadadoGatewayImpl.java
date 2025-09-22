@@ -1,6 +1,7 @@
 package com.infinitysolutions.applicationservice.infrastructure.gateway;
 
 import com.infinitysolutions.applicationservice.core.domain.ArquivoMetadado;
+import com.infinitysolutions.applicationservice.core.domain.pedido.Pedido;
 import com.infinitysolutions.applicationservice.core.domain.usuario.Usuario;
 import com.infinitysolutions.applicationservice.core.domain.valueobject.TipoAnexo;
 import com.infinitysolutions.applicationservice.core.domain.valueobject.TipoUsuario;
@@ -8,12 +9,10 @@ import com.infinitysolutions.applicationservice.core.exception.RecursoNaoEncontr
 import com.infinitysolutions.applicationservice.core.gateway.ArquivoMetadadoGateway;
 import com.infinitysolutions.applicationservice.infrastructure.mapper.ArquivoMetadadosMapper;
 import com.infinitysolutions.applicationservice.infrastructure.mapper.UsuarioEntityMapper;
-import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.entity.ArquivoMetadadosEntity;
-import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.entity.PessoaFisicaEntity;
-import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.entity.PessoaJuridicaEntity;
-import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.entity.UsuarioEntity;
+import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.entity.*;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.entity.produto.ProdutoEntity;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.repository.ArquivoMetadadosRepository;
+import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.repository.PedidoRepository;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.repository.UsuarioRepository;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.repository.produto.ProdutoRepository;
 import com.infinitysolutions.applicationservice.old.infra.exception.DocumentoInvalidoException;
@@ -37,6 +36,7 @@ public class ArquivoMetadadoGatewayImpl implements ArquivoMetadadoGateway {
     private final UsuarioRepository usuarioRepository;
     private final ArquivoMetadadosRepository arquivoMetadadosRepository;
     private final ProdutoRepository produtoRepository;
+    private final PedidoRepository pedidoRepository;
     private final FileUploadService fileUploadService;
 
     @Override
@@ -91,6 +91,13 @@ public class ArquivoMetadadoGatewayImpl implements ArquivoMetadadoGateway {
     public ArquivoMetadado enviarArquivoProduto(MultipartFile documento, TipoAnexo tipoAnexo, Integer produtoId) {
         ProdutoEntity produtoEntity = produtoRepository.findByIdAndIsAtivoTrue(produtoId).orElseThrow(() -> RecursoNaoEncontradoException.produtoNaoEncontrado(produtoId));
         ArquivoMetadadosEntity arquivoMetadadosEntity = arquivoMetadadosService.uploadAndPersistArquivo(documento, tipoAnexo, produtoEntity);
+        return ArquivoMetadadosMapper.toDomain(arquivoMetadadosEntity);
+    }
+
+    @Override
+    public ArquivoMetadado enviarDocumentoAuxiliar(MultipartFile documento, Pedido pedido) {
+        PedidoEntity pedidoEntity = pedidoRepository.findById(pedido.getId()).orElseThrow(() -> RecursoNaoEncontradoException.pedidoNaoEncontrado(pedido.getId()));
+        ArquivoMetadadosEntity arquivoMetadadosEntity = arquivoMetadadosService.uploadAndPersistArquivo(documento, TipoAnexo.DOCUMENTO_AUXILIAR, pedidoEntity);
         return ArquivoMetadadosMapper.toDomain(arquivoMetadadosEntity);
     }
 
