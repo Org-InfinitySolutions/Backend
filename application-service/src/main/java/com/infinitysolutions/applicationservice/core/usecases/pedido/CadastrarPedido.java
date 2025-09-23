@@ -4,10 +4,16 @@ import com.infinitysolutions.applicationservice.core.domain.Endereco;
 import com.infinitysolutions.applicationservice.core.domain.pedido.Pedido;
 import com.infinitysolutions.applicationservice.core.domain.pedido.ProdutoPedido;
 import com.infinitysolutions.applicationservice.core.domain.produto.Produto;
+import com.infinitysolutions.applicationservice.core.domain.usuario.Credencial;
 import com.infinitysolutions.applicationservice.core.domain.usuario.Usuario;
 import com.infinitysolutions.applicationservice.core.exception.RecursoNaoEncontradoException;
 import com.infinitysolutions.applicationservice.core.gateway.ArquivoMetadadoGateway;
 import com.infinitysolutions.applicationservice.core.gateway.PedidoGateway;
+import com.infinitysolutions.applicationservice.core.usecases.credencial.BuscarCredencialPorId;
+import com.infinitysolutions.applicationservice.core.usecases.email.EnviarEmailNotificacaoNovoPedido;
+import com.infinitysolutions.applicationservice.core.usecases.email.EnviarEmailPedidoConcluidoUsuario;
+import com.infinitysolutions.applicationservice.core.usecases.email.dto.EmailNotificacaoPedidoConcluido;
+import com.infinitysolutions.applicationservice.core.usecases.email.dto.EmailPedidoConcluidoAdmin;
 import com.infinitysolutions.applicationservice.core.usecases.endereco.ObterEndereco;
 import com.infinitysolutions.applicationservice.core.usecases.produto.BuscarProdutosPorIds;
 import com.infinitysolutions.applicationservice.core.usecases.usuario.BuscarUsuarioPorId;
@@ -20,22 +26,29 @@ import java.util.stream.Collectors;
 public class CadastrarPedido {
 
     private final BuscarUsuarioPorId buscarUsuarioPorId;
+    private final BuscarCredencialPorId buscarCredencialPorId;
     private final ObterEndereco obterEndereco;
     private final BuscarProdutosPorIds buscarProdutosPorIds;
     private final PedidoGateway pedidoGateway;
     private final ArquivoMetadadoGateway arquivoMetadadoGateway;
+    private final EnviarEmailPedidoConcluidoUsuario enviarEmailPedidoConcluidoUsuario;
+    private final EnviarEmailNotificacaoNovoPedido enviarEmailNotificacaoNovoPedido;
 
-    public CadastrarPedido(BuscarUsuarioPorId buscarUsuarioPorId, ObterEndereco obterEndereco, BuscarProdutosPorIds buscarProdutosPorIds, PedidoGateway pedidoGateway, ArquivoMetadadoGateway arquivoMetadadoGateway) {
+    public CadastrarPedido(BuscarUsuarioPorId buscarUsuarioPorId, BuscarCredencialPorId buscarCredencialPorId, ObterEndereco obterEndereco, BuscarProdutosPorIds buscarProdutosPorIds, PedidoGateway pedidoGateway, ArquivoMetadadoGateway arquivoMetadadoGateway, EnviarEmailPedidoConcluidoUsuario enviarEmailPedidoConcluidoUsuario, EnviarEmailNotificacaoNovoPedido enviarEmailNotificacaoNovoPedido) {
         this.buscarUsuarioPorId = buscarUsuarioPorId;
+        this.buscarCredencialPorId = buscarCredencialPorId;
         this.obterEndereco = obterEndereco;
         this.buscarProdutosPorIds = buscarProdutosPorIds;
         this.pedidoGateway = pedidoGateway;
         this.arquivoMetadadoGateway = arquivoMetadadoGateway;
+        this.enviarEmailPedidoConcluidoUsuario = enviarEmailPedidoConcluidoUsuario;
+        this.enviarEmailNotificacaoNovoPedido = enviarEmailNotificacaoNovoPedido;
     }
 
     public Pedido execute(CadastrarPedidoInput input, MultipartFile documentoAuxiliar, UUID uuid) {
 
         Usuario usuarioEncontrado = buscarUsuarioPorId.execute(uuid);
+        Credencial credencialEncontrada = buscarCredencialPorId.execute(uuid);
 
         Map<Integer, Integer> idQuantidadeMap = input.produtos().stream()
                 .collect(Collectors.toMap(CadastrarPedidoInput.ProdutoPedidoInput::produtoId, CadastrarPedidoInput.ProdutoPedidoInput::quantidade));
@@ -59,7 +72,6 @@ public class CadastrarPedido {
 
         Pedido pedidoCriado = PedidoMapper.toPedido(input, usuarioEncontrado, enderecoEncontrado);
 
-        // Create the product list before saving
         List<ProdutoPedido> produtosPedido = produtosEncontrados.stream()
                 .map(produto -> {
                     Integer quantidade = idQuantidadeMap.get(produto.getId());
@@ -69,13 +81,10 @@ public class CadastrarPedido {
                     return produtoPedido;
                 }).toList();
 
-        // Set the products before saving
         pedidoCriado.setProdutosPedido(produtosPedido);
 
-        // Save the pedido with all its data in a single operation
         Pedido pedidoSalvo = pedidoGateway.save(pedidoCriado);
 
-        // Now that we have the saved pedido, we can associate it with the products
         for (ProdutoPedido produtoPedido : pedidoSalvo.getProdutosPedido()) {
             produtoPedido.setPedido(pedidoSalvo);
         }
@@ -84,17 +93,27 @@ public class CadastrarPedido {
             enviarDocumentoAuxiliar(documentoAuxiliar, pedidoSalvo);
         }
 
-        //TODO: fazer envio de email
+        enviarEmailPedidoConcluidoUsuario.execute(new EmailNotificacaoPedidoConcluido(
+                usuarioEncontrado.getNome(),
+                pedidoSalvo.getId().toString(),
+                credencialEncontrada.getEmail(),
+                String.valueOf(pedidoSalvo.getQtdItens())
+        ));
+
+        String descricaoPedido = pedidoSalvo.getDescricao() != null && !pedidoSalvo.getDescricao().trim().isEmpty()
+                ? pedidoSalvo.getDescricao()
+                : "Sem descrição";
+
+        enviarEmailNotificacaoNovoPedido.execute(new EmailPedidoConcluidoAdmin(
+                usuarioEncontrado.getNome(),
+                pedidoSalvo.getId().toString(),
+                credencialEncontrada.getEmail(),
+                String.valueOf(pedidoSalvo.getQtdItens()),
+                usuarioEncontrado.getTelefoneCelular(),
+                descricaoPedido
+        ));
 
         return pedidoSalvo;
-    }
-
-    private static ProdutoPedido createProdutoPedido(Produto produto, Pedido pedidoSalvo, Integer quatidade) {
-        ProdutoPedido novoProdutoPedido = new ProdutoPedido();
-        novoProdutoPedido.setPedido(pedidoSalvo);
-        novoProdutoPedido.setProduto(produto);
-        novoProdutoPedido.setQtd(quatidade);
-        return novoProdutoPedido;
     }
 
     private void enviarDocumentoAuxiliar(MultipartFile arquivo, Pedido pedido) {

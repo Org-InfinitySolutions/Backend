@@ -23,7 +23,8 @@ public class AuthenticationUtils {
         return auth.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .anyMatch(role -> role.equals(ADMIN_SCOPE));
-    }    public boolean isCustomer(Authentication auth) {
+    }
+    public boolean isCustomer(Authentication auth) {
         if (!isAuthenticated(auth)) return false;
 
         return auth.getAuthorities().stream()

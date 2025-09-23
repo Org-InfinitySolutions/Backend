@@ -2,6 +2,7 @@ package com.infinitysolutions.applicationservice.infrastructure.mapper.produto;
 
 import com.infinitysolutions.applicationservice.core.domain.ArquivoMetadado;
 import com.infinitysolutions.applicationservice.core.domain.mapper.CategoriaMapper;
+import com.infinitysolutions.applicationservice.core.domain.pedido.ProdutoPedido;
 import com.infinitysolutions.applicationservice.core.domain.produto.Produto;
 import com.infinitysolutions.applicationservice.infrastructure.mapper.ArquivoMetadadosMapper;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.entity.ArquivoMetadadosEntity;
@@ -88,6 +89,22 @@ public class ProdutoEntityMapper {
                 .qtdDisponivel(produtoPedidoEntity.getProdutoEntity().getQtdEstoque())
                 .modelo(produtoPedidoEntity.getProdutoEntity().getModelo())
                 .imagens(produtoPedidoEntity.getProdutoEntity().getImagens().stream().map(ArquivoMetadadosEntity::getBlobUrl).toList())
+                .build();
+        ProdutoPedidoRespostaDTO produtoPedidoRespostaDTO = new ProdutoPedidoRespostaDTO();
+        produtoPedidoRespostaDTO.setProduto(produtoResumidoDTO);
+        produtoPedidoRespostaDTO.setQtdAlugada(produtoPedidoEntity.getQtd());
+        return produtoPedidoRespostaDTO;
+
+    }
+
+    public static ProdutoPedidoRespostaDTO toProdutoPedidoRespostaDTO(ProdutoPedido produtoPedidoEntity){
+        ProdutoPedidoRespostaDTO.ProdutoResumidoDTO produtoResumidoDTO = ProdutoPedidoRespostaDTO.ProdutoResumidoDTO.builder()
+                .id(produtoPedidoEntity.getProduto().getId())
+                .marca(produtoPedidoEntity.getProduto().getMarca())
+                .urlFrabricante(produtoPedidoEntity.getProduto().getUrlFabricante())
+                .qtdDisponivel(produtoPedidoEntity.getProduto().getQtdEstoque())
+                .modelo(produtoPedidoEntity.getProduto().getModelo())
+                .imagens(produtoPedidoEntity.getProduto().getImagens().stream().map(ArquivoMetadado::getBlobUrl).toList())
                 .build();
         ProdutoPedidoRespostaDTO produtoPedidoRespostaDTO = new ProdutoPedidoRespostaDTO();
         produtoPedidoRespostaDTO.setProduto(produtoResumidoDTO);

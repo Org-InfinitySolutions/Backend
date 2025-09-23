@@ -1,13 +1,15 @@
 package com.infinitysolutions.applicationservice.infrastructure.controller;
 
 import com.infinitysolutions.applicationservice.core.domain.pedido.Pedido;
+import com.infinitysolutions.applicationservice.core.domain.usuario.Credencial;
+import com.infinitysolutions.applicationservice.core.usecases.credencial.BuscarCredencialPorId;
 import com.infinitysolutions.applicationservice.core.usecases.endereco.EnderecoInput;
-import com.infinitysolutions.applicationservice.core.usecases.pedido.CadastrarPedido;
-import com.infinitysolutions.applicationservice.core.usecases.pedido.CadastrarPedidoInput;
+import com.infinitysolutions.applicationservice.core.usecases.pedido.*;
 import com.infinitysolutions.applicationservice.infrastructure.mapper.PedidoMapper;
+import com.infinitysolutions.applicationservice.infrastructure.mapper.UsuarioEntityMapper;
 import com.infinitysolutions.applicationservice.old.infra.utils.AuthenticationUtils;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.pedido.*;
-import com.infinitysolutions.applicationservice.old.service.PedidoService;
+import com.infinitysolutions.applicationservice.old.service.FileUploadService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -38,11 +40,14 @@ import java.util.UUID;
 )
 public class PedidoController {
 
+    private final UsuarioEntityMapper usuarioEntityMapper;
     private final AuthenticationUtils authUtil;
     private final CadastrarPedido cadastrarPedido;
-//    private final AtualizarSituacaoPedido atualizarSituacao;
-//    private final ListarTodosPedidos listarTodosPedidos;
-//    private final BuscarPedidoPorId buscarPedidoPorId;
+    private final AtualizarSituacaoPedido atualizarSituacao;
+    private final ListarTodosPedidos listarTodosPedidos;
+    private final BuscarPedidoPorId buscarPedidoPorId;
+    private final BuscarCredencialPorId buscarCredencialPorId;
+    private final FileUploadService fileUploadService;
 
     @Transactional
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -77,6 +82,7 @@ public class PedidoController {
     }
 
 
+    @Transactional
     @PutMapping("/{id}/situacao")
     @ResponseStatus(HttpStatus.OK)
     @Operation(
@@ -91,8 +97,8 @@ public class PedidoController {
             @Valid @RequestBody PedidoAtualizacaoSituacaoDTO dto,
             Authentication auth
             ) {
-//        return atualizarSituacao.execute(id, dto, authUtil.isCustomer(auth));
-        return null;
+        Pedido pedido = atualizarSituacao.execute(id, UUID.fromString(auth.getName()), dto.situacao(), authUtil.isCustomer(auth));
+        return PedidoMapper.toPedidoRespostaDTO(pedido);
     }
 
     @GetMapping
@@ -104,9 +110,13 @@ public class PedidoController {
                      "(usuário comum ou administrador).")
 
     public List<PedidoRespostaDTO> listar(Authentication auth) {
-//        return listarTodosPedidos.execute(authUtil.isAdmin(auth), UUID.fromString(auth.getName()));
-        return null;
+        boolean isAdmin = authUtil.isAdmin(auth);
+        List<Pedido> pedidos = listarTodosPedidos.execute(isAdmin, UUID.fromString(auth.getName()));
 
+        if (isAdmin) {
+            return PedidoMapper.toPedidoRespostaAdminDTOList(pedidos);
+        }
+        return PedidoMapper.toPedidoRespostaDTOList(pedidos);
     }
 
     @GetMapping("/{id}")
@@ -120,8 +130,14 @@ public class PedidoController {
                                          @Parameter(description = "ID do pedido", required = true)
                                          @PathVariable @Positive Integer id
                                          ) {
-//        return buscarPedidoPorId.execute(authUtil.isAdmin(auth), id, UUID.fromString(auth.getName()));
-        return null;
+        Pedido pedidoEncontrado = buscarPedidoPorId.execute(id, UUID.fromString(auth.getName()), authUtil.isAdmin(auth));
+        Credencial credencialEncontrada = buscarCredencialPorId.execute(pedidoEncontrado.getUsuario().getId());
+        List<PedidoRespostaDetalhadoDTO.DocumentoPedidoDTO> documentos = pedidoEncontrado.getDocumentos().stream().map(documento -> new PedidoRespostaDetalhadoDTO.DocumentoPedidoDTO(
+                documento.getOriginalFilename(),
+                fileUploadService.generatePrivateFileSasUrl(documento.getBlobName(), 60),
+                documento.getMimeType()
+        )).toList();
 
+        return PedidoMapper.toPedidoRespostaDetalhadoAdminDTO(pedidoEncontrado, usuarioEntityMapper.toUsuarioRespostaDTO(pedidoEncontrado.getUsuario(), credencialEncontrada), documentos);
     }
 }

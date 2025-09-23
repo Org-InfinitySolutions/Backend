@@ -111,13 +111,23 @@ public class PedidoMapper {
         return dto;
     }
 
-    public static PedidoRespostaAdminDTO toPedidoRespostaAdminDTO(PedidoEntity pedidoEntity) {
+    public static PedidoRespostaDTO toPedidoRespostaDTO(Pedido pedido) {
+        PedidoRespostaDTO dto = new PedidoRespostaDTO();
+        dto.setId(pedido.getId());
+        dto.setQtdItens(pedido.getQtdItens());
+        dto.setDataCriacao(pedido.getDataCriacao());
+        dto.setDataEntrega(pedido.getDataEntrega());
+        dto.setSituacao(pedido.getSituacao());
+        return dto;
+    }
+
+    public static PedidoRespostaAdminDTO toPedidoRespostaAdminDTO(Pedido pedidoEntity) {
         PedidoRespostaAdminDTO dto = new PedidoRespostaAdminDTO();
         dto.setId(pedidoEntity.getId());
         dto.setQtdItens(pedidoEntity.getQtdItens());
         dto.setDataCriacao(pedidoEntity.getDataCriacao());
         dto.setDataEntrega(pedidoEntity.getDataEntrega());
-        dto.setNome(pedidoEntity.getUsuarioEntity().getNome());
+        dto.setNome(pedidoEntity.getUsuario().getNome());
         dto.setSituacao(pedidoEntity.getSituacao());
         return dto;
     }
@@ -139,13 +149,31 @@ public class PedidoMapper {
         return dto;
     }
 
-    public static List<PedidoRespostaDTO> toPedidoRespostaDTOList(List<PedidoEntity> pedidoEntities) {
-        return pedidoEntities.stream()
-                .map(PedidoMapper::toPedidoRespostaDTO)
-                .collect(Collectors.toList());
+    public static PedidoRespostaDetalhadoDTO toPedidoRespostaDetalhadoAdminDTO(Pedido pedidoEntity, UsuarioRespostaDTO usuarioRespostaDTO, List<PedidoRespostaDetalhadoDTO.DocumentoPedidoDTO> documentos) {
+        PedidoRespostaDetalhadoDTO dto = new PedidoRespostaDetalhadoDTO();
+        dto.setId(pedidoEntity.getId());
+        dto.setUsuario(usuarioRespostaDTO);
+        dto.setProdutos(pedidoEntity.getProdutosPedido().stream().map(ProdutoEntityMapper::toProdutoPedidoRespostaDTO).toList());
+        dto.setEndereco(new EnderecoResumidoDTO(pedidoEntity.getEndereco().getCep(), pedidoEntity.getEndereco().getLogradouro(), pedidoEntity.getEndereco().getNumero(), pedidoEntity.getEndereco().getCidade(), pedidoEntity.getEndereco().getEstado()));
+        dto.setQtdItens(pedidoEntity.getQtdItens());
+        dto.setDataCriacao(pedidoEntity.getDataCriacao());
+        dto.setDataEntrega(pedidoEntity.getDataEntrega());
+        dto.setDataRetirada(pedidoEntity.getDataRetirada());
+        dto.setSituacao(pedidoEntity.getSituacao());
+        dto.setDocumentos(documentos);
+        dto.setDescricao(pedidoEntity.getDescricao());
+        dto.setTipoPedido(pedidoEntity.getTipo());
+        return dto;
     }
 
-    public static List<PedidoRespostaDTO> toPedidoRespostaAdminDTOList(List<PedidoEntity> pedidoEntities) {
+
+    public static List<PedidoRespostaDTO> toPedidoRespostaDTOList(List<Pedido> pedidoEntities) {
+        return pedidoEntities.stream()
+                .map(PedidoMapper::toPedidoRespostaDTO)
+                .toList();
+    }
+
+    public static List<PedidoRespostaDTO> toPedidoRespostaAdminDTOList(List<Pedido> pedidoEntities) {
         return pedidoEntities.stream()
                 .map(PedidoMapper::toPedidoRespostaAdminDTO)
                 .collect(Collectors.toList());
