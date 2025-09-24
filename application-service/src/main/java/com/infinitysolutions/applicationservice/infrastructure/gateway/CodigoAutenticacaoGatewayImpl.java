@@ -2,8 +2,8 @@ package com.infinitysolutions.applicationservice.infrastructure.gateway;
 
 import com.infinitysolutions.applicationservice.core.domain.valueobject.Email;
 import com.infinitysolutions.applicationservice.core.gateway.CodigoAutenticacaoGateway;
-import com.infinitysolutions.applicationservice.old.infra.exception.ErroInesperadoException;
-import com.infinitysolutions.applicationservice.old.infra.validation.EmailValido;
+import com.infinitysolutions.applicationservice.infrastructure.exception.ErroInesperadoException;
+import com.infinitysolutions.applicationservice.infrastructure.utils.validation.EmailValido;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

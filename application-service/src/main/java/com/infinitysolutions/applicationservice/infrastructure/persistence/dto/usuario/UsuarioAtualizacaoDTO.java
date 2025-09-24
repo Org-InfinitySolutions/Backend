@@ -3,7 +3,7 @@ package com.infinitysolutions.applicationservice.infrastructure.persistence.dto.
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.infinitysolutions.applicationservice.old.infra.validation.TelefoneValido;
+import com.infinitysolutions.applicationservice.infrastructure.utils.validation.TelefoneValido;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.endereco.EnderecoDTO;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.pessoa.fisica.PessoaFisicaAtualizacaoDTO;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.pessoa.juridica.PJAtualizacaoDTO;

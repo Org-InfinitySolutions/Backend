@@ -1,6 +1,6 @@
 package com.infinitysolutions.applicationservice.infrastructure.persistence.dto.auth;
 
-import com.infinitysolutions.applicationservice.old.infra.validation.SenhaValida;
+import com.infinitysolutions.applicationservice.infrastructure.utils.validation.SenhaValida;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 public record RequisicaoDeletarCredencial(

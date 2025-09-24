@@ -1,6 +1,6 @@
 package com.infinitysolutions.applicationservice.infrastructure.controller;
 
-import com.infinitysolutions.applicationservice.old.infra.utils.AuthenticationUtils;
+import com.infinitysolutions.applicationservice.infrastructure.utils.AuthenticationUtils;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.dashboard.*;
 import com.infinitysolutions.applicationservice.old.service.DashboardService;
 import io.swagger.v3.oas.annotations.Operation;

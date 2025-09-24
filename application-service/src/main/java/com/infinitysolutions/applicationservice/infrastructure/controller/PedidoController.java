@@ -7,9 +7,9 @@ import com.infinitysolutions.applicationservice.core.usecases.endereco.EnderecoI
 import com.infinitysolutions.applicationservice.core.usecases.pedido.*;
 import com.infinitysolutions.applicationservice.infrastructure.mapper.PedidoMapper;
 import com.infinitysolutions.applicationservice.infrastructure.mapper.UsuarioEntityMapper;
-import com.infinitysolutions.applicationservice.old.infra.utils.AuthenticationUtils;
+import com.infinitysolutions.applicationservice.infrastructure.service.S3FileUploadService;
+import com.infinitysolutions.applicationservice.infrastructure.utils.AuthenticationUtils;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.pedido.*;
-import com.infinitysolutions.applicationservice.old.service.FileUploadService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -47,7 +47,7 @@ public class PedidoController {
     private final ListarTodosPedidos listarTodosPedidos;
     private final BuscarPedidoPorId buscarPedidoPorId;
     private final BuscarCredencialPorId buscarCredencialPorId;
-    private final FileUploadService fileUploadService;
+    private final S3FileUploadService fileUploadService;
 
     @Transactional
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -134,7 +134,7 @@ public class PedidoController {
         Credencial credencialEncontrada = buscarCredencialPorId.execute(pedidoEncontrado.getUsuario().getId());
         List<PedidoRespostaDetalhadoDTO.DocumentoPedidoDTO> documentos = pedidoEncontrado.getDocumentos().stream().map(documento -> new PedidoRespostaDetalhadoDTO.DocumentoPedidoDTO(
                 documento.getOriginalFilename(),
-                fileUploadService.generatePrivateFileSasUrl(documento.getBlobName(), 60),
+                fileUploadService.generatePrivateFilePresignedUrl(documento.getBlobName(), 60),
                 documento.getMimeType()
         )).toList();
 

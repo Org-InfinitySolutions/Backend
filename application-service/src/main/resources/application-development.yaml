@@ -1,0 +1,12 @@
+aws:
+  s3:
+    region: us-east-1
+    access-key: test
+    secret-key: test
+    endpoint: http://localhost:4566
+    use-localstack: true
+
+logging:
+  level:
+    com.infinitysolutions: DEBUG
+    software.amazon.awssdk: DEBUG

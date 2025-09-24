@@ -1,7 +1,7 @@
 package com.infinitysolutions.applicationservice.infrastructure.persistence.dto.pessoa.fisica;
 
-import com.infinitysolutions.applicationservice.old.infra.validation.CpfValido;
-import com.infinitysolutions.applicationservice.old.infra.validation.RgValido;
+import com.infinitysolutions.applicationservice.infrastructure.utils.validation.CpfValido;
+import com.infinitysolutions.applicationservice.infrastructure.utils.validation.RgValido;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.usuario.UsuarioCadastroDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;

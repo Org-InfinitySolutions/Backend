@@ -9,8 +9,8 @@ import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.e
 import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.repository.produto.CategoriaRepository;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.repository.produto.ProdutoPedidoRepository;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.repository.produto.ProdutoRepository;
-import com.infinitysolutions.applicationservice.old.infra.exception.EntidadeNaoEncontradaException;
-import com.infinitysolutions.applicationservice.old.infra.exception.VinculoExistenteException;
+import com.infinitysolutions.applicationservice.infrastructure.exception.EntidadeNaoEncontradaException;
+import com.infinitysolutions.applicationservice.infrastructure.exception.VinculoExistenteException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;

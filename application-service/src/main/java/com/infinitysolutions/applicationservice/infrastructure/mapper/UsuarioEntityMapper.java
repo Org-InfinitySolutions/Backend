@@ -24,7 +24,7 @@ import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.p
 import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.pessoa.juridica.PJRespostaCadastroDTO;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.usuario.UsuarioRespostaCadastroDTO;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.usuario.UsuarioRespostaDTO;
-import com.infinitysolutions.applicationservice.old.service.FileUploadService;
+import com.infinitysolutions.applicationservice.infrastructure.service.S3FileUploadService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -34,7 +34,7 @@ import java.util.List;
 @Component
 public class UsuarioEntityMapper {
 
-    private final FileUploadService fileUploadService;
+    private final S3FileUploadService fileUploadService;
 
     public PessoaFisicaEntity toPessoaFisica(String nome, String telefoneCelular, String rg, String cpf) {
         return new PessoaFisicaEntity(nome, telefoneCelular, rg, cpf);
@@ -193,7 +193,7 @@ public class UsuarioEntityMapper {
                 pessoaFisica.getDocumentos().stream()
                         .map(documento -> new UsuarioRespostaDTO.DocumentoUsuarioDTO(
                                             documento.getOriginalFilename(),
-                                            fileUploadService.generatePrivateFileSasUrl(documento.getBlobName(), 60),
+                                            fileUploadService.generatePrivateFilePresignedUrl(documento.getBlobName(), 60),
                                             documento.getMimeType(),
                                             documento.getTipoAnexo().toString()
                                     )).toList()
@@ -227,7 +227,7 @@ public class UsuarioEntityMapper {
                 pessoaJuridica.getPossuiCadastroCompleto(),
                 pessoaJuridica.getDocumentos().stream().map(documento -> new UsuarioRespostaDTO.DocumentoUsuarioDTO(
                         documento.getOriginalFilename(),
-                        fileUploadService.generatePrivateFileSasUrl(documento.getBlobName(), 60),
+                        fileUploadService.generatePrivateFilePresignedUrl(documento.getBlobName(), 60),
                         documento.getMimeType(),
                         documento.getTipoAnexo().toString()
                 )).toList()

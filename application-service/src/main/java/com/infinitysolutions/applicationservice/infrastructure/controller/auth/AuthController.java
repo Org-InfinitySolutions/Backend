@@ -6,7 +6,7 @@ import com.infinitysolutions.applicationservice.core.usecases.credencial.BuscarC
 import com.infinitysolutions.applicationservice.core.usecases.credencial.DeletarCredencial;
 import com.infinitysolutions.applicationservice.core.usecases.credencial.RealizarLogin;
 import com.infinitysolutions.applicationservice.core.usecases.credencial.RespostaLogin;
-import com.infinitysolutions.applicationservice.old.infra.validation.EmailValido;
+import com.infinitysolutions.applicationservice.infrastructure.utils.validation.EmailValido;
 
 import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.auth.*;
 import io.swagger.v3.oas.annotations.Hidden;

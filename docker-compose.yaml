@@ -13,9 +13,17 @@ services:
       DB_USERNAME: root
       DB_PASSWORD: 281004
       GMAIL_PASSWORD: gmail-password
-      BLOB_STORAGE_CONNECTION_STRING:
+      AWS_REGION: us-east-1
+      AWS_ACCESS_KEY_ID: test
+      AWS_SECRET_ACCESS_KEY: test
+      AWS_S3_ENDPOINT: http://localstack:4566
+      AWS_S3_PUBLIC_BUCKET: arquivos-publicos-dev
+      AWS_S3_PRIVATE_BUCKET: arquivos-privados-dev
+      AWS_USE_LOCALSTACK: true
+      SPRING_PROFILES_ACTIVE: development
     depends_on:
       - db_service
+      - localstack
     networks:
       - novalocacoes-network
     restart: unless-stopped
@@ -51,3 +59,4 @@ networks:
 
 volumes:
   mysql-data:
+  localstack-data:

@@ -2,29 +2,26 @@ package com.infinitysolutions.applicationservice.infrastructure.gateway;
 
 import com.infinitysolutions.applicationservice.core.domain.ArquivoMetadado;
 import com.infinitysolutions.applicationservice.core.domain.pedido.Pedido;
-import com.infinitysolutions.applicationservice.core.domain.usuario.Usuario;
 import com.infinitysolutions.applicationservice.core.domain.valueobject.TipoAnexo;
 import com.infinitysolutions.applicationservice.core.domain.valueobject.TipoUsuario;
 import com.infinitysolutions.applicationservice.core.exception.RecursoNaoEncontradoException;
 import com.infinitysolutions.applicationservice.core.gateway.ArquivoMetadadoGateway;
 import com.infinitysolutions.applicationservice.infrastructure.mapper.ArquivoMetadadosMapper;
-import com.infinitysolutions.applicationservice.infrastructure.mapper.UsuarioEntityMapper;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.entity.*;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.entity.produto.ProdutoEntity;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.repository.ArquivoMetadadosRepository;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.repository.PedidoRepository;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.repository.UsuarioRepository;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.repository.produto.ProdutoRepository;
-import com.infinitysolutions.applicationservice.old.infra.exception.DocumentoInvalidoException;
-import com.infinitysolutions.applicationservice.old.service.ArquivoMetadadosService;
-import com.infinitysolutions.applicationservice.old.service.FileUploadService;
+import com.infinitysolutions.applicationservice.infrastructure.exception.DocumentoInvalidoException;
+import com.infinitysolutions.applicationservice.infrastructure.service.S3ArquivoMetadadosService;
+import com.infinitysolutions.applicationservice.infrastructure.service.S3FileUploadService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Component
@@ -32,12 +29,12 @@ import java.util.UUID;
 @Slf4j
 public class ArquivoMetadadoGatewayImpl implements ArquivoMetadadoGateway {
 
-    private final ArquivoMetadadosService arquivoMetadadosService;
+    private final S3ArquivoMetadadosService s3ArquivoMetadadosService;
     private final UsuarioRepository usuarioRepository;
     private final ArquivoMetadadosRepository arquivoMetadadosRepository;
     private final ProdutoRepository produtoRepository;
     private final PedidoRepository pedidoRepository;
-    private final FileUploadService fileUploadService;
+    private final S3FileUploadService s3FileUploadService;
 
     @Override
     public List<ArquivoMetadado> findAllByUsuarioId(UUID id) {
@@ -56,11 +53,11 @@ public class ArquivoMetadadoGatewayImpl implements ArquivoMetadadoGateway {
         List<ArquivoMetadadosEntity> entities = arquivoMetadadosRepository.findByProduto(entity);
         for (ArquivoMetadadosEntity imagemAntiga : entities) {
             try {
-                fileUploadService.deletarArquivo(imagemAntiga.getBlobUrl());
+                s3FileUploadService.deletarArquivo(imagemAntiga.getBlobUrl());
                 arquivoMetadadosRepository.delete(imagemAntiga);
-                log.info("Arquivo excluído do blob storage: {}", imagemAntiga.getBlobName());
+                log.info("Arquivo excluído do S3: {}", imagemAntiga.getBlobName());
             } catch (Exception e) {
-                log.error("Erro ao excluir arquivo do blob storage: {}, erro: {}", imagemAntiga.getBlobName(), e.getMessage());
+                log.error("Erro ao excluir arquivo do S3: {}, erro: {}", imagemAntiga.getBlobName(), e.getMessage());
             }
         }
     }
@@ -75,13 +72,13 @@ public class ArquivoMetadadoGatewayImpl implements ArquivoMetadadoGateway {
                 throw DocumentoInvalidoException.tipoAnexoInvalidoPorUsuario(tipoAnexo, TipoUsuario.PF.name());
             }
 
-            ArquivoMetadadosEntity savedEntity = arquivoMetadadosService.uploadAndPersistArquivo(documento, tipoAnexo, pessoaFisicaEntity);
+            ArquivoMetadadosEntity savedEntity = s3ArquivoMetadadosService.uploadAndPersistArquivo(documento, tipoAnexo, pessoaFisicaEntity);
             return ArquivoMetadadosMapper.toDomain(savedEntity);
         } else if (usuarioEntity instanceof PessoaJuridicaEntity pessoaJuridicaEntity) {
             if (!tipoAnexo.equals(TipoAnexo.COPIA_CNPJ) && !tipoAnexo.equals(TipoAnexo.COPIA_CONTRATO_SOCIAL) && !tipoAnexo.equals(TipoAnexo.COMPROVANTE_ENDERECO)) {
                 throw DocumentoInvalidoException.tipoAnexoInvalidoPorUsuario(tipoAnexo, TipoUsuario.PJ.name());
             }
-            ArquivoMetadadosEntity savedEntity = arquivoMetadadosService.uploadAndPersistArquivo(documento, tipoAnexo, pessoaJuridicaEntity);
+            ArquivoMetadadosEntity savedEntity = s3ArquivoMetadadosService.uploadAndPersistArquivo(documento, tipoAnexo, pessoaJuridicaEntity);
             return ArquivoMetadadosMapper.toDomain(savedEntity);
         }
         throw new RecursoNaoEncontradoException("Tipo de usuário não encontrado");
@@ -90,14 +87,14 @@ public class ArquivoMetadadoGatewayImpl implements ArquivoMetadadoGateway {
     @Override
     public ArquivoMetadado enviarArquivoProduto(MultipartFile documento, TipoAnexo tipoAnexo, Integer produtoId) {
         ProdutoEntity produtoEntity = produtoRepository.findByIdAndIsAtivoTrue(produtoId).orElseThrow(() -> RecursoNaoEncontradoException.produtoNaoEncontrado(produtoId));
-        ArquivoMetadadosEntity arquivoMetadadosEntity = arquivoMetadadosService.uploadAndPersistArquivo(documento, tipoAnexo, produtoEntity);
+        ArquivoMetadadosEntity arquivoMetadadosEntity = s3ArquivoMetadadosService.uploadAndPersistArquivo(documento, tipoAnexo, produtoEntity);
         return ArquivoMetadadosMapper.toDomain(arquivoMetadadosEntity);
     }
 
     @Override
     public ArquivoMetadado enviarDocumentoAuxiliar(MultipartFile documento, Pedido pedido) {
         PedidoEntity pedidoEntity = pedidoRepository.findById(pedido.getId()).orElseThrow(() -> RecursoNaoEncontradoException.pedidoNaoEncontrado(pedido.getId()));
-        ArquivoMetadadosEntity arquivoMetadadosEntity = arquivoMetadadosService.uploadAndPersistArquivo(documento, TipoAnexo.DOCUMENTO_AUXILIAR, pedidoEntity);
+        ArquivoMetadadosEntity arquivoMetadadosEntity = s3ArquivoMetadadosService.uploadAndPersistArquivo(documento, TipoAnexo.DOCUMENTO_AUXILIAR, pedidoEntity);
         return ArquivoMetadadosMapper.toDomain(arquivoMetadadosEntity);
     }
 
