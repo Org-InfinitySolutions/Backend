@@ -1,4 +1,4 @@
-package com.infinitysolutions.applicationservice.old.service;
+package com.infinitysolutions.applicationservice.infrastructure.service;
 
 import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.dashboard.*;
 
