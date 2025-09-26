@@ -6,6 +6,7 @@ import com.infinitysolutions.applicationservice.core.usecases.email.EnviarEmailA
 import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.auth.UsuarioAutenticacaoValidarCodigoDTO;
 import com.infinitysolutions.applicationservice.core.usecases.email.dto.EnviarEmailInput;
 import com.infinitysolutions.applicationservice.core.usecases.email.dto.EnviarEmailResponse;
+import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.email.EnviarEmailDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -38,8 +39,8 @@ public class MailSenderController {
         @ApiResponse(responseCode = "500", description = "Erro interno ao enviar email")
     })
     @ResponseStatus(HttpStatus.OK)
-    public EnviarEmailResponse enviarCodigoVerificacao(@RequestBody @Valid EnviarEmailInput dto) {
-            return enviarCodigoAutenticacaoCase.execute(dto);
+    public EnviarEmailResponse enviarCodigoVerificacao(@RequestBody @Valid EnviarEmailDto dto) {
+            return enviarCodigoAutenticacaoCase.execute(new EnviarEmailInput(dto.getNome(), Email.of(dto.getEmail())));
     }
     @PostMapping("/validar-codigo")
     @Operation(
