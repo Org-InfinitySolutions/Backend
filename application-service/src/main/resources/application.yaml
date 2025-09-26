@@ -1,6 +1,5 @@
 server:
   port: ${SERVER_PORT:8082}
-  id: ${SERVER_ID:localhost}
 
 spring:
   cloud:
@@ -11,9 +10,6 @@ spring:
             connect-timeout: 5000
             read-timeout: 5000
             logger-level: full
-    azure:
-      storage:
-        connection-string: ${BLOB_STORAGE_CONNECTION_STRING:DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://127.0.0.1:10000/devstoreaccount1;}
   mail:
     host: smtp.gmail.com
     port: 587
@@ -35,12 +31,6 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
-eureka:
-  client:
-    service-url:
-      defaultZone: http://${EUREKA_IP:localhost}:8761/eureka
-    register-with-eureka: true
-    fetch-registry: true
 
 springdoc:
   show-actuator: false
@@ -51,13 +41,17 @@ springdoc:
     urls[0].url: /api/v3/api-docs
     urls[0].name: API Docs
   api-docs:
-    path: /v3/api-docs
+    path: /api/v3/api-docs
 
 services:
-  auth:
-    url: http://${AUTH_SERVICE_URL:localhost}:8081
-    apikey: ${AUTH_SERVICE_API_KEY:seu-api-key-aqui}
   admin:
     email: ${ADMIN_EMAIL:filipefranca876@gmail.com}
+
+admin:
+  email: ${ADMIN_EMAIL:admin@infinitysolutions.com}
+  senha: ${ADMIN_SENHA:admin123}
+  usuario-id: 00000000-0000-0000-0000-000000000001
 jwt:
   public-key: classpath:publicKey.pem
+  private-key: classpath:privateKey.pem
+  expiracao-segundos: ${AUTH_JWT_TEMPO_EXPIRACAO:3600}

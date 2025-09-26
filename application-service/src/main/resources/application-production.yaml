@@ -1,0 +1,16 @@
+aws:
+  s3:
+    region: ${AWS_REGION:us-east-1}
+    # access-key: ""
+    # secret-key: ""
+    endpoint: ""  # Vazio para usar AWS real
+    public-bucket-name: ${AWS_S3_PUBLIC_BUCKET:infinitysolutions-arquivos-publicos}
+    private-bucket-name: ${AWS_S3_PRIVATE_BUCKET:infinitysolutions-arquivos-privados}
+    use-localstack: false
+
+
+
+logging:
+  level:
+    com.infinitysolutions: DEBUG
+    software.amazon.awssdk: DEBUG
