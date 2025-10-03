@@ -14,8 +14,8 @@ public class PFRespostaCadastroDTO extends UsuarioRespostaCadastroDTO {
     @Schema(example = "***.***.789-00")
     private String cpf;
 
-    public PFRespostaCadastroDTO(UUID id, String nome, String telefone, EnderecoResumidoDTO enderecoResumidoDTO, String cpf) {
-        super(id, nome, telefone, enderecoResumidoDTO);
+    public PFRespostaCadastroDTO(UUID id, String nome, String telefone, String email, EnderecoResumidoDTO enderecoResumidoDTO, String cpf) {
+        super(id, nome, telefone, email, enderecoResumidoDTO);
         this.cpf = cpf;
     }
 }

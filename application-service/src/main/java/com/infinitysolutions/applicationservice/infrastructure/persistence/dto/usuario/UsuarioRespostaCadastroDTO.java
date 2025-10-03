@@ -32,12 +32,15 @@ public abstract class UsuarioRespostaCadastroDTO {
     @JsonProperty("telefone_celular")
     private String telefone;
 
+    private String email;
+
     private EnderecoResumidoDTO endereco;
 
-    protected UsuarioRespostaCadastroDTO(UUID id, String nome, String telefone, EnderecoResumidoDTO enderecoResumidoDTO) {
+    protected UsuarioRespostaCadastroDTO(UUID id, String nome, String telefone, String email, EnderecoResumidoDTO enderecoResumidoDTO) {
         this.id = id;
         this.nome = nome;
         this.telefone = telefone;
+        this.email = email;
         this.endereco = enderecoResumidoDTO;
     }
 }
