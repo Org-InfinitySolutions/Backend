@@ -112,7 +112,6 @@ public class UsuarioController {
     )
     public List<UsuarioRespostaCadastroDTO> listarTodos() {
         List<Usuario> usuariosEncontrados = listarTodosUsuariosCase.execute();
-        // return usuariosEncontrados.stream().map(usuarioEntityMapper::toUsuarioRespostaCadastroDTO).toList();
 
         List<UsuarioRespostaCadastroDTO> usuarioResposta = new ArrayList<>();
         for(int i = 0; i < usuariosEncontrados.size(); i++) {
