@@ -115,19 +115,20 @@ public class UsuarioEntityMapper {
                 .toList();
     }
 
-    public UsuarioRespostaCadastroDTO toUsuarioRespostaCadastroDTO(Usuario usuario) {
+    public UsuarioRespostaCadastroDTO toUsuarioRespostaCadastroDTO(Usuario usuario, Credencial identificacao) {
         if (usuario == null) {
             return null;
         }
-        if (usuario.getTipoUsuario().equals(TipoUsuario.PF)) return toPessoaFisicaRespostaCadastroDTO((PessoaFisica) usuario);
-        return toPessoaJuridicaRespostaCadastroDTO((PessoaJuridica) usuario);
+        if (usuario.getTipoUsuario().equals(TipoUsuario.PF)) return toPessoaFisicaRespostaCadastroDTO((PessoaFisica) usuario,  identificacao);
+        return toPessoaJuridicaRespostaCadastroDTO((PessoaJuridica) usuario, identificacao);
     }
 
-    public PFRespostaCadastroDTO toPessoaFisicaRespostaCadastroDTO(PessoaFisica pessoaFisica) {
+    public PFRespostaCadastroDTO toPessoaFisicaRespostaCadastroDTO(PessoaFisica pessoaFisica, Credencial identificacao) {
         return new PFRespostaCadastroDTO(
                 pessoaFisica.getId(),
                 pessoaFisica.getNome(),
                 pessoaFisica.getTelefoneCelular(),
+                identificacao.getEmailValor(),
                 new EnderecoResumidoDTO(
                         pessoaFisica.getEndereco().getCep(),
                         pessoaFisica.getEndereco().getLogradouro(),
@@ -137,11 +138,12 @@ public class UsuarioEntityMapper {
                 pessoaFisica.getCpfValueObject().getValorFormatado());
     }
 
-    public PJRespostaCadastroDTO toPessoaJuridicaRespostaCadastroDTO(PessoaJuridica pessoaJuridica) {
+    public PJRespostaCadastroDTO toPessoaJuridicaRespostaCadastroDTO(PessoaJuridica pessoaJuridica, Credencial identificacao) {
         return new PJRespostaCadastroDTO(
                 pessoaJuridica.getId(),
                 pessoaJuridica.getNome(),
                 pessoaJuridica.getTelefoneCelular(),
+                identificacao.getEmailValor(),
                 new EnderecoResumidoDTO(
                         pessoaJuridica.getEndereco().getCep(),
                         pessoaJuridica.getEndereco().getLogradouro(),

@@ -21,8 +21,8 @@ public class PJRespostaCadastroDTO extends UsuarioRespostaCadastroDTO {
     @JsonProperty("telefone_residencial")
     private String telefoneResidencial;
 
-    public PJRespostaCadastroDTO(UUID id, String nome, String telefoneCelular, EnderecoResumidoDTO enderecoResumidoDTO, String cnpj, String razaoSocial, String telefoneResidencial) {
-        super(id, nome, telefoneCelular, enderecoResumidoDTO);
+    public PJRespostaCadastroDTO(UUID id, String nome, String telefoneCelular, String email, EnderecoResumidoDTO enderecoResumidoDTO, String cnpj, String razaoSocial, String telefoneResidencial) {
+        super(id, nome, telefoneCelular, email, enderecoResumidoDTO);
         this.cnpj = cnpj;
         this.razaoSocial = razaoSocial;
         this.telefoneResidencial = telefoneResidencial;

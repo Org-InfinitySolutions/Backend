@@ -33,6 +33,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -98,7 +99,9 @@ public class UsuarioController {
             default -> throw RecursoNaoEncontradoException.estrategiaNaoEncontrada(usuarioCadastroDTO.getTipo());
         };
 
-        return usuarioEntityMapper.toUsuarioRespostaCadastroDTO(criarUsuarioCase.execute(input));
+        Usuario usuarioSalvo = criarUsuarioCase.execute(input);
+        Credencial identificacao = buscarCredencialPorIdCase.execute(usuarioSalvo.getId());
+        return usuarioEntityMapper.toUsuarioRespostaCadastroDTO(usuarioSalvo, identificacao);
     }
 
     @GetMapping
@@ -109,7 +112,14 @@ public class UsuarioController {
     )
     public List<UsuarioRespostaCadastroDTO> listarTodos() {
         List<Usuario> usuariosEncontrados = listarTodosUsuariosCase.execute();
-        return usuariosEncontrados.stream().map(usuarioEntityMapper::toUsuarioRespostaCadastroDTO).toList();
+
+        List<UsuarioRespostaCadastroDTO> usuarioResposta = new ArrayList<>();
+        for(int i = 0; i < usuariosEncontrados.size(); i++) {
+            Credencial identificacao = buscarCredencialPorIdCase.execute(usuariosEncontrados.get(i).getId());
+            usuarioResposta.add(usuarioEntityMapper.toUsuarioRespostaCadastroDTO(usuariosEncontrados.get(i), identificacao));
+        }
+
+        return usuarioResposta;
     }
 
     @GetMapping("/{usuarioId}")
@@ -131,12 +141,13 @@ public class UsuarioController {
         description = "Atualiza os detalhes de um usuário específico com base no ID fornecido"
     )
     public UsuarioRespostaCadastroDTO atualizar(@PathVariable UUID usuarioId, @Valid @RequestBody UsuarioAtualizacaoDTO usuarioAtualizacaoDTO) {
+        Credencial identificacao = buscarCredencialPorIdCase.execute(usuarioId);
         if (usuarioAtualizacaoDTO.getTipo().equals("PF")) {
             AtualizarPessoaFisicaInput result = (AtualizarPessoaFisicaInput) usuarioEntityMapper.toAtualizarUsuarioInput(usuarioAtualizacaoDTO);
-            return usuarioEntityMapper.toUsuarioRespostaCadastroDTO(atualizarUsuarioCase.execute(usuarioId, result));
+            return usuarioEntityMapper.toUsuarioRespostaCadastroDTO(atualizarUsuarioCase.execute(usuarioId, result), identificacao);
         } else {
             AtualizarPessoaJuridicaInput result = (AtualizarPessoaJuridicaInput) usuarioEntityMapper.toAtualizarUsuarioInput(usuarioAtualizacaoDTO);
-            return usuarioEntityMapper.toUsuarioRespostaCadastroDTO(atualizarUsuarioCase.execute(usuarioId, result));
+            return usuarioEntityMapper.toUsuarioRespostaCadastroDTO(atualizarUsuarioCase.execute(usuarioId, result), identificacao);
         }
     }
 
