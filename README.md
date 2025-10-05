@@ -47,7 +47,7 @@ application-service/
 
 ---
 
-## 🚀 Executando o Projeto
+# 🚀 Executando o Projeto
 
 ### 📋 Pré-requisitos
 
@@ -56,15 +56,18 @@ application-service/
 - **Maven 3.6+** (ou usar o wrapper incluído)
 - **Git**
 
-### 🔧 Ambiente de Desenvolvimento
+# 🔧 Ambiente de Desenvolvimento
 
-#### 1. Clone o repositório
+### 1. Clone o repositório
 ```bash
 git clone https://github.com/Org-InfinitySolutions/Backend.git
 cd Backend
 ```
 
-#### 2. Configure as variáveis de ambiente (opcional)
+### 2. Configure as variáveis de ambiente (opcional)
+
+Seguindo por este passo não será necessário a utilização de docker, mas é obrigatório configurar o Mysql e Localstack em sua máquina antes de prosseguir.
+
 Crie um arquivo `.env` na raiz do projeto:
 ```env
 # Database
@@ -85,8 +88,21 @@ AWS_S3_ENDPOINT=http://localhost:4566
 AWS_USE_LOCALSTACK=true
 ```
 
-#### 3. Inicie os serviços com Docker
-# Docker compose do localstack:
+A estrutura do projeto ficará assim:
+```
+Backend
+├── application-service/
+├── README.md
+├── .env
+├── bd_script.sql
+└── docker-compose.yaml
+```
+
+2.1 Depois de ajustar as credenciais você poderá subir o projeto 
+
+## Docker compose do localstack:
+
+Caso tenha docker instalado, adicione o trecho abaixo no arquivo ```docker-compose.yaml``` localizado na raiz do projeto.
 
 ```bash
 
@@ -117,15 +133,22 @@ AWS_USE_LOCALSTACK=true
       retries: 3
       start_period: 10s
 ```
-```bash
+
+### 3. Inicie os serviços com Docker
+
+#### 3.1 Para executar todos os serviços gere o arquivo .JAR do projeto
+```
 # Iniciar todos os serviços (aplicação, banco)
 docker-compose up -d
+````
 
+#### 3.2 Caso queira executar a API pela IDE suba apenas a insfraestrutura
+```
 # Ou iniciar apenas a infraestrutura
 docker-compose up -d db_service localstack
 ```
 
-#### 4. Execute a aplicação localmente (alternativa)
+### 4. Execute a aplicação localmente (alternativa)
 ```bash
 # Usando Maven Wrapper
 ./mvnw spring-boot:run -Dspring.profiles.active=development
@@ -134,7 +157,7 @@ docker-compose up -d db_service localstack
 mvn spring-boot:run -Dspring.profiles.active=development
 ```
 
-#### 5. Acesse a aplicação
+### 5. Acesse a aplicação
 - **API**: http://localhost:8082
 - **Swagger UI**: http://localhost:8082/swagger-ui.html
 - **Banco de dados**: localhost:3307 (via Docker)
