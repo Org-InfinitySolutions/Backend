@@ -1,5 +1,7 @@
 package com.infinitysolutions.applicationservice.core.exception;
 
+import com.infinitysolutions.applicationservice.core.domain.valueobject.NomeCargo;
+
 import java.util.UUID;
 
 public class RecursoNaoEncontradoException extends CoreLayerException {
@@ -41,5 +43,9 @@ public class RecursoNaoEncontradoException extends CoreLayerException {
 
     public static com.infinitysolutions.applicationservice.core.exception.RecursoNaoEncontradoException credencialNaoEncontrada(String email) {
         return new com.infinitysolutions.applicationservice.core.exception.RecursoNaoEncontradoException("Credencial não encontrada para usuário com email: " + email);
+    }
+
+    public static com.infinitysolutions.applicationservice.core.exception.RecursoNaoEncontradoException cargoNaoEncontrado(NomeCargo nomeCargo){
+        return new com.infinitysolutions.applicationservice.core.exception.RecursoNaoEncontradoException("Cargo não encontrado com o nome: " + nomeCargo);
     }
 }

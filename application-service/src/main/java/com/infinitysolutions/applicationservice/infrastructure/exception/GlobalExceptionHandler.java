@@ -230,6 +230,8 @@ public class GlobalExceptionHandler {
         return HttpStatus.CONFLICT;
     } else if (ex instanceof DocumentoInvalidoException || ex instanceof CredencialException || ex instanceof CategoriaException) {
         return HttpStatus.BAD_REQUEST;
+    } else if (ex instanceof RecursoNaoProcessavelException) {
+        return HttpStatus.UNPROCESSABLE_ENTITY;
     }
         return HttpStatus.INTERNAL_SERVER_ERROR;
     }

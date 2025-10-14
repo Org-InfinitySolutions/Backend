@@ -137,4 +137,8 @@ public class Credencial {
                 ", ultimoLogin=" + ultimoLogin +
                 '}';
     }
+
+    public void removeCargo(Cargo cargoFuncionario) {
+        this.cargos.remove(cargoFuncionario);
+    }
 }
