@@ -2,16 +2,14 @@ package com.infinitysolutions.applicationservice.infrastructure.mapper;
 
 import com.infinitysolutions.applicationservice.core.domain.ArquivoMetadado;
 import com.infinitysolutions.applicationservice.core.domain.Endereco;
-import com.infinitysolutions.applicationservice.core.domain.usuario.Credencial;
-import com.infinitysolutions.applicationservice.core.domain.usuario.PessoaFisica;
-import com.infinitysolutions.applicationservice.core.domain.usuario.PessoaJuridica;
-import com.infinitysolutions.applicationservice.core.domain.usuario.Usuario;
+import com.infinitysolutions.applicationservice.core.domain.usuario.*;
 import com.infinitysolutions.applicationservice.core.domain.valueobject.TipoUsuario;
 import com.infinitysolutions.applicationservice.core.exception.EstrategiaNaoEncontradaException;
 import com.infinitysolutions.applicationservice.core.usecases.endereco.EnderecoInput;
 import com.infinitysolutions.applicationservice.core.usecases.usuario.AtualizarUsuarioInput;
 import com.infinitysolutions.applicationservice.core.usecases.usuario.pessoafisica.AtualizarPessoaFisicaInput;
 import com.infinitysolutions.applicationservice.core.usecases.usuario.pessoajuridica.AtualizarPessoaJuridicaInput;
+import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.pessoa.fisica.FuncRespostaCadastroDTO;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.pessoa.fisica.PessoaFisicaAtualizacaoDTO;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.pessoa.juridica.PJAtualizacaoDTO;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.usuario.UsuarioAtualizacaoDTO;
@@ -29,6 +27,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Set;
 
 @RequiredArgsConstructor
 @Component
@@ -119,8 +118,22 @@ public class UsuarioEntityMapper {
         if (usuario == null) {
             return null;
         }
-        if (usuario.getTipoUsuario().equals(TipoUsuario.PF)) return toPessoaFisicaRespostaCadastroDTO((PessoaFisica) usuario,  identificacao);
-        return toPessoaJuridicaRespostaCadastroDTO((PessoaJuridica) usuario, identificacao);
+
+        Set<Cargo> cargos = identificacao.getCargos();
+
+        UsuarioRespostaCadastroDTO response = null;
+
+        for (Cargo cargo : cargos) {
+            response = switch (cargo.getNome()) {
+                case USUARIO_PF -> toPessoaFisicaRespostaCadastroDTO((PessoaFisica) usuario, identificacao);
+                case USUARIO_PJ -> toPessoaJuridicaRespostaCadastroDTO((PessoaJuridica) usuario, identificacao);
+                case FUNCIONARIO -> toFuncionarioRespostaCadastroDTO((PessoaFisica) usuario, identificacao);
+                default -> response = null;
+            };
+        }
+
+        return response;
+
     }
 
     public PFRespostaCadastroDTO toPessoaFisicaRespostaCadastroDTO(PessoaFisica pessoaFisica, Credencial identificacao) {
@@ -154,6 +167,21 @@ public class UsuarioEntityMapper {
                 pessoaJuridica.getRazaoSocial(),
                 pessoaJuridica.getTelefoneResidencial()
         );
+    }
+
+    public FuncRespostaCadastroDTO toFuncionarioRespostaCadastroDTO(PessoaFisica pessoaFisica, Credencial identificacao) {
+        return new FuncRespostaCadastroDTO(
+                pessoaFisica.getId(),
+                pessoaFisica.getNome(),
+                pessoaFisica.getTelefoneCelular(),
+                identificacao.getEmailValor(),
+                new EnderecoResumidoDTO(
+                        pessoaFisica.getEndereco().getCep(),
+                        pessoaFisica.getEndereco().getLogradouro(),
+                        pessoaFisica.getEndereco().getNumero(),
+                        pessoaFisica.getEndereco().getCidade(),
+                        pessoaFisica.getEndereco().getEstado()),
+                pessoaFisica.getCpfValueObject().getValorFormatado());
     }
 
     public UsuarioRespostaDTO toUsuarioRespostaDTO(Usuario usuario, Credencial credencial) {

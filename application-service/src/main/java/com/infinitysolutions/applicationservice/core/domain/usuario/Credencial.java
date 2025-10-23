@@ -5,10 +5,7 @@ import com.infinitysolutions.applicationservice.core.domain.valueobject.Senha;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Entidade de domínio que representa as credenciais de um usuário.
@@ -23,7 +20,7 @@ public class Credencial {
     private String hashSenha;
     private LocalDateTime ultimoLogin;
     private boolean ativo;
-    private Set<Cargo> cargos = new HashSet<>();
+    private Set<Cargo> cargos = new LinkedHashSet<>();
     private final static BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
     private Credencial(UUID usuarioId, Email email, String hashSenha, Set<Cargo> cargosEncontrados, LocalDateTime ultimoLogin) {

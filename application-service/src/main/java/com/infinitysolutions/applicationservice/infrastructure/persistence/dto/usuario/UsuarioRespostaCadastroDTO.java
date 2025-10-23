@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.endereco.EnderecoResumidoDTO;
+import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.pessoa.fisica.FuncRespostaCadastroDTO;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.pessoa.fisica.PFRespostaCadastroDTO;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.pessoa.juridica.PJRespostaCadastroDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -19,7 +20,8 @@ import java.util.UUID;
 )
 @JsonSubTypes({
         @JsonSubTypes.Type(value = PFRespostaCadastroDTO.class, name = "PF"),
-        @JsonSubTypes.Type(value = PJRespostaCadastroDTO.class, name = "PJ")
+        @JsonSubTypes.Type(value = PJRespostaCadastroDTO.class, name = "PJ"),
+        @JsonSubTypes.Type(value = FuncRespostaCadastroDTO.class, name = "FUNCIONARIO")
 })
 @Schema(description = "Informações de resposta após criação de usuário")
 @Data
