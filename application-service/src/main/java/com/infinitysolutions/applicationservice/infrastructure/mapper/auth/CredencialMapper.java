@@ -7,6 +7,7 @@ import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.e
 import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.entity.CredencialEntity;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -17,10 +18,10 @@ public class CredencialMapper {
      throw new IllegalStateException("Utility class");
     }
 
-    public static CredencialEntity toEntity(UUID idUsuario, String email, String senha, Set<Cargo> cargos, LocalDateTime ultimoLogin, boolean isAtivo) {
+    public static CredencialEntity toEntity(UUID idUsuario, String email, String senha, List<Cargo> cargos, LocalDateTime ultimoLogin, boolean isAtivo) {
         CredencialEntity entity = new CredencialEntity(idUsuario, email, senha, isAtivo);
         entity.setUltimoLogin(ultimoLogin);
-        Set<CargoEntity> cargoEntities = cargos.stream().map(CargoMapper::toEntity).collect(Collectors.toSet());
+        List<CargoEntity> cargoEntities = cargos.stream().map(CargoMapper::toEntity).toList();
         entity.setCargoEntities(cargoEntities);
         return entity;
     }

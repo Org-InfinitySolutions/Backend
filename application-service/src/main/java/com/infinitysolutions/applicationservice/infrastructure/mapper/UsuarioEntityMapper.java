@@ -119,7 +119,7 @@ public class UsuarioEntityMapper {
             return null;
         }
 
-        Set<Cargo> cargos = identificacao.getCargos();
+        List<Cargo> cargos = identificacao.getCargos();
 
         UsuarioRespostaCadastroDTO response = null;
 

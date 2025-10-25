@@ -20,7 +20,7 @@ public class Credencial {
     private String hashSenha;
     private LocalDateTime ultimoLogin;
     private boolean ativo;
-    private Set<Cargo> cargos = new LinkedHashSet<>();
+    private List<Cargo> cargos = new ArrayList<>();
     private final static BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
     private Credencial(UUID usuarioId, Email email, String hashSenha, Set<Cargo> cargosEncontrados, LocalDateTime ultimoLogin) {
@@ -56,7 +56,7 @@ public class Credencial {
         return new Credencial(usuarioId, email, hashSenha, cargos, ultimoLogin);
     }
 
-    public Set<Cargo> getCargos() {
+    public List<Cargo> getCargos() {
         return cargos;
     }
 

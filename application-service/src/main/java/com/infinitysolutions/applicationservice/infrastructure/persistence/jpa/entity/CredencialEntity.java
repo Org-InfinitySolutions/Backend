@@ -6,9 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @Entity
 @Data
@@ -34,7 +32,7 @@ public class CredencialEntity {
             joinColumns = @JoinColumn(name = "fk_usuario"),
             inverseJoinColumns = @JoinColumn(name = "cargo_id")
     )
-    private Set<CargoEntity> cargoEntities;
+    private List<CargoEntity> cargoEntities;
 
     @DefaultValue("true")
     @Column(nullable = false)
@@ -44,7 +42,7 @@ public class CredencialEntity {
         this.fkUsuario = fkUsuario;
         this.email = email;
         this.hashSenha = hashSenha;
-        this.cargoEntities = new HashSet<>();
+        this.cargoEntities = new ArrayList<>();
         this.ativo = isAtivo;
     }
 
