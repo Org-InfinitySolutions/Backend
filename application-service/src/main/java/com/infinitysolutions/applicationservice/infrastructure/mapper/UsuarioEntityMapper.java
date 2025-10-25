@@ -3,6 +3,7 @@ package com.infinitysolutions.applicationservice.infrastructure.mapper;
 import com.infinitysolutions.applicationservice.core.domain.ArquivoMetadado;
 import com.infinitysolutions.applicationservice.core.domain.Endereco;
 import com.infinitysolutions.applicationservice.core.domain.usuario.*;
+import com.infinitysolutions.applicationservice.core.domain.valueobject.NomeCargo;
 import com.infinitysolutions.applicationservice.core.domain.valueobject.TipoUsuario;
 import com.infinitysolutions.applicationservice.core.exception.EstrategiaNaoEncontradaException;
 import com.infinitysolutions.applicationservice.core.usecases.endereco.EnderecoInput;
@@ -123,13 +124,12 @@ public class UsuarioEntityMapper {
 
         UsuarioRespostaCadastroDTO response = null;
 
-        for (Cargo cargo : cargos) {
-            response = switch (cargo.getNome()) {
-                case USUARIO_PF -> toPessoaFisicaRespostaCadastroDTO((PessoaFisica) usuario, identificacao);
-                case USUARIO_PJ -> toPessoaJuridicaRespostaCadastroDTO((PessoaJuridica) usuario, identificacao);
-                case FUNCIONARIO -> toFuncionarioRespostaCadastroDTO((PessoaFisica) usuario, identificacao);
-                default -> response = null;
-            };
+        if (cargos.stream().anyMatch(cargo -> cargo.getNome().equals(NomeCargo.FUNCIONARIO))) {
+            response = toFuncionarioRespostaCadastroDTO((PessoaFisica) usuario, identificacao);
+        } else if (cargos.stream().anyMatch(cargo -> cargo.getNome().equals(NomeCargo.USUARIO_PF))) {
+            response = toPessoaFisicaRespostaCadastroDTO((PessoaFisica) usuario, identificacao);
+        } else {
+            response = toPessoaJuridicaRespostaCadastroDTO((PessoaJuridica) usuario, identificacao);
         }
 
         return response;
