@@ -5,6 +5,7 @@ import com.infinitysolutions.applicationservice.core.domain.usuario.Credencial;
 import com.infinitysolutions.applicationservice.core.usecases.credencial.BuscarCredencialPorId;
 import com.infinitysolutions.applicationservice.core.usecases.endereco.EnderecoInput;
 import com.infinitysolutions.applicationservice.core.usecases.pedido.*;
+import com.infinitysolutions.applicationservice.core.valueobject.PageResult;
 import com.infinitysolutions.applicationservice.infrastructure.mapper.PedidoMapper;
 import com.infinitysolutions.applicationservice.infrastructure.mapper.UsuarioEntityMapper;
 import com.infinitysolutions.applicationservice.infrastructure.service.S3FileUploadService;
@@ -104,20 +105,33 @@ public class PedidoController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     @Operation(
-        summary = "Listar pedidos do sistema",
-        description = "Retorna uma lista com todos os pedidos registrados. " +
-                     "As informações dos pedidos variam de acordo com o perfil do usuário " +
-                     "(usuário comum ou administrador).")
-
-    public List<PedidoRespostaDTO> listar(Authentication auth) {
+            summary = "Listar pedidos do sistema",
+            description = "Retorna uma lista com todos os pedidos registrados com suporte a paginação offset/limit. " +
+                    "As informações variam conforme o perfil do usuário (comum ou administrador)."
+    )
+    public PageResult<PedidoRespostaDTO> listar(
+            Authentication auth,
+            @RequestParam(defaultValue = "0") int offset,
+            @RequestParam(defaultValue = "10") int limit,
+            @RequestParam(defaultValue = "id,desc") String sort
+    ) {
         boolean isAdmin = authUtil.isAdmin(auth);
-        List<Pedido> pedidos = listarTodosPedidos.execute(isAdmin, UUID.fromString(auth.getName()));
+        UUID usuarioId = UUID.fromString(auth.getName());
 
-        if (isAdmin) {
-            return PedidoMapper.toPedidoRespostaAdminDTOList(pedidos);
-        }
-        return PedidoMapper.toPedidoRespostaDTOList(pedidos);
+        PageResult<Pedido> pagePedidos = listarTodosPedidos.execute(isAdmin, usuarioId, offset, limit, sort);
+
+        List<PedidoRespostaDTO> pedidosDTO = isAdmin
+                ? PedidoMapper.toPedidoRespostaAdminDTOList(pagePedidos.getContent())
+                : PedidoMapper.toPedidoRespostaDTOList(pagePedidos.getContent());
+
+        return new PageResult<>(
+                pedidosDTO,
+                pagePedidos.getTotalElements(),
+                pagePedidos.getOffset(),
+                pagePedidos.getLimit()
+        );
     }
+
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)

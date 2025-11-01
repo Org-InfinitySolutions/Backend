@@ -1,6 +1,8 @@
 package com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.repository.produto;
 
 import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.entity.produto.ProdutoEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -12,5 +14,5 @@ public interface ProdutoRepository extends JpaRepository<ProdutoEntity, Integer>
     Optional<ProdutoEntity> findByIdAndIsAtivoTrue(Integer integer);
     Set<ProdutoEntity> findByIdInAndIsAtivoTrue(Set<Integer> ids);
 
-    Set<Integer> id(Integer id);
+    Page<ProdutoEntity> findAllByIsAtivoTrue(Pageable pageable);
 }

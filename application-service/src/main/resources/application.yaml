@@ -23,7 +23,7 @@ spring:
   datasource:
     url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:novalocacoes}
     username: ${DB_USERNAME:root}
-    password: ${DB_PASSWORD:281004}
+    password: ${DB_PASSWORD:Kodol@te2403}
   jpa:
     hibernate:
       ddl-auto: update
