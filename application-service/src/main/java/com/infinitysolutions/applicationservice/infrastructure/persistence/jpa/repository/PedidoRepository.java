@@ -2,6 +2,8 @@ package com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.
 
 import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.entity.PedidoEntity;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.entity.UsuarioEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -102,4 +104,10 @@ public interface PedidoRepository extends JpaRepository<PedidoEntity, Integer> {
            nativeQuery = true)
     List<Object[]> findEquipamentosPopulares(@Param("dataInicio") LocalDateTime dataInicio, 
                                              @Param("limite") int limite);
+
+    @Query(value = "SELECT p FROM PedidoEntity p LEFT JOIN FETCH p.usuarioEntity",
+           countQuery = "SELECT COUNT(p) FROM PedidoEntity p")
+    Page<PedidoEntity> findAllWithUsuarioEntity(Pageable pageable);
+
+    Page<PedidoEntity> findByUsuarioEntityId(UUID usuarioId, Pageable pageable);
 }

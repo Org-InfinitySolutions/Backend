@@ -37,7 +37,7 @@ public class RealizarLogin {
 
         String scope = credencialEncontrada.getCargos().stream()
                 .map(cargo -> "ROLE_" + cargo.getNome().name())
-                .collect(Collectors.joining(" "));
+                .collect(Collectors.joining(", "));
 
         JwtClaimsSet claims = JwtClaimsSet.builder()
                 .issuer("auth-service")

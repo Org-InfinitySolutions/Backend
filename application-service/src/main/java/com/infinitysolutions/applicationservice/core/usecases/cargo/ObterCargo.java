@@ -3,6 +3,7 @@ package com.infinitysolutions.applicationservice.core.usecases.cargo;
 import com.infinitysolutions.applicationservice.core.domain.usuario.Cargo;
 import com.infinitysolutions.applicationservice.core.domain.valueobject.NomeCargo;
 import com.infinitysolutions.applicationservice.core.domain.valueobject.TipoUsuario;
+import com.infinitysolutions.applicationservice.core.exception.RecursoNaoEncontradoException;
 import com.infinitysolutions.applicationservice.core.gateway.CargoGateway;
 
 import java.util.Optional;
@@ -25,5 +26,15 @@ public class ObterCargo {
         Optional<Cargo> cargoOpt = cargoGateway.findByNome(nomeCargo);
         return cargoOpt.orElseGet(() -> cargoGateway.save(Cargo.criar(nomeCargo, nomeCargo.getDescricao())));
 
+    }
+
+    public Cargo execute(NomeCargo nome) {
+        Optional<Cargo> cargoOpt = cargoGateway.findByNome(nome);
+
+
+        return cargoOpt.orElseGet(() -> {
+            if (!nome.equals(NomeCargo.FUNCIONARIO)) throw RecursoNaoEncontradoException.cargoNaoEncontrado(nome);
+            return cargoGateway.save(Cargo.criar(nome, nome.getDescricao()));
+        });
     }
 }

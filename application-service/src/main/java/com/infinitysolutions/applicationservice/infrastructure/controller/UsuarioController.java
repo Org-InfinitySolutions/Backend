@@ -2,6 +2,7 @@ package com.infinitysolutions.applicationservice.infrastructure.controller;
 
 import com.infinitysolutions.applicationservice.core.domain.usuario.Credencial;
 import com.infinitysolutions.applicationservice.core.domain.usuario.Usuario;
+import com.infinitysolutions.applicationservice.core.exception.AutenticacaoException;
 import com.infinitysolutions.applicationservice.core.exception.RecursoNaoEncontradoException;
 import com.infinitysolutions.applicationservice.core.usecases.credencial.BuscarCredencialPorId;
 import com.infinitysolutions.applicationservice.core.usecases.usuario.*;
@@ -13,6 +14,7 @@ import com.infinitysolutions.applicationservice.core.usecases.usuario.pessoafisi
 import com.infinitysolutions.applicationservice.core.usecases.usuario.pessoajuridica.AtualizarPessoaJuridicaInput;
 import com.infinitysolutions.applicationservice.core.usecases.usuario.pessoajuridica.CriarPJInput;
 import com.infinitysolutions.applicationservice.core.usecases.usuario.pessoajuridica.VerificarCnpj;
+import com.infinitysolutions.applicationservice.core.valueobject.PageResult;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.endereco.EnderecoDTO;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.pessoa.fisica.PessoaFisicaCadastroDTO;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.pessoa.juridica.PessoaJuridicaCadastroDTO;
@@ -22,6 +24,7 @@ import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.u
 import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.usuario.UsuarioRespostaDTO;
 import com.infinitysolutions.applicationservice.infrastructure.mapper.UsuarioEntityMapper;
 import com.infinitysolutions.applicationservice.core.usecases.usuario.RespostaVerificacao;
+import com.infinitysolutions.applicationservice.infrastructure.utils.AuthenticationUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.transaction.Transactional;
@@ -30,6 +33,8 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -49,7 +54,11 @@ public class UsuarioController {
     private final BuscarUsuarioPorId buscarUsuarioPorIdCase;
     private final BuscarCredencialPorId buscarCredencialPorIdCase;
 
+    private final AuthenticationUtils authenticationUtils;
+
     private final AtualizarUsuario atualizarUsuarioCase;
+    private final PromoverUsuario promoverUsuarioCase;
+    private final RebaixarUsuario rebaixarUsuarioCase;
     private final VerificarCpf verificarCpfCase;
     private final VerificarRg verificarRgCase;
     private final VerificarCnpj verificarCnpjCase;
@@ -107,19 +116,51 @@ public class UsuarioController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     @Operation(
-        summary = "Listar todos os usuários",
-        description = "Retorna uma lista de todos os usuários cadastrados no sistema"
+            summary = "Listar todos os usuários (paginado)",
+            description = "Retorna uma lista paginada de usuários cadastrados no sistema"
     )
-    public List<UsuarioRespostaCadastroDTO> listarTodos() {
-        List<Usuario> usuariosEncontrados = listarTodosUsuariosCase.execute();
+    public PageResult<UsuarioRespostaCadastroDTO> listarTodos(
+            @RequestParam(defaultValue = "0") int offset,
+            @RequestParam(defaultValue = "10") int limit
+    ) {
+        var paginaUsuarios = listarTodosUsuariosCase.execute(offset, limit);
 
-        List<UsuarioRespostaCadastroDTO> usuarioResposta = new ArrayList<>();
-        for(int i = 0; i < usuariosEncontrados.size(); i++) {
-            Credencial identificacao = buscarCredencialPorIdCase.execute(usuariosEncontrados.get(i).getId());
-            usuarioResposta.add(usuarioEntityMapper.toUsuarioRespostaCadastroDTO(usuariosEncontrados.get(i), identificacao));
-        }
+        List<UsuarioRespostaCadastroDTO> usuarioResposta = paginaUsuarios.getContent().stream()
+                .map(usuario -> {
+                    var credencial = buscarCredencialPorIdCase.execute(usuario.getId());
+                    return usuarioEntityMapper.toUsuarioRespostaCadastroDTO(usuario, credencial);
+                })
+                .toList();
 
-        return usuarioResposta;
+        return new PageResult<>(
+                usuarioResposta,
+                paginaUsuarios.getTotalElements(),
+                paginaUsuarios.getOffset(),
+                paginaUsuarios.getLimit()
+        );
+    }
+
+
+    @PutMapping("/promover/{usuarioId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(
+            summary = "Promove um usuário",
+            description = "Realiza a promoção de um usuário PF para Funcionário"
+    )
+    public void  promoverUsuario(@PathVariable UUID usuarioId, Authentication auth) {
+        if (!authenticationUtils.isAdmin(auth)) throw AutenticacaoException.acessoNegado();
+        promoverUsuarioCase.execute(usuarioId);
+    }
+
+    @PutMapping("/rebaixar/{usuarioId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(
+            summary = "rebaixa um usuário",
+            description = "Rebaixa um usuário PF Funcionário para apenas PF"
+    )
+    public void  rebaixarUsuario(@PathVariable UUID usuarioId, Authentication auth) {
+        if (!authenticationUtils.isAdmin(auth)) throw AutenticacaoException.acessoNegado();
+        rebaixarUsuarioCase.execute(usuarioId);
     }
 
     @GetMapping("/{usuarioId}")

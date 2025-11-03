@@ -7,6 +7,7 @@ import com.infinitysolutions.applicationservice.core.domain.pedido.ProdutoPedido
 import com.infinitysolutions.applicationservice.core.domain.usuario.Usuario;
 import com.infinitysolutions.applicationservice.core.exception.RecursoNaoEncontradoException;
 import com.infinitysolutions.applicationservice.core.gateway.PedidoGateway;
+import com.infinitysolutions.applicationservice.core.valueobject.PageResult;
 import com.infinitysolutions.applicationservice.infrastructure.mapper.ArquivoMetadadosMapper;
 import com.infinitysolutions.applicationservice.infrastructure.mapper.EnderecoMapper;
 import com.infinitysolutions.applicationservice.infrastructure.mapper.PedidoMapper;
@@ -188,38 +189,47 @@ public class PedidoGatewayImpl implements PedidoGateway {
 
     @Override
     public List<Pedido> findAll(UUID uuid, boolean admin) {
-        if (admin) {
-            return pedidoRepository.findAllWithUsuarioEntityOrderByDataCriacaoDesc().stream().map(pedidoEntity -> {
-                Usuario usuarioProduto = usuarioEntityMapper.toDomain(pedidoEntity.getUsuarioEntity());
-                Endereco endereco = EnderecoMapper.toDomain(pedidoEntity.getEnderecoEntity());
-                List<ArquivoMetadado> documentos = pedidoEntity.getDocumentos().stream().map(ArquivoMetadadosMapper::toDomain).toList();
-                Pedido pedido = PedidoMapper.toPedido(pedidoEntity, usuarioProduto, new ArrayList<>(), endereco, documentos);
-                List<ProdutoPedido> produtoPedidos = pedidoEntity.getProdutosPedido().stream().map(entity -> {
-                    ProdutoPedido produtoPedido = new ProdutoPedido();
-                    produtoPedido.setPedido(pedido);
-                    produtoPedido.setProduto(ProdutoEntityMapper.toDomain(entity.getProdutoEntity()));
-                    produtoPedido.setQtd(entity.getQtd());
-                    return produtoPedido;
-                }).toList();
-                pedido.setProdutosPedido(produtoPedidos);
-                return pedido;
-            }).toList();
-        }
-        return pedidoRepository.findByUsuarioEntityIdOrderByDataCriacaoDesc(uuid).stream().map(pedidoEntity -> {
-            Usuario usuarioProduto = usuarioEntityMapper.toDomain(pedidoEntity.getUsuarioEntity());
-            Endereco endereco = EnderecoMapper.toDomain(pedidoEntity.getEnderecoEntity());
-            List<ArquivoMetadado> documentos = pedidoEntity.getDocumentos().stream().map(ArquivoMetadadosMapper::toDomain).toList();
-            Pedido pedido = PedidoMapper.toPedido(pedidoEntity, usuarioProduto, new ArrayList<>(), endereco, documentos);
-            List<ProdutoPedido> produtoPedidos = pedidoEntity.getProdutosPedido().stream().map(entity -> {
-                ProdutoPedido produtoPedido = new ProdutoPedido();
-                produtoPedido.setPedido(pedido);
-                produtoPedido.setProduto(ProdutoEntityMapper.toDomain(entity.getProdutoEntity()));
-                produtoPedido.setQtd(entity.getQtd());
-                return produtoPedido;
-            }).toList();
-            pedido.setProdutosPedido(produtoPedidos);
-            return pedido;
-        }).toList();
+        return List.of();
     }
 
+    @Override
+    public PageResult<Pedido> findAll(UUID usuarioId, boolean isAdmin, int offset, int limit, String sort) {
+
+        // Constrói o PageRequest
+        String[] sortParts = sort.split(",");
+        org.springframework.data.domain.Sort.Direction direction =
+                sortParts[1].equalsIgnoreCase("desc") ? org.springframework.data.domain.Sort.Direction.DESC : org.springframework.data.domain.Sort.Direction.ASC;
+
+        org.springframework.data.domain.Pageable pageable =
+                org.springframework.data.domain.PageRequest.of(offset / limit, limit, direction, sortParts[0]);
+
+        org.springframework.data.domain.Page<PedidoEntity> pageEntities;
+
+        if (isAdmin) {
+            pageEntities = pedidoRepository.findAllWithUsuarioEntity(pageable);
+        } else {
+            pageEntities = pedidoRepository.findByUsuarioEntityId(usuarioId, pageable);
+        }
+
+        // Mapeia para domínio
+        List<Pedido> pedidos = pageEntities.getContent().stream().map(entity -> {
+            Usuario usuario = usuarioEntityMapper.toDomain(entity.getUsuarioEntity());
+            Endereco endereco = EnderecoMapper.toDomain(entity.getEnderecoEntity());
+            List<ArquivoMetadado> documentos = entity.getDocumentos().stream().map(ArquivoMetadadosMapper::toDomain).toList();
+
+            Pedido pedido = PedidoMapper.toPedido(entity, usuario, new ArrayList<>(), endereco, documentos);
+            List<ProdutoPedido> produtoPedidos = entity.getProdutosPedido().stream().map(produtoEntity -> {
+                ProdutoPedido p = new ProdutoPedido();
+                p.setPedido(pedido);
+                p.setProduto(ProdutoEntityMapper.toDomain(produtoEntity.getProdutoEntity()));
+                p.setQtd(produtoEntity.getQtd());
+                return p;
+            }).toList();
+            pedido.setProdutosPedido(produtoPedidos);
+
+            return pedido;
+        }).toList();
+
+        return new PageResult<>(pedidos, pageEntities.getTotalElements(), offset, limit);
+    }
 }
