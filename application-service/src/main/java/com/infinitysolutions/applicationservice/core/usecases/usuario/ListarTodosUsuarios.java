@@ -2,8 +2,7 @@ package com.infinitysolutions.applicationservice.core.usecases.usuario;
 
 import com.infinitysolutions.applicationservice.core.domain.usuario.Usuario;
 import com.infinitysolutions.applicationservice.core.gateway.UsuarioGateway;
-
-import java.util.List;
+import com.infinitysolutions.applicationservice.core.valueobject.PageResult;
 
 public class ListarTodosUsuarios {
 
@@ -13,7 +12,7 @@ public class ListarTodosUsuarios {
         this.usuarioGateway = usuarioGateway;
     }
 
-    public List<Usuario> execute() {
-        return usuarioGateway.findAll();
+    public PageResult<Usuario> execute(int offset, int limit) {
+        return usuarioGateway.findAll(offset, limit);
     }
 }

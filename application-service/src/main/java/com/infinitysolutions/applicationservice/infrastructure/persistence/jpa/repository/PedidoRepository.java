@@ -105,6 +105,8 @@ public interface PedidoRepository extends JpaRepository<PedidoEntity, Integer> {
     List<Object[]> findEquipamentosPopulares(@Param("dataInicio") LocalDateTime dataInicio, 
                                              @Param("limite") int limite);
 
+    @Query(value = "SELECT p FROM PedidoEntity p LEFT JOIN FETCH p.usuarioEntity",
+           countQuery = "SELECT COUNT(p) FROM PedidoEntity p")
     Page<PedidoEntity> findAllWithUsuarioEntity(Pageable pageable);
 
     Page<PedidoEntity> findByUsuarioEntityId(UUID usuarioId, Pageable pageable);

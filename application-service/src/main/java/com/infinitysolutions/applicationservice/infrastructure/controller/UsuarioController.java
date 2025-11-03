@@ -14,6 +14,7 @@ import com.infinitysolutions.applicationservice.core.usecases.usuario.pessoafisi
 import com.infinitysolutions.applicationservice.core.usecases.usuario.pessoajuridica.AtualizarPessoaJuridicaInput;
 import com.infinitysolutions.applicationservice.core.usecases.usuario.pessoajuridica.CriarPJInput;
 import com.infinitysolutions.applicationservice.core.usecases.usuario.pessoajuridica.VerificarCnpj;
+import com.infinitysolutions.applicationservice.core.valueobject.PageResult;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.endereco.EnderecoDTO;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.pessoa.fisica.PessoaFisicaCadastroDTO;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.pessoa.juridica.PessoaJuridicaCadastroDTO;
@@ -115,20 +116,30 @@ public class UsuarioController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     @Operation(
-        summary = "Listar todos os usuários",
-        description = "Retorna uma lista de todos os usuários cadastrados no sistema"
+            summary = "Listar todos os usuários (paginado)",
+            description = "Retorna uma lista paginada de usuários cadastrados no sistema"
     )
-    public List<UsuarioRespostaCadastroDTO> listarTodos() {
-        List<Usuario> usuariosEncontrados = listarTodosUsuariosCase.execute();
+    public PageResult<UsuarioRespostaCadastroDTO> listarTodos(
+            @RequestParam(defaultValue = "0") int offset,
+            @RequestParam(defaultValue = "10") int limit
+    ) {
+        var paginaUsuarios = listarTodosUsuariosCase.execute(offset, limit);
 
-        List<UsuarioRespostaCadastroDTO> usuarioResposta = new ArrayList<>();
-        for(int i = 0; i < usuariosEncontrados.size(); i++) {
-            Credencial identificacao = buscarCredencialPorIdCase.execute(usuariosEncontrados.get(i).getId());
-            usuarioResposta.add(usuarioEntityMapper.toUsuarioRespostaCadastroDTO(usuariosEncontrados.get(i), identificacao));
-        }
+        List<UsuarioRespostaCadastroDTO> usuarioResposta = paginaUsuarios.getContent().stream()
+                .map(usuario -> {
+                    var credencial = buscarCredencialPorIdCase.execute(usuario.getId());
+                    return usuarioEntityMapper.toUsuarioRespostaCadastroDTO(usuario, credencial);
+                })
+                .toList();
 
-        return usuarioResposta;
+        return new PageResult<>(
+                usuarioResposta,
+                paginaUsuarios.getTotalElements(),
+                paginaUsuarios.getOffset(),
+                paginaUsuarios.getLimit()
+        );
     }
+
 
     @PutMapping("/promover/{usuarioId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)

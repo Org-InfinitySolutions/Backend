@@ -2,9 +2,14 @@ package com.infinitysolutions.applicationservice.infrastructure.gateway.usuario;
 
 import com.infinitysolutions.applicationservice.core.domain.usuario.Usuario;
 import com.infinitysolutions.applicationservice.core.gateway.UsuarioGateway;
+import com.infinitysolutions.applicationservice.core.valueobject.PageResult;
 import com.infinitysolutions.applicationservice.infrastructure.mapper.UsuarioEntityMapper;
+import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.entity.UsuarioEntity;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -24,8 +29,16 @@ public class UsuarioGatewayImpl implements UsuarioGateway {
     }
 
     @Override
-    public List<Usuario> findAll() {
-        return repository.findAllByIsAtivoTrue().stream().map(usuarioMapper::toDomain).toList();
-    }
+    public PageResult<Usuario> findAll(int offset, int limit) {
+        int page = offset / limit;
+        Pageable pageable = PageRequest.of(page, limit);
+        Page<UsuarioEntity> pageResult = repository.findAllByIsAtivoTrue(pageable);
 
+        List<Usuario> usuarios = pageResult.getContent()
+                .stream()
+                .map(usuarioMapper::toDomain)
+                .toList();
+
+        return new PageResult<>(usuarios, pageResult.getTotalElements(), offset, limit);
+    }
 }
