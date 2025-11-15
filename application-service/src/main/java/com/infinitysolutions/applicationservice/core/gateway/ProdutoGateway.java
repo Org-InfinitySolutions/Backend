@@ -1,6 +1,7 @@
 package com.infinitysolutions.applicationservice.core.gateway;
 
 import com.infinitysolutions.applicationservice.core.domain.produto.Produto;
+import com.infinitysolutions.applicationservice.core.valueobject.PageResult;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,4 +14,6 @@ public interface ProdutoGateway {
     Produto update(Produto produtoEncontrado);
     void remove(Integer produtoId);
     Set<Produto> findAllByIds(Set<Integer> ids);
+
+    PageResult<Produto> findAllPaginated(boolean isAdmin, int offset, int limit);
 }

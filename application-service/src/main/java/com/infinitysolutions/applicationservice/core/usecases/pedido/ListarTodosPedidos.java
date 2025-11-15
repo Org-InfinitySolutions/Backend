@@ -1,10 +1,9 @@
 package com.infinitysolutions.applicationservice.core.usecases.pedido;
 
-
 import com.infinitysolutions.applicationservice.core.domain.pedido.Pedido;
 import com.infinitysolutions.applicationservice.core.gateway.PedidoGateway;
+import com.infinitysolutions.applicationservice.core.valueobject.PageResult;
 
-import java.util.List;
 import java.util.UUID;
 
 public class ListarTodosPedidos {
@@ -15,7 +14,7 @@ public class ListarTodosPedidos {
         this.pedidoGateway = pedidoGateway;
     }
 
-    public List<Pedido> execute(boolean admin, UUID uuid) {
-        return pedidoGateway.findAll(uuid, admin);
+    public PageResult<Pedido> execute(boolean admin, UUID usuarioId, int offset, int limit, String sort) {
+        return pedidoGateway.findAll(usuarioId, admin, offset, limit, sort);
     }
 }

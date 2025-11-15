@@ -3,6 +3,7 @@ package com.infinitysolutions.applicationservice.infrastructure.gateway.produto;
 import com.infinitysolutions.applicationservice.core.domain.produto.Produto;
 import com.infinitysolutions.applicationservice.core.exception.RecursoNaoEncontradoException;
 import com.infinitysolutions.applicationservice.core.gateway.ProdutoGateway;
+import com.infinitysolutions.applicationservice.core.valueobject.PageResult;
 import com.infinitysolutions.applicationservice.infrastructure.mapper.produto.ProdutoEntityMapper;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.entity.produto.CategoriaEntity;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.entity.produto.ProdutoEntity;
@@ -13,6 +14,9 @@ import com.infinitysolutions.applicationservice.infrastructure.exception.Entidad
 import com.infinitysolutions.applicationservice.infrastructure.exception.VinculoExistenteException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -36,14 +40,32 @@ public class ProdutoGatewayImpl implements ProdutoGateway {
     }
 
     @Override
-    public List<Produto> findAll(boolean isAdmin) {
+    public PageResult<Produto> findAllPaginated(boolean isAdmin, int offset, int limit) {
+        Pageable pageable = PageRequest.of(offset / limit, limit);
+        Page<ProdutoEntity> page;
+
         if (isAdmin) {
-            return produtoRepository.findAll()
-                    .stream().map(ProdutoEntityMapper::toDomain).toList();
+            page = produtoRepository.findAll(pageable);
+        } else {
+            page = produtoRepository.findAllByIsAtivoTrue(pageable);
         }
 
-        return produtoRepository.findAllByIsAtivoTrue()
-                .stream().map(ProdutoEntityMapper::toDomain).toList();
+        List<Produto> produtos = page.getContent()
+                .stream()
+                .map(ProdutoEntityMapper::toDomain)
+                .toList();
+
+        return new PageResult<>(produtos, page.getTotalElements(), offset, limit);
+    }
+
+    @Override
+    public List<Produto> findAll(boolean isAdmin) {
+        List<ProdutoEntity> entities = isAdmin
+            ? produtoRepository.findAll()
+            : produtoRepository.findAllByIsAtivoTrue();
+        return entities.stream()
+                .map(ProdutoEntityMapper::toDomain)
+                .toList();
     }
 
     @Override
@@ -72,7 +94,6 @@ public class ProdutoGatewayImpl implements ProdutoGateway {
             throw new EntidadeNaoEncontradaException("Produto não encontrado com o id: " + produtoId);
         }
 
-        // Verificar se o produto está vinculado a algum pedido
         if (produtoPedidoRepository.existsByProdutoEntityId(produtoId)) {
             log.warn("Tentativa de exclusão do produto {} que está vinculado a pedidos", produtoId);
             throw VinculoExistenteException.produtoVinculadoAPedidos(produtoId);
