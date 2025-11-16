@@ -6,6 +6,7 @@ import com.infinitysolutions.applicationservice.core.domain.usuario.*;
 import com.infinitysolutions.applicationservice.core.domain.valueobject.NomeCargo;
 import com.infinitysolutions.applicationservice.core.domain.valueobject.TipoUsuario;
 import com.infinitysolutions.applicationservice.core.exception.EstrategiaNaoEncontradaException;
+import com.infinitysolutions.applicationservice.core.usecases.cargo.ObterCargo;
 import com.infinitysolutions.applicationservice.core.usecases.endereco.EnderecoInput;
 import com.infinitysolutions.applicationservice.core.usecases.usuario.AtualizarUsuarioInput;
 import com.infinitysolutions.applicationservice.core.usecases.usuario.pessoafisica.AtualizarPessoaFisicaInput;
@@ -126,10 +127,13 @@ public class UsuarioEntityMapper {
 
         if (cargos.stream().anyMatch(cargo -> cargo.getNome().equals(NomeCargo.FUNCIONARIO))) {
             response = toFuncionarioRespostaCadastroDTO((PessoaFisica) usuario, identificacao);
+            response.setCargo(NomeCargo.FUNCIONARIO);
         } else if (cargos.stream().anyMatch(cargo -> cargo.getNome().equals(NomeCargo.USUARIO_PF))) {
             response = toPessoaFisicaRespostaCadastroDTO((PessoaFisica) usuario, identificacao);
+            response.setCargo(NomeCargo.USUARIO_PF);
         } else {
             response = toPessoaJuridicaRespostaCadastroDTO((PessoaJuridica) usuario, identificacao);
+            response.setCargo(NomeCargo.USUARIO_PJ);
         }
 
         return response;

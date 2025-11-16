@@ -3,6 +3,9 @@ package com.infinitysolutions.applicationservice.infrastructure.persistence.dto.
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.infinitysolutions.applicationservice.core.domain.usuario.Cargo;
+import com.infinitysolutions.applicationservice.core.domain.valueobject.NomeCargo;
+import com.infinitysolutions.applicationservice.core.domain.valueobject.TipoUsuario;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.endereco.EnderecoResumidoDTO;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.pessoa.fisica.FuncRespostaCadastroDTO;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.pessoa.fisica.PFRespostaCadastroDTO;
@@ -30,6 +33,8 @@ public abstract class UsuarioRespostaCadastroDTO {
     private UUID id;
 
     private String nome;
+
+    private NomeCargo cargo;
 
     @JsonProperty("telefone_celular")
     private String telefone;

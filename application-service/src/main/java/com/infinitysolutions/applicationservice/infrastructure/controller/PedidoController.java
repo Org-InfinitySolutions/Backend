@@ -115,7 +115,7 @@ public class PedidoController {
             @RequestParam(defaultValue = "10") int limit,
             @RequestParam(defaultValue = "id,desc") String sort
     ) {
-        boolean isAdmin = authUtil.isAdmin(auth);
+        boolean isAdmin = authUtil.isAdminOrEmployee(auth);
         UUID usuarioId = UUID.fromString(auth.getName());
 
         PageResult<Pedido> pagePedidos = listarTodosPedidos.execute(isAdmin, usuarioId, offset, limit, sort);
