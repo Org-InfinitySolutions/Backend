@@ -8,6 +8,7 @@ import com.infinitysolutions.applicationservice.core.domain.usuario.Usuario;
 import com.infinitysolutions.applicationservice.core.domain.valueobject.SituacaoPedido;
 import com.infinitysolutions.applicationservice.core.domain.valueobject.TipoPedido;
 import com.infinitysolutions.applicationservice.core.usecases.pedido.CadastrarPedidoInput;
+import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.endereco.EnderecoDTO;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.entity.ArquivoMetadadosEntity;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.entity.EnderecoEntity;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.jpa.entity.PedidoEntity;
@@ -129,7 +130,7 @@ public class PedidoMapper {
         dto.setId(pedidoEntity.getId());
         dto.setUsuario(usuarioRespostaDTO);
         dto.setProdutos(pedidoEntity.getProdutosPedido().stream().map(ProdutoEntityMapper::toProdutoPedidoRespostaDTO).toList());
-        dto.setEndereco(new EnderecoResumidoDTO(pedidoEntity.getEnderecoEntity().getCep(), pedidoEntity.getEnderecoEntity().getLogradouro(), pedidoEntity.getEnderecoEntity().getNumero(), pedidoEntity.getEnderecoEntity().getCidade(), pedidoEntity.getEnderecoEntity().getEstado()));
+        dto.setEndereco(new EnderecoDTO(pedidoEntity.getEnderecoEntity().getCep(), pedidoEntity.getEnderecoEntity().getLogradouro(), pedidoEntity.getEnderecoEntity().getBairro(), pedidoEntity.getEnderecoEntity().getNumero(), pedidoEntity.getEnderecoEntity().getCidade(), pedidoEntity.getEnderecoEntity().getEstado(), pedidoEntity.getEnderecoEntity().getComplemento()));
         dto.setQtdItens(pedidoEntity.getQtdItens());
         dto.setDataCriacao(pedidoEntity.getDataCriacao());
         dto.setDataEntrega(pedidoEntity.getDataEntrega());
@@ -146,7 +147,7 @@ public class PedidoMapper {
         dto.setId(pedidoEntity.getId());
         dto.setUsuario(usuarioRespostaDTO);
         dto.setProdutos(pedidoEntity.getProdutosPedido().stream().map(ProdutoEntityMapper::toProdutoPedidoRespostaDTO).toList());
-        dto.setEndereco(new EnderecoResumidoDTO(pedidoEntity.getEndereco().getCep(), pedidoEntity.getEndereco().getLogradouro(), pedidoEntity.getEndereco().getNumero(), pedidoEntity.getEndereco().getCidade(), pedidoEntity.getEndereco().getEstado()));
+        dto.setEndereco(new EnderecoDTO(pedidoEntity.getEndereco().getCep(), pedidoEntity.getEndereco().getLogradouro(), pedidoEntity.getEndereco().getBairro(), pedidoEntity.getEndereco().getNumero(), pedidoEntity.getEndereco().getCidade(), pedidoEntity.getEndereco().getEstado(), pedidoEntity.getEndereco().getComplemento()));
         dto.setQtdItens(pedidoEntity.getQtdItens());
         dto.setDataCriacao(pedidoEntity.getDataCriacao());
         dto.setDataEntrega(pedidoEntity.getDataEntrega());
