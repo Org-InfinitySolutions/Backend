@@ -1,6 +1,5 @@
 package com.infinitysolutions.applicationservice.infrastructure.persistence.dto.pessoa.fisica;
 
-import com.infinitysolutions.applicationservice.core.domain.valueobject.TipoUsuario;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.endereco.EnderecoResumidoDTO;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.usuario.UsuarioRespostaCadastroDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
