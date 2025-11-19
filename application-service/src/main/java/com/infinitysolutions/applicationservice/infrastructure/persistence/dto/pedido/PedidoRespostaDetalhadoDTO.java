@@ -1,6 +1,7 @@
 package com.infinitysolutions.applicationservice.infrastructure.persistence.dto.pedido;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.endereco.EnderecoDTO;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.endereco.EnderecoResumidoDTO;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.produto.ProdutoPedidoRespostaDTO;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.usuario.UsuarioRespostaDTO;
@@ -33,7 +34,7 @@ public class PedidoRespostaDetalhadoDTO {
 
     private List<ProdutoPedidoRespostaDTO> produtos;
 
-    private EnderecoResumidoDTO endereco;
+    private EnderecoDTO endereco;
 
     @Schema(
         description = "Quantidade total de itens no pedido",
