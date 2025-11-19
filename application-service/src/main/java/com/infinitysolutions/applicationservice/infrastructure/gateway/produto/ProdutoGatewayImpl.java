@@ -41,7 +41,8 @@ public class ProdutoGatewayImpl implements ProdutoGateway {
 
     @Override
     public PageResult<Produto> findAllPaginated(boolean isAdmin, int offset, int limit) {
-        Pageable pageable = PageRequest.of(offset / limit, limit);
+        // offset é o número da página (0, 1, 2, 3...)
+        Pageable pageable = PageRequest.of(offset, limit);
         Page<ProdutoEntity> page;
 
         if (isAdmin) {

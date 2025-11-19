@@ -23,7 +23,6 @@ services:
       SPRING_PROFILES_ACTIVE: development
     depends_on:
       - db_service
-      - localstack
     networks:
       - novalocacoes-network
     restart: unless-stopped
@@ -33,6 +32,14 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
+  rabbitmq:
+    image: 'rabbitmq:3.13-management'
+    environment:
+      - 'RABBITMQ_DEFAULT_PASS=secret'
+      - 'RABBITMQ_DEFAULT_USER=myuser'
+    ports:
+      - '5672:5672'
+      - '15672:15672'
   db_service:
     image: mysql:8.0
     container_name: novalocacoes-db

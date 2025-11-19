@@ -30,8 +30,8 @@ public class UsuarioGatewayImpl implements UsuarioGateway {
 
     @Override
     public PageResult<Usuario> findAll(int offset, int limit) {
-        int page = offset / limit;
-        Pageable pageable = PageRequest.of(page, limit);
+        // offset é o número da página (0, 1, 2, 3...)
+        Pageable pageable = PageRequest.of(offset, limit);
         Page<UsuarioEntity> pageResult = repository.findAllByIsAtivoTrue(pageable);
 
         List<Usuario> usuarios = pageResult.getContent()

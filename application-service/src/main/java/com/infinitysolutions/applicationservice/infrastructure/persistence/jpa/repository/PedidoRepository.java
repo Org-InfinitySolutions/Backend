@@ -110,4 +110,35 @@ public interface PedidoRepository extends JpaRepository<PedidoEntity, Integer> {
     Page<PedidoEntity> findAllWithUsuarioEntity(Pageable pageable);
 
     Page<PedidoEntity> findByUsuarioEntityId(UUID usuarioId, Pageable pageable);
+
+
+    // Queries para relatório mensal
+
+    /**
+     * Conta o total de pedidos criados em um período específico
+     */
+    @Query("SELECT COUNT(p) FROM PedidoEntity p WHERE p.dataCriacao BETWEEN :dataInicio AND :dataFim")
+    Long countPedidosByPeriodo(@Param("dataInicio") LocalDateTime dataInicio, @Param("dataFim") LocalDateTime dataFim);
+
+    /**
+     * Conta pedidos por situação em um período específico
+     */
+    @Query("SELECT COUNT(p) FROM PedidoEntity p WHERE p.dataCriacao BETWEEN :dataInicio AND :dataFim AND p.situacao = :situacao")
+    Long countPedidosBySituacaoAndPeriodo(@Param("dataInicio") LocalDateTime dataInicio,
+                                          @Param("dataFim") LocalDateTime dataFim,
+                                          @Param("situacao") com.infinitysolutions.applicationservice.core.domain.valueobject.SituacaoPedido situacao);
+
+    /**
+     * Conta pedidos por tipo em um período específico
+     */
+    @Query("SELECT COUNT(p) FROM PedidoEntity p WHERE p.dataCriacao BETWEEN :dataInicio AND :dataFim AND p.tipo = :tipo")
+    Long countPedidosByTipoAndPeriodo(@Param("dataInicio") LocalDateTime dataInicio,
+                                      @Param("dataFim") LocalDateTime dataFim,
+                                      @Param("tipo") com.infinitysolutions.applicationservice.core.domain.valueobject.TipoPedido tipo);
+
+    /**
+     * Conta o total de itens locados em um período específico (soma das quantidades dos produtos nos pedidos)
+     */
+    @Query("SELECT COALESCE(SUM(pp.qtd), 0) FROM PedidoEntity p JOIN p.produtosPedido pp WHERE p.dataCriacao BETWEEN :dataInicio AND :dataFim")
+    Long countTotalItensLocadosByPeriodo(@Param("dataInicio") LocalDateTime dataInicio, @Param("dataFim") LocalDateTime dataFim);
 }

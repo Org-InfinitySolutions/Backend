@@ -49,9 +49,9 @@ public class ProdutoController {
                    "Usuários não autenticados veem apenas produtos ativos; funcionários e administradores veem todos."
    )
    public PageResult<ProdutoRespostaDTO> listarTodosProdutos(
-           @Parameter(description = "Offset inicial para paginação", example = "0")
+           @Parameter(description = "Número da página (começa em 0)", example = "0")
            @RequestParam(defaultValue = "0") int offset,
-           @Parameter(description = "Limite máximo de registros por página", example = "10")
+           @Parameter(description = "Quantidade de itens por página", example = "10")
            @RequestParam(defaultValue = "10") int limit,
            @Parameter(description = "Informações de autenticação do usuário", hidden = true)
            Authentication authentication) {

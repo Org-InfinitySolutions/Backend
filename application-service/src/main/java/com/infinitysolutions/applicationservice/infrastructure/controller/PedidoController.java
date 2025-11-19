@@ -106,13 +106,16 @@ public class PedidoController {
     @ResponseStatus(HttpStatus.OK)
     @Operation(
             summary = "Listar pedidos do sistema",
-            description = "Retorna uma lista com todos os pedidos registrados com suporte a paginação offset/limit. " +
+            description = "Retorna uma lista com todos os pedidos registrados com suporte a paginação. " +
                     "As informações variam conforme o perfil do usuário (comum ou administrador)."
     )
     public PageResult<PedidoRespostaDTO> listar(
             Authentication auth,
+            @Parameter(description = "Número da página (começa em 0)", example = "0")
             @RequestParam(defaultValue = "0") int offset,
+            @Parameter(description = "Quantidade de itens por página", example = "10")
             @RequestParam(defaultValue = "10") int limit,
+            @Parameter(description = "Ordenação (campo,direção)", example = "id,desc")
             @RequestParam(defaultValue = "id,desc") String sort
     ) {
         boolean isAdmin = authUtil.isAdmin(auth);

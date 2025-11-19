@@ -15,6 +15,7 @@ import com.infinitysolutions.applicationservice.core.usecases.usuario.pessoajuri
 import com.infinitysolutions.applicationservice.core.usecases.usuario.pessoajuridica.CriarPJInput;
 import com.infinitysolutions.applicationservice.core.usecases.usuario.pessoajuridica.VerificarCnpj;
 import com.infinitysolutions.applicationservice.core.valueobject.PageResult;
+import com.infinitysolutions.applicationservice.infrastructure.config.rabbit.RelatorioSender;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.endereco.EnderecoDTO;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.pessoa.fisica.PessoaFisicaCadastroDTO;
 import com.infinitysolutions.applicationservice.infrastructure.persistence.dto.pessoa.juridica.PessoaJuridicaCadastroDTO;
@@ -26,6 +27,7 @@ import com.infinitysolutions.applicationservice.infrastructure.mapper.UsuarioEnt
 import com.infinitysolutions.applicationservice.core.usecases.usuario.RespostaVerificacao;
 import com.infinitysolutions.applicationservice.infrastructure.utils.AuthenticationUtils;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -120,7 +122,9 @@ public class UsuarioController {
             description = "Retorna uma lista paginada de usuários cadastrados no sistema"
     )
     public PageResult<UsuarioRespostaCadastroDTO> listarTodos(
+            @Parameter(description = "Número da página (começa em 0)", example = "0")
             @RequestParam(defaultValue = "0") int offset,
+            @Parameter(description = "Quantidade de itens por página", example = "10")
             @RequestParam(defaultValue = "10") int limit
     ) {
         var paginaUsuarios = listarTodosUsuariosCase.execute(offset, limit);

@@ -200,8 +200,9 @@ public class PedidoGatewayImpl implements PedidoGateway {
         org.springframework.data.domain.Sort.Direction direction =
                 sortParts[1].equalsIgnoreCase("desc") ? org.springframework.data.domain.Sort.Direction.DESC : org.springframework.data.domain.Sort.Direction.ASC;
 
+        // offset é o número da página (0, 1, 2, 3...)
         org.springframework.data.domain.Pageable pageable =
-                org.springframework.data.domain.PageRequest.of(offset / limit, limit, direction, sortParts[0]);
+                org.springframework.data.domain.PageRequest.of(offset, limit, direction, sortParts[0]);
 
         org.springframework.data.domain.Page<PedidoEntity> pageEntities;
 
